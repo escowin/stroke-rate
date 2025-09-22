@@ -11,8 +11,10 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 #### 1. Device Discovery & Connection
 - **Bluetooth LE Discovery**: Automatically scan for and identify nearby heart rate monitors
 - **Multi-Device Support**: Connect to up to 4 heart rate devices simultaneously
+- **SpeedCoach Conflict Detection**: Identify when heart rate monitors are already connected to SpeedCoach devices
 - **Connection Management**: Maintain stable connections with automatic reconnection capabilities
 - **Device Identification**: Display device names, battery levels, and connection status
+- **Connection Priority System**: Handle conflicts between app and SpeedCoach connections
 
 #### 2. Rower Assignment & Management
 - **Seat Assignment**: Map each heart rate device to specific rower positions (Bow, 2-seat, 3-seat, 4-seat)
@@ -49,6 +51,8 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 - **Web Bluetooth API**: Native browser support for BLE devices
 - **Heart Rate Service**: Standard GATT service implementation
 - **Connection Pooling**: Efficient management of multiple device connections
+- **SpeedCoach Conflict Resolution**: Detect and manage existing SpeedCoach connections
+- **Connection State Monitoring**: Track all active Bluetooth connections and their destinations
 - **Error Handling**: Robust connection failure recovery
 
 #### 3. Data Management
@@ -85,18 +89,23 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 - [ ] PWA setup with service worker and manifest
 - [ ] Basic UI framework with responsive design
 - [ ] Bluetooth LE device discovery implementation
+- [ ] SpeedCoach connection conflict detection system
 - [ ] Single heart rate device connection and data display
 - [ ] GitHub Pages deployment pipeline
 
 #### Technical Tasks:
-- Set up React/Vue.js or vanilla JS PWA structure
-- Implement Web Bluetooth API integration
-- Create basic heart rate data visualization
-- Design and implement core UI components
+- Set up React 18 + TypeScript PWA structure with Vite
+- Implement Web Bluetooth API integration with custom React hooks
+- Add SpeedCoach connection conflict detection and management
+- Create connection conflict resolution UI with user choice interface
+- Create basic heart rate data visualization with Recharts
+- Design and implement core UI components with Tailwind CSS
 - Set up automated deployment to GitHub Pages
 
 #### Success Criteria:
 - App installs as PWA on mobile device
+- Successfully detects existing SpeedCoach connections
+- Provides clear conflict resolution interface
 - Successfully connects to one heart rate monitor
 - Displays real-time heart rate data
 - Maintains connection during 30+ minute session
@@ -111,11 +120,11 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 - [ ] Connection status monitoring and error handling
 
 #### Technical Tasks:
-- Implement connection pool management
-- Create device assignment workflow
-- Design multi-rower dashboard layout
-- Add connection health monitoring
-- Implement automatic reconnection logic
+- Implement connection pool management with Zustand state management
+- Create device assignment workflow with React forms
+- Design multi-rower dashboard layout with responsive Tailwind CSS
+- Add connection health monitoring with custom React hooks
+- Implement automatic reconnection logic with Web Bluetooth API
 
 #### Success Criteria:
 - Connects to 4 heart rate devices simultaneously
@@ -133,11 +142,11 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 - [ ] Alert system for heart rate anomalies
 
 #### Technical Tasks:
-- Implement heart rate zone algorithms
-- Create time-series data storage and retrieval
-- Design trend visualization components
-- Add notification system for alerts
-- Implement session data persistence
+- Implement heart rate zone algorithms with TypeScript type safety
+- Create time-series data storage and retrieval with IndexedDB (idb library)
+- Design trend visualization components with Recharts
+- Add notification system for alerts using Web Notifications API
+- Implement session data persistence with React state management
 
 #### Success Criteria:
 - Accurate heart rate zone classification
@@ -155,11 +164,11 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 - [ ] Data export functionality
 
 #### Technical Tasks:
-- Create workout template system
-- Implement session analytics algorithms
-- Design progress tracking interface
-- Add data export capabilities (CSV, JSON)
-- Create historical data visualization
+- Create workout template system with React components and TypeScript interfaces
+- Implement session analytics algorithms with mathematical libraries
+- Design progress tracking interface with Recharts visualizations
+- Add data export capabilities (CSV, JSON) using browser APIs
+- Create historical data visualization with responsive React components
 
 #### Success Criteria:
 - Multiple workout templates available
@@ -177,11 +186,11 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 - [ ] Beta testing with real rowing sessions
 
 #### Technical Tasks:
-- Performance profiling and optimization
-- Cross-device compatibility testing
-- User interface refinements
-- Create user documentation
-- Conduct real-world testing sessions
+- Performance profiling and optimization with React DevTools and Lighthouse
+- Cross-device compatibility testing (iOS Safari, Android Chrome)
+- User interface refinements with Tailwind CSS and accessibility improvements
+- Create user documentation with React-based help system
+- Conduct real-world testing sessions with actual rowing crews
 
 #### Success Criteria:
 - App performs smoothly on target devices
@@ -192,16 +201,18 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 ## Technical Architecture
 
 ### Frontend Stack
-- **Framework**: React with TypeScript (or Vue.js)
+- **Framework**: React 18 + TypeScript 5.x
+- **Build Tool**: Vite (optimized for PWA and performance)
+- **State Management**: Zustand (lightweight, perfect for this scope)
 - **PWA**: Workbox for service worker management
-- **Bluetooth**: Web Bluetooth API
-- **Storage**: IndexedDB for local data persistence
-- **Styling**: Tailwind CSS or Material-UI
-- **Charts**: Chart.js or D3.js for data visualization
+- **Bluetooth**: Web Bluetooth API with custom React hooks
+- **Storage**: IndexedDB via idb library (better TypeScript support)
+- **Styling**: Tailwind CSS + Headless UI (mobile-first, accessible)
+- **Charts**: Recharts (React-native, lightweight for heart rate trends)
 
 ### Development Tools
-- **Build**: Vite or Create React App
-- **Testing**: Jest + React Testing Library
+- **Build**: Vite (faster builds, better PWA support than CRA)
+- **Testing**: Vitest + React Testing Library + MSW (mock Bluetooth API)
 - **Linting**: ESLint + Prettier
 - **Deployment**: GitHub Actions for automated deployment
 - **Version Control**: Git with conventional commits
@@ -211,10 +222,51 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 - **Minimum**: Chrome 56+, Safari 11+, Edge 79+
 - **Features**: Web Bluetooth API support required
 
+## Connection Conflict Management
+
+### SpeedCoach Integration Challenge
+Based on the [SpeedCoach GPS documentation](https://nksports.com/mwdownloads/download/link/id/144), heart rate monitors (Garmin HRM-Dual, WHOOP bands) typically connect to individual SpeedCoach devices during practice. This creates a **critical Bluetooth connection conflict** since most heart rate monitors can only maintain one active connection at a time.
+
+### Conflict Resolution Strategy
+
+#### **Primary Approach: App Priority with User Choice**
+- **Detection**: App scans for heart rate devices and identifies existing SpeedCoach connections
+- **User Interface**: Clear warning dialog when conflicts are detected
+- **User Choice**: Allow coxswain to choose whether to disconnect from SpeedCoach
+- **Graceful Handling**: Provide options to reconnect to SpeedCoach after session
+
+#### **User Workflow for Connection Conflicts**
+```
+1. Coxswain opens app
+2. App scans for heart rate devices
+3. App detects existing SpeedCoach connections
+4. App shows connection conflict warning:
+   "3 heart rate monitors are connected to SpeedCoach devices.
+   To use this app, you'll need to disconnect them from SpeedCoach.
+   Continue? [Yes] [No]"
+5. If Yes: App disconnects from SpeedCoach and connects to app
+6. If No: App shows limited functionality or alternative options
+7. After session: Option to restore SpeedCoach connections
+```
+
+#### **Technical Implementation**
+- **Connection State Monitoring**: Track all active Bluetooth connections and their destinations
+- **Conflict Detection**: Identify when heart rate monitors are connected to other devices
+- **User Interface**: Clear conflict resolution dialogs with connection status display
+- **Connection Management**: Safely disconnect from SpeedCoach and establish app connections
+- **Reconnection Options**: Provide way to restore SpeedCoach connections post-session
+
+### **Advantages of This Approach**
+- **Centralized Monitoring**: Coxswain gets unified view of all 4 rowers' heart rate data
+- **Enhanced Functionality**: App provides features SpeedCoach cannot (multi-device monitoring)
+- **User Control**: Coxswain decides connection priority based on training needs
+- **Flexibility**: Can switch between SpeedCoach and app usage as needed
+
 ## Risk Mitigation
 
 ### Technical Risks
 - **Bluetooth Stability**: Implement robust reconnection logic and connection monitoring
+- **SpeedCoach Conflicts**: Handle existing connections gracefully with user choice
 - **Browser Compatibility**: Progressive enhancement with fallback options
 - **Performance**: Optimize for mobile devices with limited resources
 - **Data Loss**: Implement comprehensive local storage with backup mechanisms
@@ -241,12 +293,13 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 ## Future Enhancements
 
 ### Phase 6+ Potential Features
+- **ANT+ Integration**: Support ANT+ protocol for simultaneous connections with SpeedCoach
 - **GPS Integration**: Track boat speed and correlate with heart rate data
 - **Stroke Rate Monitoring**: Integrate with boat sensors for comprehensive analysis
 - **Team Management**: Multi-boat support for larger rowing programs
 - **Cloud Sync**: Optional cloud backup and team sharing
 - **Advanced Analytics**: Machine learning insights for performance optimization
-- **Integration**: Connect with existing rowing apps and training platforms
+- **SpeedCoach Integration**: Direct data sharing with SpeedCoach devices when possible
 
 ---
 
