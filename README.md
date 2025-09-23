@@ -147,8 +147,8 @@ The app is automatically deployed to GitHub Pages on every push to the main bran
 
 ### 🛠️ Browser Compatibility
 
-- **Primary**: Chrome/Edge (Android), Safari (iOS)
-- **Minimum**: Chrome 56+, Safari 11+, Edge 79+
+- **Primary**: Chrome/Edge (Android)
+- **Minimum**: Chrome 56+, Edge 79+
 - **Features**: Web Bluetooth API support required
 
 ### 📝 License
@@ -165,7 +165,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### 📞 Support
 
-For support, please open an issue in the GitHub repository or contact the development team.
+For support, please open an issue in the GitHub repository or contact me [Edwin Escobar](https://github.com/escowin).
 
 ---
 

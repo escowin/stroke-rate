@@ -24,7 +24,9 @@ export const DeviceSetup = () => {
     scanForDevices, 
     connectToDevice, 
     disconnectFromDevice, 
-    isScanning 
+    isScanning,
+    clearKnownDevices,
+    getKnownDevices
   } = useBluetooth();
   
   const [newRowerName, setNewRowerName] = useState('');
@@ -131,6 +133,24 @@ export const DeviceSetup = () => {
                 </button>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Debug Information */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <h4 className="text-sm font-medium text-blue-800 mb-2">Debug Information</h4>
+            <div className="text-xs text-blue-700 space-y-1">
+              <p>Known Devices: {getKnownDevices().length}</p>
+              <p>Conflicts Detected: {connectionStatus.conflicts.length}</p>
+              <p>Has SpeedCoach Conflicts: {connectionStatus.hasSpeedCoachConflicts ? 'Yes' : 'No'}</p>
+              <button
+                onClick={clearKnownDevices}
+                className="mt-2 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Clear Known Devices
+              </button>
+            </div>
           </div>
         )}
 

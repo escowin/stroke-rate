@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'Coxswain Heart Rate Monitor',
-        short_name: 'Coxswain HR',
-        description: 'Real-time heart rate monitoring for rowing coxswains',
+        name: 'Stroke Rate - Rowing Heart Rates',
+        short_name: 'StrokeRate',
+        description: 'Real-time heart rate monitoring data for coxswains',
         theme_color: '#3b82f6',
         background_color: '#ffffff',
         display: 'standalone',

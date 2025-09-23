@@ -40,6 +40,14 @@ export const useBluetooth = () => {
       // Check for SpeedCoach conflicts
       const conflicts = await bluetoothService.checkSpeedCoachConflicts(devices);
       
+      // Debug logging
+      console.log('Scan results:', {
+        devicesFound: devices.length,
+        conflictsDetected: conflicts.length,
+        knownDevices: bluetoothService.getKnownDevices().length,
+        conflicts: conflicts
+      });
+      
       setConnectionStatus({
         availableDevices: devices,
         hasSpeedCoachConflicts: conflicts.length > 0,
@@ -130,6 +138,17 @@ export const useBluetooth = () => {
     setStoreError(undefined);
   }, [setStoreError]);
 
+  // Clear known devices (for testing)
+  const clearKnownDevices = useCallback(() => {
+    bluetoothService.clearKnownDevices();
+    console.log('Cleared known devices for testing');
+  }, [bluetoothService]);
+
+  // Get known devices (for debugging)
+  const getKnownDevices = useCallback(() => {
+    return bluetoothService.getKnownDevices();
+  }, [bluetoothService]);
+
   return {
     isAvailable,
     isScanning,
@@ -139,6 +158,8 @@ export const useBluetooth = () => {
     disconnectFromDevice,
     getBatteryLevel,
     handleSpeedCoachConflicts,
-    clearError
+    clearError,
+    clearKnownDevices,
+    getKnownDevices
   };
 };

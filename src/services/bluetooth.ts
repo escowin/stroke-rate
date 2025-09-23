@@ -10,6 +10,8 @@ export class BluetoothService {
   private static instance: BluetoothService;
   private connectedDevices: Map<string, any> = new Map();
   private heartRateListeners: Map<string, (data: HeartRateData) => void> = new Map();
+  private knownDevices: Map<string, BluetoothDevice> = new Map();
+  private connectionAttempts: Map<string, number> = new Map();
 
   static getInstance(): BluetoothService {
     if (!BluetoothService.instance) {
@@ -70,7 +72,12 @@ export class BluetoothService {
         optionalServices: [HEART_RATE_SERVICE_UUID, BATTERY_SERVICE_UUID]
       });
 
-      devices.push(this.mapBluetoothDevice(device));
+      const mappedDevice = this.mapBluetoothDevice(device);
+      devices.push(mappedDevice);
+      
+      // Store known device for conflict detection
+      this.knownDevices.set(device.id, mappedDevice);
+      
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'SecurityError') {
@@ -91,6 +98,10 @@ export class BluetoothService {
   // Connect to a specific device
   async connectToDevice(deviceId: string): Promise<boolean> {
     try {
+      // Track connection attempts for conflict detection
+      const attempts = this.connectionAttempts.get(deviceId) || 0;
+      this.connectionAttempts.set(deviceId, attempts + 1);
+      
       // This is a simplified version - in a real implementation,
       // you'd need to store the BluetoothDevice object from the scan
       const device = await (navigator as any).bluetooth.requestDevice({
@@ -104,6 +115,10 @@ export class BluetoothService {
       }
 
       this.connectedDevices.set(deviceId, server);
+      
+      // Reset connection attempts on successful connection
+      this.connectionAttempts.delete(deviceId);
+      
       return true;
     } catch (error) {
       if (error instanceof Error) {
@@ -210,22 +225,61 @@ export class BluetoothService {
   // Check for SpeedCoach conflicts
   async checkSpeedCoachConflicts(devices: BluetoothDevice[]): Promise<SpeedCoachConflict[]> {
     const conflicts: SpeedCoachConflict[] = [];
+    const currentTime = Date.now();
     
-    // This is a simplified implementation
-    // In reality, you'd need to check the actual connection state
-    // and detect if devices are already connected to SpeedCoach
-    for (const device of devices) {
-      if (device.name.includes('HRM') || device.name.includes('Garmin')) {
+    // Check for devices that should be available but aren't showing up
+    // This indicates they might be connected to SpeedCoach
+    for (const [deviceId, knownDevice] of this.knownDevices) {
+      const isCurrentlyVisible = devices.some(d => d.id === deviceId);
+      const isHeartRateDevice = this.isHeartRateDevice(knownDevice.name);
+      const timeSinceLastSeen = currentTime - (knownDevice.lastSeen?.getTime() || 0);
+      
+      // If a known heart rate device is not visible and was seen recently,
+      // it's likely connected to SpeedCoach
+      if (isHeartRateDevice && !isCurrentlyVisible && timeSinceLastSeen < 300000) { // 5 minutes
         conflicts.push({
-          deviceId: device.id,
-          deviceName: device.name,
-          isConnectedToSpeedCoach: Math.random() > 0.5, // Mock detection
+          deviceId: knownDevice.id,
+          deviceName: knownDevice.name,
+          isConnectedToSpeedCoach: true,
           canDisconnect: true
         });
       }
     }
     
+    // Also check for devices that appear but might have connection issues
+    for (const device of devices) {
+      if (this.isHeartRateDevice(device.name)) {
+        const connectionAttempts = this.connectionAttempts.get(device.id) || 0;
+        
+        // If we've tried to connect multiple times and failed,
+        // it might be connected to SpeedCoach
+        if (connectionAttempts > 2) {
+          conflicts.push({
+            deviceId: device.id,
+            deviceName: device.name,
+            isConnectedToSpeedCoach: true,
+            canDisconnect: true
+          });
+        }
+      }
+    }
+    
     return conflicts;
+  }
+
+  // Helper method to identify heart rate devices
+  private isHeartRateDevice(deviceName: string): boolean {
+    const name = deviceName.toLowerCase();
+    return (
+      name.includes('hrm') ||
+      name.includes('garmin') ||
+      name.includes('polar') ||
+      name.includes('wahoo') ||
+      name.includes('whoop') ||
+      name.includes('heart') ||
+      name.includes('hr-') ||
+      name.includes('hr ')
+    );
   }
 
   // Parse heart rate data from characteristic value
@@ -262,6 +316,45 @@ export class BluetoothService {
       connected: false,
       lastSeen: new Date()
     };
+  }
+
+  // Handle SpeedCoach disconnection
+  async handleSpeedCoachDisconnection(conflicts: SpeedCoachConflict[]): Promise<boolean> {
+    try {
+      // In a real implementation, this would:
+      // 1. Attempt to connect to each conflicted device
+      // 2. If connection fails, it means the device is connected to SpeedCoach
+      // 3. We would need to implement a way to force disconnection
+      // For now, we'll simulate the process
+      
+      console.log('Handling SpeedCoach disconnection for conflicts:', conflicts);
+      
+      // Clear connection attempts for conflicted devices
+      for (const conflict of conflicts) {
+        this.connectionAttempts.delete(conflict.deviceId);
+      }
+      
+      // In a real implementation, you might:
+      // - Send a disconnect command to the device
+      // - Wait for the device to become available
+      // - Retry connection
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to handle SpeedCoach disconnection:', error);
+      return false;
+    }
+  }
+
+  // Get known devices for debugging
+  getKnownDevices(): BluetoothDevice[] {
+    return Array.from(this.knownDevices.values());
+  }
+
+  // Clear known devices (useful for testing)
+  clearKnownDevices(): void {
+    this.knownDevices.clear();
+    this.connectionAttempts.clear();
   }
 
   // Get connection status

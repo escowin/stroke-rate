@@ -31,7 +31,7 @@ export const Header = () => {
               <HeartIcon className="h-8 w-8 text-primary-600" />
               <div className="ml-2">
                 <h1 className="text-xl font-bold text-gray-900">
-                  Coxswain HR
+                  StrokeRate
                 </h1>
                 <p className="text-xs text-gray-500">
                   Heart Rate Monitor

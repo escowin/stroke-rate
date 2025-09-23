@@ -1,12 +1,13 @@
 import { useAppStore } from '../store';
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { 
   ExclamationTriangleIcon,
   XMarkIcon,
   WifiIcon,
   SignalSlashIcon
 } from '@heroicons/react/24/outline';
+import { BluetoothService } from '../services/bluetooth';
 
 export const ConnectionConflictDialog = () => {
   const { 
@@ -17,15 +18,33 @@ export const ConnectionConflictDialog = () => {
 
   const { showConflictDialog } = uiState;
   const { conflicts } = connectionStatus;
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const bluetoothService = BluetoothService.getInstance();
 
   const handleClose = () => {
     setUIState({ showConflictDialog: false });
   };
 
-  const handleContinue = () => {
-    // In a real implementation, this would handle the SpeedCoach disconnection
-    console.log('Continuing with SpeedCoach disconnection...');
-    setUIState({ showConflictDialog: false });
+  const handleContinue = async () => {
+    setIsProcessing(true);
+    try {
+      // Handle SpeedCoach disconnection
+      const success = await bluetoothService.handleSpeedCoachDisconnection(conflicts);
+      
+      if (success) {
+        console.log('SpeedCoach disconnection handled successfully');
+        // Optionally trigger a new scan to refresh available devices
+        // This would be handled by the parent component
+      } else {
+        console.error('Failed to handle SpeedCoach disconnection');
+      }
+    } catch (error) {
+      console.error('Error handling SpeedCoach disconnection:', error);
+    } finally {
+      setIsProcessing(false);
+      setUIState({ showConflictDialog: false });
+    }
   };
 
   const handleCancel = () => {
@@ -127,9 +146,10 @@ export const ConnectionConflictDialog = () => {
                   </button>
                   <button
                     onClick={handleContinue}
-                    className="flex-1 inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                    disabled={isProcessing}
+                    className="flex-1 inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Continue & Disconnect
+                    {isProcessing ? 'Processing...' : 'Continue & Disconnect'}
                   </button>
                 </div>
               </Dialog.Panel>
