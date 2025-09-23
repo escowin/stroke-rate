@@ -1,0 +1,17 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="#3b82f6" stroke="#1e40af" stroke-width="8"/>
+  
+  <!-- Heart icon -->
+  <path d="M256 400c-8-8-16-16-24-24-32-32-64-64-64-96 0-32 24-56 56-56 16 0 32 8 32 8s16-8 32-8c32 0 56 24 56 56 0 32-32 64-64 96-8 8-16 16-24 24z" fill="white"/>
+  
+  <!-- Heart rate lines -->
+  <path d="M180 200h20v20h-20v-20z" fill="white"/>
+  <path d="M200 200h20v40h-20v-40z" fill="white"/>
+  <path d="M220 200h20v60h-20v-60z" fill="white"/>
+  <path d="M240 200h20v40h-20v-40z" fill="white"/>
+  <path d="M260 200h20v20h-20v-20z" fill="white"/>
+  <path d="M280 200h20v30h-20v-30z" fill="white"/>
+  <path d="M300 200h20v50h-20v-50z" fill="white"/>
+  <path d="M320 200h20v30h-20v-30z" fill="white"/>
+</svg>
