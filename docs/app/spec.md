@@ -72,7 +72,6 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 ### Primary User: Coxswain
 - **Quick Access**: One-tap access to heart rate data during rowing
 - **Glanceable Interface**: Large, clear numbers visible in various lighting conditions
-- **Voice Integration**: Optional voice announcements for heart rate zones
 - **Minimal Interaction**: Hands-free operation during active rowing
 
 ### Secondary Users: Rowers & Coaches
@@ -82,7 +81,7 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 
 ## Development Phases
 
-### Phase 1: Foundation (Weeks 1-3)
+### Phase 1: Foundation
 **Goal**: Establish core PWA infrastructure and basic Bluetooth connectivity
 
 #### Deliverables:
@@ -99,7 +98,7 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 - Add SpeedCoach connection conflict detection and management
 - Create connection conflict resolution UI with user choice interface
 - Create basic heart rate data visualization with Recharts
-- Design and implement core UI components with Tailwind CSS
+- Design and implement core UI components and vanilla CSS
 - Set up automated deployment to GitHub Pages
 
 #### Success Criteria:
@@ -110,7 +109,7 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 - Displays real-time heart rate data
 - Maintains connection during 30+ minute session
 
-### Phase 2: Multi-Device Support (Weeks 4-6)
+### Phase 2: Multi-Device Support
 **Goal**: Enable connection to multiple heart rate devices simultaneously
 
 #### Deliverables:
@@ -132,7 +131,7 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 - Clear visual indication of connection status
 - Intuitive device assignment process
 
-### Phase 3: Enhanced Visualization (Weeks 7-9)
+### Phase 3: Enhanced Visualization
 **Goal**: Implement comprehensive data visualization and heart rate zone analysis
 
 #### Deliverables:
@@ -154,7 +153,7 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 - Persistent session data storage
 - Effective alert system for zone violations
 
-### Phase 4: Training Integration (Weeks 10-12)
+### Phase 4: Training Integration
 **Goal**: Add workout templates and training analytics
 
 #### Deliverables:
@@ -176,7 +175,7 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 - Long-term progress tracking
 - Successful data export functionality
 
-### Phase 5: Polish & Optimization (Weeks 13-14)
+### Phase 5: Polish & Optimization
 **Goal**: Performance optimization, testing, and user experience refinement
 
 #### Deliverables:
@@ -198,7 +197,7 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 - Complete user documentation
 - Ready for production deployment
 
-### Phase 6: Dedicated Device Solution (Future)
+### Phase 6: Dedicated Device Solution
 **Goal**: Address iOS Safari limitations with dedicated Raspberry Pi hardware
 
 #### Problem Statement:
@@ -278,7 +277,7 @@ iOS Safari does not support the Web Bluetooth API, limiting the app's reach to ~
 - **PWA**: Workbox for service worker management
 - **Bluetooth**: Web Bluetooth API with custom React hooks
 - **Storage**: IndexedDB via idb library (better TypeScript support)
-- **Styling**: Tailwind CSS + Headless UI (mobile-first, accessible)
+- **Styling**: Vanilla CSS (mobile-first, accessible)
 - **Charts**: Recharts (React-native, lightweight for heart rate trends)
 
 ### Development Tools
@@ -289,8 +288,8 @@ iOS Safari does not support the Web Bluetooth API, limiting the app's reach to ~
 - **Version Control**: Git with conventional commits
 
 ### Browser Compatibility
-- **Primary**: Chrome/Edge (Android), Safari (iOS)
-- **Minimum**: Chrome 56+, Safari 11+, Edge 79+
+- **Primary**: Chrome/Edge (Android)
+- **Minimum**: Chrome 56+, Edge 79+
 - **Features**: Web Bluetooth API support required
 
 ## Connection Conflict Management

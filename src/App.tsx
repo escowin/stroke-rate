@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { useAppStore } from './store';
 import { useBluetooth } from './hooks/useBluetooth';
-import { Dashboard } from './components/Dashboard';
 import { DeviceSetup } from './components/DeviceSetup';
 import { ConnectionConflictDialog } from './components/ConnectionConflictDialog';
 import { Header } from './components/Header';
 import { ErrorBoundary } from './components/ErrorBoundary';
+
+// Lazy load the Dashboard component (contains heavy recharts dependency)
+const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
 
 function App() {
   const { uiState, connectionStatus, error, setUIState, clearError } = useAppStore();
@@ -29,11 +31,27 @@ function App() {
       case 'setup':
         return <DeviceSetup />;
       case 'session':
-        return <Dashboard />;
+        return (
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+            </div>
+          }>
+            <Dashboard />
+          </Suspense>
+        );
       case 'settings':
         return <div className="p-6">Settings coming soon...</div>;
       default:
-        return <Dashboard />;
+        return (
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+            </div>
+          }>
+            <Dashboard />
+          </Suspense>
+        );
     }
   };
 

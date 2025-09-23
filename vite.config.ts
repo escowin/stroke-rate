@@ -61,6 +61,28 @@ export default defineConfig({
   ],
   base: '/bowsman-observations/',
   build: {
-    outDir: 'dist'
+    outDir: 'dist',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React and React DOM
+          'react-vendor': ['react', 'react-dom'],
+          // Chart library (recharts is quite large)
+          'charts': ['recharts'],
+          // UI libraries
+          'ui-vendor': ['@headlessui/react', '@heroicons/react'],
+          // State management and utilities
+          'utils': ['zustand', 'idb']
+        }
+      }
+    },
+    // Increase chunk size warning limit to 1000kb for now
+    chunkSizeWarningLimit: 1000,
+    // Use esbuild for minification (more reliable than terser)
+    minify: 'esbuild',
+    // Source maps for debugging (disable in production for smaller builds)
+    sourcemap: false,
+    // Target modern browsers for smaller bundles
+    target: 'esnext'
   }
 })

@@ -1,5 +1,13 @@
 import { useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
+} from 'recharts';
 import type { HeartRateData, HeartRateZones } from '../types';
 // import { useHeartRateZones } from '../hooks/useHeartRateZones';
 
