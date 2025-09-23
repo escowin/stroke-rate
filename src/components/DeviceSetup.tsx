@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '../store';
 import { useBluetooth } from '../hooks/useBluetooth';
 import type { BluetoothDevice, Rower } from '../types';
@@ -34,6 +34,13 @@ export const DeviceSetup = () => {
     !rowers.some(rower => rower.seat === seat)
   );
 
+  // Update selectedSeat when available seats change
+  useEffect(() => {
+    if (availableSeats.length > 0 && !availableSeats.includes(selectedSeat)) {
+      setSelectedSeat(availableSeats[0]);
+    }
+  }, [availableSeats, selectedSeat]);
+
   const handleScanForDevices = async () => {
     await scanForDevices();
   };
@@ -51,7 +58,7 @@ export const DeviceSetup = () => {
       const rower: Rower = {
         id: `rower-${Date.now()}`,
         name: newRowerName.trim(),
-        seat: selectedSeat,
+        seat: availableSeats[0],
         targetZones: {
           recovery: { name: 'Recovery', min: 60, max: 120, color: '#10b981', description: 'Active recovery' },
           aerobic: { name: 'Aerobic', min: 120, max: 150, color: '#3b82f6', description: 'Base aerobic' },
