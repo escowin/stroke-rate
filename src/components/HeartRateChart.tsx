@@ -8,16 +8,15 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts';
-import type { HeartRateData, HeartRateZones } from '../types';
+import type { HeartRateData } from '../types';
 // import { useHeartRateZones } from '../hooks/useHeartRateZones';
 
 interface HeartRateChartProps {
   data: HeartRateData[];
-  zones: HeartRateZones;
   maxDataPoints?: number;
 }
 
-export const HeartRateChart = ({ data, zones, maxDataPoints = 50 }: HeartRateChartProps) => {
+export const HeartRateChart = ({ data, maxDataPoints = 50 }: HeartRateChartProps) => {
   // const { getZoneColor } = useHeartRateZones();
 
   const chartData = useMemo(() => {
@@ -81,9 +80,10 @@ export const HeartRateChart = ({ data, zones, maxDataPoints = 50 }: HeartRateCha
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis 
               dataKey="time" 
-              tick={{ fontSize: 12 }}
+              tick={false}
               tickLine={{ stroke: '#d1d5db' }}
               axisLine={{ stroke: '#d1d5db' }}
+              label={{ value: 'Time', position: 'insideBottom', offset: -10, style: { textAnchor: 'middle', fontSize: 12, fill: '#6b7280' } }}
             />
             <YAxis 
               domain={[60, 200]}
@@ -102,26 +102,6 @@ export const HeartRateChart = ({ data, zones, maxDataPoints = 50 }: HeartRateCha
             />
           </LineChart>
         </ResponsiveContainer>
-      </div>
-
-      {/* Zone Indicators */}
-      <div className="mt-4 flex justify-between text-xs text-gray-500">
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 rounded" style={{ backgroundColor: zones.recovery.color }} />
-          <span>Recovery</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 rounded" style={{ backgroundColor: zones.aerobic.color }} />
-          <span>Aerobic</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 rounded" style={{ backgroundColor: zones.threshold.color }} />
-          <span>Threshold</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 rounded" style={{ backgroundColor: zones.anaerobic.color }} />
-          <span>Anaerobic</span>
-        </div>
       </div>
     </div>
   );

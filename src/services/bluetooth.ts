@@ -267,6 +267,33 @@ export class BluetoothService {
     return conflicts;
   }
 
+  // Add a manual conflict report (for when user knows a device is connected to SpeedCoach)
+  addManualConflict(deviceName: string): void {
+    const conflict: SpeedCoachConflict = {
+      deviceId: `manual-${Date.now()}`,
+      deviceName: deviceName,
+      isConnectedToSpeedCoach: true,
+      canDisconnect: true
+    };
+    
+    // Store this as a known device for future reference
+    const device: BluetoothDevice = {
+      id: conflict.deviceId,
+      name: deviceName,
+      connected: false,
+      lastSeen: new Date()
+    };
+    
+    this.knownDevices.set(conflict.deviceId, device);
+    console.log('Manual conflict added:', conflict);
+  }
+
+  // Check if we should suggest potential conflicts (when no heart rate devices are found)
+  shouldSuggestConflicts(devices: BluetoothDevice[]): boolean {
+    const heartRateDevices = devices.filter(d => this.isHeartRateDevice(d.name));
+    return heartRateDevices.length === 0;
+  }
+
   // Helper method to identify heart rate devices
   private isHeartRateDevice(deviceName: string): boolean {
     const name = deviceName.toLowerCase();

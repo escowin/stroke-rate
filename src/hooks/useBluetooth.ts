@@ -40,18 +40,27 @@ export const useBluetooth = () => {
       // Check for SpeedCoach conflicts
       const conflicts = await bluetoothService.checkSpeedCoachConflicts(devices);
       
+      // Check if we should suggest potential conflicts
+      const shouldSuggest = bluetoothService.shouldSuggestConflicts(devices);
+      
       // Debug logging
       console.log('Scan results:', {
         devicesFound: devices.length,
         conflictsDetected: conflicts.length,
         knownDevices: bluetoothService.getKnownDevices().length,
+        shouldSuggestConflicts: shouldSuggest,
         conflicts: conflicts
       });
       
       setConnectionStatus({
         availableDevices: devices,
-        hasSpeedCoachConflicts: conflicts.length > 0,
-        conflicts
+        hasSpeedCoachConflicts: conflicts.length > 0 || shouldSuggest,
+        conflicts: shouldSuggest && conflicts.length === 0 ? [{
+          deviceId: 'suggestion',
+          deviceName: 'No heart rate devices found - may be connected to SpeedCoach',
+          isConnectedToSpeedCoach: true,
+          canDisconnect: false
+        }] : conflicts
       });
 
       return devices;
@@ -149,6 +158,12 @@ export const useBluetooth = () => {
     return bluetoothService.getKnownDevices();
   }, [bluetoothService]);
 
+  // Add manual conflict report
+  const addManualConflict = useCallback((deviceName: string) => {
+    bluetoothService.addManualConflict(deviceName);
+    console.log('Manual conflict added for device:', deviceName);
+  }, [bluetoothService]);
+
   return {
     isAvailable,
     isScanning,
@@ -160,6 +175,7 @@ export const useBluetooth = () => {
     handleSpeedCoachConflicts,
     clearError,
     clearKnownDevices,
-    getKnownDevices
+    getKnownDevices,
+    addManualConflict
   };
 };

@@ -114,7 +114,6 @@ export const Dashboard = () => {
           {currentSession && currentSession.heartRateData.length > 0 && (
             <HeartRateChart
               data={currentSession.heartRateData}
-              zones={zones}
             />
           )}
         </>

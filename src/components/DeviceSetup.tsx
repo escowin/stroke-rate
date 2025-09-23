@@ -7,7 +7,8 @@ import {
   PlusIcon, 
   TrashIcon,
   UserIcon,
-  SignalIcon
+  SignalIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 
 export const DeviceSetup = () => {
@@ -26,7 +27,8 @@ export const DeviceSetup = () => {
     disconnectFromDevice, 
     isScanning,
     clearKnownDevices,
-    getKnownDevices
+    getKnownDevices,
+    addManualConflict
   } = useBluetooth();
   
   const [newRowerName, setNewRowerName] = useState('');
@@ -133,6 +135,40 @@ export const DeviceSetup = () => {
                 </button>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* No Heart Rate Devices Found */}
+        {connectionStatus.availableDevices.length === 0 && !isScanning && (
+          <div className="space-y-3">
+            <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+              <div className="flex items-start space-x-3">
+                <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="text-sm font-medium text-yellow-800">
+                    No heart rate devices found
+                  </h3>
+                  <p className="text-sm text-yellow-700 mt-1">
+                    This could mean your heart rate device is connected to SpeedCoach. 
+                    If you know your device is connected to SpeedCoach, you can report it below.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 className="text-sm font-medium text-blue-800 mb-2">Report SpeedCoach Conflict</h4>
+              <p className="text-xs text-blue-700 mb-3">
+                If you know your heart rate device (like Whoop 4.0) is connected to SpeedCoach, 
+                click the button below to report it:
+              </p>
+              <button
+                onClick={() => addManualConflict('Whoop 4.0')}
+                className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
+              >
+                Report Whoop 4.0 Connected to SpeedCoach
+              </button>
+            </div>
           </div>
         )}
 
