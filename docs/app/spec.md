@@ -198,6 +198,77 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 - Complete user documentation
 - Ready for production deployment
 
+### Phase 6: Dedicated Device Solution (Future)
+**Goal**: Address iOS Safari limitations with dedicated Raspberry Pi hardware
+
+#### Problem Statement:
+iOS Safari does not support the Web Bluetooth API, limiting the app's reach to ~60% of mobile users in key markets. A dedicated device solution would provide universal compatibility and enhanced functionality.
+
+#### Solution: Raspberry Pi-Based Coxswain Device
+
+**Hardware Specifications:**
+- **Platform**: Raspberry Pi 4 Model B (4GB RAM)
+- **Display**: 7" Official Touch Display (800x480 resolution)
+- **Enclosure**: Waterproof case (IP65 rating) for marine environment
+- **Connectivity**: Built-in Bluetooth 5.0 + optional external antenna
+- **Power**: 10,000mAh battery pack for all-day operation
+- **Storage**: 32GB+ microSD card for OS and application data
+- **Mounting**: Marine-grade mounting hardware for coxswain's area
+
+**Software Architecture:**
+- **Base OS**: Raspberry Pi OS Lite with Chromium browser
+- **Application**: PWA running in kiosk mode (fullscreen, no browser UI)
+- **Bluetooth**: Native Web Bluetooth API support via Chromium
+- **Auto-start**: Systemd service to launch app on boot
+- **Updates**: OTA update mechanism for app and system updates
+
+#### Deliverables:
+- [ ] Raspberry Pi image with pre-configured PWA
+- [ ] Kiosk mode implementation with auto-launch
+- [ ] Marine-grade hardware assembly guide
+- [ ] Fleet management system for multiple devices
+- [ ] Enhanced features leveraging Pi's capabilities
+
+#### Technical Tasks:
+- Create Raspberry Pi OS image with Chromium kiosk mode
+- Implement auto-start systemd service for PWA
+- Design marine-grade hardware assembly and mounting
+- Add Pi-specific features (GPS, accelerometer, data logging)
+- Create fleet management dashboard for multiple boats
+- Implement OTA update system for remote device management
+
+#### Enhanced Features for Dedicated Device:
+- **GPS Integration**: Track boat speed and correlate with heart rate data
+- **Accelerometer**: Monitor boat movement and stroke synchronization
+- **Data Logging**: Local storage of all session data with SD card backup
+- **Wireless Sync**: Automatic data synchronization to cloud/coach dashboard
+- **Status Indicators**: LED indicators for connection status and battery level
+- **Voice Announcements**: Audio feedback for heart rate zones and alerts
+- **Weather Integration**: Display weather conditions and their impact on performance
+
+#### Advantages:
+- **Universal Compatibility**: Works regardless of coxswain's personal device
+- **Enhanced Reliability**: Dedicated hardware optimized for the application
+- **Better Performance**: More processing power and storage than mobile devices
+- **Marine Environment**: Designed for water, vibration, and temperature extremes
+- **Fleet Management**: Centralized control and monitoring of multiple boats
+- **Cost Effective**: ~$150-200 per device vs. commercial rowing computers
+- **Customizable**: Can add features specific to rowing club needs
+
+#### Implementation Strategy:
+1. **Prototype Phase**: Build and test single device with existing PWA
+2. **Hardware Optimization**: Refine enclosure, mounting, and power management
+3. **Software Enhancement**: Add Pi-specific features and optimizations
+4. **Fleet Deployment**: Scale to multiple boats with management system
+5. **Integration**: Connect with existing rowing club infrastructure
+
+#### Success Criteria:
+- Device operates reliably in marine environment for 8+ hours
+- Seamless Bluetooth connectivity with all heart rate monitors
+- Positive feedback from coxswains and coaches
+- Successful fleet deployment across multiple boats
+- Integration with existing rowing club data systems
+
 ## Technical Architecture
 
 ### Frontend Stack
@@ -293,6 +364,7 @@ Based on the [SpeedCoach GPS documentation](https://nksports.com/mwdownloads/dow
 ## Future Enhancements
 
 ### Phase 6+ Potential Features
+- **Dedicated Device Solution**: Raspberry Pi-based coxswain devices for universal compatibility
 - **ANT+ Integration**: Support ANT+ protocol for simultaneous connections with SpeedCoach
 - **GPS Integration**: Track boat speed and correlate with heart rate data
 - **Stroke Rate Monitoring**: Integrate with boat sensors for comprehensive analysis
@@ -300,6 +372,7 @@ Based on the [SpeedCoach GPS documentation](https://nksports.com/mwdownloads/dow
 - **Cloud Sync**: Optional cloud backup and team sharing
 - **Advanced Analytics**: Machine learning insights for performance optimization
 - **SpeedCoach Integration**: Direct data sharing with SpeedCoach devices when possible
+- **Fleet Management**: Centralized monitoring and control of multiple boat devices
 
 ---
 
