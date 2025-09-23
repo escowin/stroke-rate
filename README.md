@@ -1,10 +1,10 @@
-# Coxswain Heart Rate Monitor
+# Stroke Rate - Heart Rate Monitor
 
 A Progressive Web Application (PWA) that enables coxswains to monitor real-time heart rate data from all rowers in a 4+ boat during training and racing.
 
 ## Phase 1 Implementation ✅
 
-This repository contains the **Phase 1** implementation of the Coxswain Heart Rate Monitor, which establishes the core PWA infrastructure and basic Bluetooth connectivity.
+This repository contains the **Phase 1** implementation of Stroke Rate, which establishes the core PWA infrastructure and basic Bluetooth connectivity.
 
 ### ✅ Completed Features
 
@@ -38,8 +38,8 @@ This repository contains the **Phase 1** implementation of the Coxswain Heart Ra
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/bowsman-observations.git
-cd bowsman-observations
+git clone https://github.com/your-username/stroke-rate.git
+cd stroke-rate
 
 # Install dependencies
 npm install
