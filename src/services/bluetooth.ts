@@ -43,8 +43,14 @@ export class BluetoothService {
 
       return [this.mapBluetoothDevice(device)];
     } catch (error) {
-      if (error instanceof Error && error.name === 'NotFoundError') {
-        throw new Error('No heart rate devices found');
+      if (error instanceof Error) {
+        if (error.name === 'NotFoundError') {
+          throw new Error('No heart rate devices found');
+        } else if (error.name === 'SecurityError') {
+          throw new Error('Bluetooth access denied or cancelled by user');
+        } else if (error.name === 'AbortError') {
+          throw new Error('Device selection was cancelled');
+        }
       }
       throw error;
     }
@@ -66,7 +72,17 @@ export class BluetoothService {
 
       devices.push(this.mapBluetoothDevice(device));
     } catch (error) {
-      console.warn('Device scan failed:', error);
+      if (error instanceof Error) {
+        if (error.name === 'SecurityError') {
+          console.warn('Bluetooth access denied or cancelled by user');
+        } else if (error.name === 'AbortError') {
+          console.warn('Device selection was cancelled');
+        } else {
+          console.warn('Device scan failed:', error);
+        }
+      } else {
+        console.warn('Device scan failed:', error);
+      }
     }
 
     return devices;
@@ -90,7 +106,17 @@ export class BluetoothService {
       this.connectedDevices.set(deviceId, server);
       return true;
     } catch (error) {
-      console.error('Failed to connect to device:', error);
+      if (error instanceof Error) {
+        if (error.name === 'SecurityError') {
+          console.warn('Bluetooth access denied or cancelled by user');
+        } else if (error.name === 'AbortError') {
+          console.warn('Device selection was cancelled');
+        } else {
+          console.error('Failed to connect to device:', error);
+        }
+      } else {
+        console.error('Failed to connect to device:', error);
+      }
       return false;
     }
   }
