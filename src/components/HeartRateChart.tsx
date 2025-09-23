@@ -83,7 +83,7 @@ export const HeartRateChart = ({ data, maxDataPoints = 50 }: HeartRateChartProps
               tick={false}
               tickLine={{ stroke: '#d1d5db' }}
               axisLine={{ stroke: '#d1d5db' }}
-              label={{ value: 'Time', position: 'insideBottom', offset: -10, style: { textAnchor: 'middle', fontSize: 12, fill: '#6b7280' } }}
+              label={{ value: 'Time', position: 'outsideBottom', offset: 10, style: { textAnchor: 'middle', fontSize: 12, fill: '#6b7280' } }}
             />
             <YAxis 
               domain={[60, 200]}
