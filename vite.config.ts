@@ -17,8 +17,8 @@ export default defineConfig({
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
-        scope: '/bowsman-observations/',
-        start_url: '/bowsman-observations/',
+        scope: '/stroke-rate/',
+        start_url: '/stroke-rate/',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -59,7 +59,7 @@ export default defineConfig({
       }
     })
   ],
-  base: '/bowsman-observations/',
+  base: '/stroke-rate/',
   build: {
     outDir: 'dist',
     rollupOptions: {
