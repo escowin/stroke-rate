@@ -107,18 +107,18 @@ export const DeviceSetup = () => {
   // Use the optimized getDeviceHealthStatus from the hook
 
   return (
-    <div className="space-y-6">
+    <div className="device-setup-container">
       {/* Device Discovery */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
+      <div className="device-discovery">
+        <div className="device-discovery-header">
+          <h2 className="device-discovery-title">
             Heart Rate Devices
           </h2>
-          <div className="flex space-x-2">
+          <div className="device-discovery-actions">
             {connectionStatus.availableDevices.length > 0 && (
               <button
                 onClick={handleConnectAllAvailable}
-                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="btn btn-secondary"
               >
                 <CheckCircleIcon className="h-4 w-4 mr-2" />
                 Connect All
@@ -127,7 +127,7 @@ export const DeviceSetup = () => {
             <button
               onClick={handleScanForDevices}
               disabled={isScanning}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn btn-primary"
             >
               <WifiIcon className="h-4 w-4 mr-2" />
               {isScanning ? 'Scanning...' : 'Scan for Devices'}
@@ -137,27 +137,27 @@ export const DeviceSetup = () => {
 
         {/* Available Devices */}
         {connectionStatus.availableDevices.length > 0 && (
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium text-gray-700">Available Devices</h3>
+          <div className="device-list">
+            <h3 className="device-list-title">Available Devices</h3>
             {connectionStatus.availableDevices.map((device) => (
               <div
                 key={device.id}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                className="device-item"
               >
-                <div className="flex items-center space-x-3">
-                  <SignalIcon className="h-5 w-5 text-gray-400" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
+                <div className="device-item-info">
+                  <SignalIcon className="device-item-icon" />
+                  <div className="device-item-details">
+                    <p className="device-item-name">
                       {device.name}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="device-item-id">
                       {device.id}
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => handleConnectDevice(device)}
-                  className="px-3 py-1 text-sm font-medium text-primary-600 hover:text-primary-700"
+                  className="device-item-connect-button"
                 >
                   Connect
                 </button>
@@ -168,14 +168,14 @@ export const DeviceSetup = () => {
 
         {/* No Heart Rate Devices Found */}
         {connectionStatus.availableDevices.length === 0 && !isScanning && (
-          <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-            <div className="flex items-start space-x-3">
-              <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600 mt-0.5" />
-              <div className="flex-1">
-                <h3 className="text-sm font-medium text-yellow-800">
+          <div className="no-devices-warning">
+            <div className="no-devices-warning-content">
+              <ExclamationTriangleIcon className="no-devices-warning-icon" />
+              <div className="no-devices-warning-text">
+                <h3 className="no-devices-warning-title">
                   No heart rate devices found
                 </h3>
-                <p className="text-sm text-yellow-700 mt-1">
+                <p className="no-devices-warning-description">
                   This may mean heart rate devices are connected to SpeedCoach. 
                   Ask rowers to disconnect their devices from SpeedCoach, then scan again.
                 </p>
@@ -186,15 +186,15 @@ export const DeviceSetup = () => {
 
         {/* Debug Information */}
         {process.env.NODE_ENV === 'development' && (
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-            <h4 className="text-sm font-medium text-blue-800 mb-2">Debug Information</h4>
-            <div className="text-xs text-blue-700 space-y-1">
-              <p>Known Devices: {getKnownDevices().length}</p>
-              <p>Conflicts Detected: {connectionStatus.conflicts.length}</p>
-              <p>Has SpeedCoach Conflicts: {connectionStatus.hasSpeedCoachConflicts ? 'Yes' : 'No'}</p>
+          <div className="debug-info">
+            <h4 className="debug-info-title">Debug Information</h4>
+            <div className="debug-info-content">
+              <p className="debug-info-item">Known Devices: {getKnownDevices().length}</p>
+              <p className="debug-info-item">Conflicts Detected: {connectionStatus.conflicts.length}</p>
+              <p className="debug-info-item">Has SpeedCoach Conflicts: {connectionStatus.hasSpeedCoachConflicts ? 'Yes' : 'No'}</p>
               <button
                 onClick={clearKnownDevices}
-                className="mt-2 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="debug-clear-button"
               >
                 Clear Known Devices
               </button>
@@ -204,38 +204,41 @@ export const DeviceSetup = () => {
 
         {/* Connected Devices */}
         {connectionStatus.connectedDevices.length > 0 && (
-          <div className="mt-4 space-y-2">
-            <h3 className="text-sm font-medium text-gray-700">Connected Devices</h3>
+          <div className="connected-devices">
+            <h3 className="connected-devices-title">Connected Devices</h3>
             {connectionStatus.connectedDevices.map((device) => {
               const healthStatus = getDeviceHealthStatus(device.id);
               const isHealthy = healthStatus.status === 'healthy';
-              const bgColor = isHealthy ? 'bg-green-50' : 'bg-red-50';
-              const dotColor = isHealthy ? 'bg-green-500' : 'bg-red-500';
-              const textColor = isHealthy ? 'text-green-700' : 'text-red-700';
               
               return (
                 <div
                   key={device.id}
-                  className={`flex items-center justify-between p-3 ${bgColor} rounded-lg`}
+                  className={`connected-device-item ${
+                    isHealthy ? 'connected-device-item--healthy' : 'connected-device-item--unhealthy'
+                  }`}
                 >
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-2 h-2 ${dotColor} rounded-full`} />
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
+                  <div className="connected-device-info">
+                    <div className={`connected-device-status-indicator ${
+                      isHealthy ? 'connected-device-status-indicator--healthy' : 'connected-device-status-indicator--unhealthy'
+                    }`} />
+                    <div className="connected-device-details">
+                      <p className="connected-device-name">
                         {device.name}
                       </p>
-                      <p className={`text-xs ${textColor}`}>
+                      <p className={`connected-device-status ${
+                        isHealthy ? 'connected-device-status--healthy' : 'connected-device-status--unhealthy'
+                      }`}>
                         {isHealthy ? 'Connected & Healthy' : 'Connected (Unhealthy)'}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="connected-device-actions">
                     {!isHealthy && (
-                      <ExclamationCircleIcon className="h-4 w-4 text-red-500" />
+                      <ExclamationCircleIcon className="connected-device-warning-icon" />
                     )}
                     <button
                       onClick={() => handleDisconnectDevice(device.id)}
-                      className="px-3 py-1 text-sm font-medium text-red-600 hover:text-red-700"
+                      className="connected-device-disconnect-button"
                     >
                       Disconnect
                     </button>
@@ -248,26 +251,26 @@ export const DeviceSetup = () => {
       </div>
 
       {/* Rower Management */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="rower-management">
+        <h2 className="rower-management-title">
           Rower Setup
         </h2>
 
         {/* Add New Rower */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">Add New Rower</h3>
-          <div className="flex space-x-3">
+        <div className="add-rower-section">
+          <h3 className="add-rower-title">Add New Rower</h3>
+          <div className="add-rower-form">
             <input
               type="text"
               placeholder="Rower name"
               value={newRowerName}
               onChange={(e) => setNewRowerName(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="add-rower-name-input"
             />
             <select
               value={selectedSeat}
               onChange={(e) => setSelectedSeat(Number(e.target.value))}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="add-rower-seat-select"
             >
               {availableSeats.map(seat => (
                 <option key={seat} value={seat}>
@@ -278,7 +281,7 @@ export const DeviceSetup = () => {
             <button
               onClick={handleAddRower}
               disabled={!newRowerName.trim() || availableSeats.length === 0}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn btn-primary"
             >
               <PlusIcon className="h-4 w-4 mr-2" />
               Add
@@ -288,32 +291,32 @@ export const DeviceSetup = () => {
 
         {/* Rower List */}
         {rowers.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium text-gray-700">Configured Rowers</h3>
+          <div className="rower-list">
+            <h3 className="rower-list-title">Configured Rowers</h3>
             {rowers.map((rower) => (
               <div
                 key={rower.id}
-                className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
+                className="rower-item"
               >
-                <div className="flex items-center space-x-3">
-                  <UserIcon className="h-5 w-5 text-gray-400" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
+                <div className="rower-item-info">
+                  <UserIcon className="rower-item-icon" />
+                  <div className="rower-item-details">
+                    <p className="rower-item-name">
                       {rower.name}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="rower-item-seat">
                       Seat {rower.seat}
                     </p>
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-3">
+                <div className="rower-item-actions">
                   {/* Device Assignment */}
-                  <div className="flex items-center space-x-2">
+                  <div className="rower-device-assignment">
                     <select
                       value={rower.deviceId || ''}
                       onChange={(e) => handleAssignDevice(rower.id, e.target.value)}
-                      className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="rower-device-select"
                     >
                       <option value="">No device</option>
                       {connectionStatus.connectedDevices.map((device) => {
@@ -329,14 +332,18 @@ export const DeviceSetup = () => {
                     
                     {/* Device Health Indicator */}
                     {rower.deviceId && (
-                      <div className="flex items-center space-x-1">
+                      <div className="rower-device-health">
                         {(() => {
                           const healthStatus = getDeviceHealthStatus(rower.deviceId);
                           const isHealthy = healthStatus.status === 'healthy';
                           return (
                             <>
-                              <div className={`w-2 h-2 rounded-full ${isHealthy ? 'bg-green-500' : 'bg-red-500'}`} />
-                              <span className={`text-xs ${isHealthy ? 'text-green-600' : 'text-red-600'}`}>
+                              <div className={`rower-device-health-indicator ${
+                                isHealthy ? 'rower-device-health-indicator--healthy' : 'rower-device-health-indicator--unhealthy'
+                              }`} />
+                              <span className={`rower-device-health-text ${
+                                isHealthy ? 'rower-device-health-text--healthy' : 'rower-device-health-text--unhealthy'
+                              }`}>
                                 {isHealthy ? 'Healthy' : 'Unhealthy'}
                               </span>
                             </>
@@ -348,9 +355,9 @@ export const DeviceSetup = () => {
                   
                   <button
                     onClick={() => handleRemoveRower(rower.id)}
-                    className="p-1 text-red-600 hover:text-red-700"
+                    className="rower-remove-button"
                   >
-                    <TrashIcon className="h-4 w-4" />
+                    <TrashIcon className="rower-remove-icon" />
                   </button>
                 </div>
               </div>

@@ -57,26 +57,29 @@ export const ReconnectionStatus = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-red-200 p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center space-x-2">
-          <ExclamationTriangleIcon className="h-5 w-5 text-red-500" />
-          <h3 className="text-sm font-medium text-red-800">
+    <div className="reconnection-status">
+      <div className="reconnection-status-header">
+        <div className="reconnection-status-title">
+          <ExclamationTriangleIcon className="reconnection-status-icon" />
+          <h3 className="reconnection-status-text">
             Connection Issues Detected
           </h3>
         </div>
         {unhealthyConnections.length > 1 && (
-          <button
-            onClick={handleReconnectAll}
-            className="inline-flex items-center px-3 py-1 border border-red-300 text-xs font-medium rounded-md shadow-sm text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-          >
-            <ArrowPathIcon className="h-3 w-3 mr-1" />
-            Reconnect All
-          </button>
+          <div className="reconnection-status-actions">
+            <button
+              onClick={handleReconnectAll}
+              className="btn btn-secondary"
+              style={{ color: 'var(--status-error)', borderColor: 'var(--status-error)' }}
+            >
+              <ArrowPathIcon className="h-3 w-3 mr-1" />
+              Reconnect All
+            </button>
+          </div>
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="reconnection-device-list">
         {unhealthyConnections.map((health) => {
           const isAttempting = reconnectionAttempts.get(health.deviceId);
           const result = reconnectionResults.get(health.deviceId);
@@ -85,48 +88,48 @@ export const ReconnectionStatus = () => {
           return (
             <div
               key={health.deviceId}
-              className="flex items-center justify-between p-2 bg-red-50 rounded-lg"
+              className="reconnection-device-item"
             >
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-red-500 rounded-full" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
+              <div className="reconnection-device-info">
+                <div className="reconnection-device-indicator" />
+                <div className="reconnection-device-details">
+                  <p className="reconnection-device-name">
                     {device?.name || `Device ${health.deviceId}`}
                   </p>
-                  <p className="text-xs text-red-600">
+                  <p className="reconnection-device-timeout">
                     Last heartbeat: {Math.round(health.timeSinceLastHeartbeat / 1000)}s ago
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-center space-x-2">
+              <div className="reconnection-device-actions">
                 {result === true && (
-                  <div className="flex items-center space-x-1 text-green-600">
-                    <CheckCircleIcon className="h-4 w-4" />
-                    <span className="text-xs">Reconnected</span>
+                  <div className="reconnection-result reconnection-result--success">
+                    <CheckCircleIcon className="reconnection-result-icon" />
+                    <span className="reconnection-result-text">Reconnected</span>
                   </div>
                 )}
                 
                 {result === false && (
-                  <div className="flex items-center space-x-1 text-red-600">
-                    <XCircleIcon className="h-4 w-4" />
-                    <span className="text-xs">Failed</span>
+                  <div className="reconnection-result reconnection-result--failure">
+                    <XCircleIcon className="reconnection-result-icon" />
+                    <span className="reconnection-result-text">Failed</span>
                   </div>
                 )}
                 
                 <button
                   onClick={() => handleManualReconnection(health.deviceId)}
                   disabled={isAttempting}
-                  className="inline-flex items-center px-2 py-1 border border-red-300 text-xs font-medium rounded shadow-sm text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="reconnection-button"
                 >
                   {isAttempting ? (
                     <>
-                      <ArrowPathIcon className="h-3 w-3 mr-1 animate-spin" />
+                      <ArrowPathIcon className="reconnection-button-icon reconnection-button-icon--spinning" />
                       Reconnecting...
                     </>
                   ) : (
                     <>
-                      <ArrowPathIcon className="h-3 w-3 mr-1" />
+                      <ArrowPathIcon className="reconnection-button-icon" />
                       Reconnect
                     </>
                   )}

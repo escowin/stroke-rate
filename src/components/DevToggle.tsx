@@ -170,37 +170,37 @@ export const DevToggle = () => {
   }, [mockDataInterval]);
 
   return (
-    <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
-      <div className="flex items-center space-x-2 mb-3">
-        <BeakerIcon className="h-5 w-5 text-purple-600" />
-        <h3 className="text-sm font-medium text-purple-900">
+    <div className="dev-toggle">
+      <div className="dev-toggle-header">
+        <BeakerIcon className="dev-toggle-icon" />
+        <h3 className="dev-toggle-title">
           Development Tools
         </h3>
       </div>
       
-      <div className="space-y-3">
+      <div className="dev-toggle-content">
         {/* Mock Data Toggle */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-purple-700">Use Mock Data</span>
+        <div className="dev-toggle-control">
+          <span className="dev-toggle-label">Use Mock Data</span>
           <button
             onClick={handleToggleMockData}
-            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
-              useMockData ? 'bg-purple-600' : 'bg-gray-200'
+            className={`dev-toggle-switch ${
+              useMockData ? 'dev-toggle-switch--active' : 'dev-toggle-switch--inactive'
             }`}
           >
             <span
-              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                useMockData ? 'translate-x-5' : 'translate-x-0'
+              className={`dev-toggle-switch-thumb ${
+                useMockData ? 'dev-toggle-switch-thumb--active' : 'dev-toggle-switch-thumb--inactive'
               }`}
             />
           </button>
         </div>
 
         {/* Mock Actions */}
-        <div className="flex flex-wrap gap-2">
+        <div className="dev-toggle-actions">
           <button
             onClick={handleLoadMockRowers}
-            className="inline-flex items-center px-3 py-1 border border-purple-300 text-xs font-medium rounded-md text-purple-700 bg-white hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            className="dev-toggle-button"
           >
             Load Mock Rowers
           </button>
@@ -208,33 +208,33 @@ export const DevToggle = () => {
           {!currentSession?.isActive ? (
             <button
               onClick={handleStartMockSession}
-              className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              className="dev-toggle-button dev-toggle-button--primary"
             >
-              <PlayIcon className="h-3 w-3 mr-1" />
+              <PlayIcon className="dev-toggle-button-icon" />
               Start Mock Session
             </button>
           ) : (
             <button
               onClick={handleStopMockSession}
-              className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              className="dev-toggle-button dev-toggle-button--danger"
             >
-              <StopIcon className="h-3 w-3 mr-1" />
+              <StopIcon className="dev-toggle-button-icon" />
               Stop Mock Session
             </button>
           )}
         </div>
 
         {/* Scenario Generation */}
-        <div>
-          <p className="text-xs text-purple-600 mb-2">Generate Scenario Data:</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="dev-toggle-scenarios">
+          <p className="dev-toggle-scenarios-label">Generate Scenario Data:</p>
+          <div className="dev-toggle-scenarios-list">
             {['practice', 'race', 'intervals', 'warmup'].map((scenario) => (
               <button
                 key={scenario}
                 onClick={() => handleGenerateScenario(scenario as any)}
-                className="inline-flex items-center px-2 py-1 border border-purple-300 text-xs font-medium rounded text-purple-700 bg-white hover:bg-purple-50 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="dev-toggle-scenario-button"
               >
-                <ArrowPathIcon className="h-3 w-3 mr-1" />
+                <ArrowPathIcon className="dev-toggle-scenario-icon" />
                 {scenario.charAt(0).toUpperCase() + scenario.slice(1)}
               </button>
             ))}
@@ -242,8 +242,8 @@ export const DevToggle = () => {
         </div>
 
         {isGeneratingData && (
-          <div className="flex items-center space-x-2 text-xs text-purple-600">
-            <div className="animate-pulse w-2 h-2 bg-purple-500 rounded-full" />
+          <div className="dev-toggle-status">
+            <div className="dev-toggle-status-indicator" />
             <span>Generating real-time mock data...</span>
           </div>
         )}

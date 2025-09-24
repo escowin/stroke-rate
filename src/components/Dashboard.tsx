@@ -54,32 +54,32 @@ export const Dashboard = () => {
   const connectedRowers = rowers.filter(rower => rower.deviceId && rower.currentHeartRate);
 
   return (
-    <div className="space-y-6">
+    <div className="dashboard-container">
       {/* Session Controls */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">
+      <div className="session-controls">
+        <div className="session-header">
+          <div className="session-info">
+            <h2 className="session-title">
               Training Session
             </h2>
-            <p className="text-sm text-gray-600">
+            <p className="session-subtitle">
               {isSessionActive 
                 ? `Started ${currentSession?.startTime.toLocaleTimeString()}`
                 : 'Ready to start monitoring'
               }
             </p>
             {isSessionActive && (
-              <div className="flex items-center space-x-4 mt-2">
-                <div className="flex items-center space-x-1">
-                  <CheckCircleIcon className="h-4 w-4 text-green-500" />
-                  <span className="text-xs text-gray-600">
+              <div className="session-status">
+                <div className="status-indicator">
+                  <CheckCircleIcon className="status-icon" style={{ color: 'var(--status-success)' }} />
+                  <span className="status-text status-text--success">
                     {connectedRowers.length} rower(s) active
                   </span>
                 </div>
                 {unhealthyConnections.length > 0 && (
-                  <div className="flex items-center space-x-1">
-                    <ExclamationTriangleIcon className="h-4 w-4 text-red-500" />
-                    <span className="text-xs text-red-600">
+                  <div className="status-indicator">
+                    <ExclamationTriangleIcon className="status-icon" style={{ color: 'var(--status-error)' }} />
+                    <span className="status-text status-text--error">
                       {unhealthyConnections.length} connection(s) unhealthy
                     </span>
                   </div>
@@ -88,12 +88,12 @@ export const Dashboard = () => {
             )}
           </div>
           
-          <div className="flex space-x-3">
+          <div className="session-actions">
             {!isSessionActive ? (
               <button
                 onClick={handleStartSession}
                 disabled={connectionStatus.connectedDevices.length === 0}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn btn-primary"
               >
                 <PlayIcon className="h-4 w-4 mr-2" />
                 Start Session
@@ -101,7 +101,7 @@ export const Dashboard = () => {
             ) : (
               <button
                 onClick={handleEndSession}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                className="btn btn-danger"
               >
                 <StopIcon className="h-4 w-4 mr-2" />
                 End Session
@@ -110,7 +110,7 @@ export const Dashboard = () => {
             
             <button
               onClick={() => setUIState({ currentView: 'setup' })}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="btn btn-secondary"
             >
               <PlusIcon className="h-4 w-4 mr-2" />
               Add Rower
@@ -129,9 +129,9 @@ export const Dashboard = () => {
       {rowers.length > 0 ? (
         <>
           {/* Rower Status Overview */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Rower Status</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="rower-overview">
+            <h3 className="rower-overview-title">Rower Status</h3>
+            <div className="rower-grid">
               {[1, 2, 3, 4].map(seat => {
                 const rower = rowers.find(r => r.seat === seat);
                 const isConnected = rower && rower.deviceId && rower.currentHeartRate;
@@ -140,25 +140,25 @@ export const Dashboard = () => {
                 return (
                   <div
                     key={seat}
-                    className={`p-3 rounded-lg border ${
+                    className={`rower-seat ${
                       isConnected 
-                        ? 'bg-green-50 border-green-200' 
+                        ? 'rower-seat--connected' 
                         : hasDevice 
-                        ? 'bg-yellow-50 border-yellow-200'
-                        : 'bg-gray-50 border-gray-200'
+                        ? 'rower-seat--device-only'
+                        : 'rower-seat--empty'
                     }`}
                   >
-                    <div className="text-center">
-                      <div className={`w-3 h-3 rounded-full mx-auto mb-2 ${
-                        isConnected ? 'bg-green-500' : hasDevice ? 'bg-yellow-500' : 'bg-gray-400'
+                    <div className="rower-seat-content">
+                      <div className={`rower-status-indicator ${
+                        isConnected ? 'rower-status-indicator--connected' : hasDevice ? 'rower-status-indicator--device-only' : 'rower-status-indicator--empty'
                       }`} />
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="rower-seat-number">
                         Seat {seat}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="rower-name">
                         {rower ? rower.name : 'Empty'}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="rower-status">
                         {isConnected ? 'Active' : hasDevice ? 'Connected' : 'No Device'}
                       </p>
                     </div>
@@ -170,7 +170,7 @@ export const Dashboard = () => {
 
           {/* Heart Rate Cards */}
           {connectedRowers.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="heart-rate-grid">
               {connectedRowers.map((rower) => (
                 <HeartRateCard
                   key={rower.id}
@@ -189,18 +189,18 @@ export const Dashboard = () => {
           )}
         </>
       ) : (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-          <ChartBarIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">
+        <div className="empty-state">
+          <ChartBarIcon className="empty-state-icon" />
+          <h3 className="empty-state-title">
             No heart rate data
           </h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="empty-state-description">
             Connect heart rate devices and assign them to rowers to start monitoring.
           </p>
-          <div className="mt-6">
+          <div className="empty-state-action">
             <button
               onClick={() => setUIState({ currentView: 'setup' })}
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="btn btn-primary"
             >
               <PlusIcon className="h-4 w-4 mr-2" />
               Setup Devices
@@ -210,21 +210,21 @@ export const Dashboard = () => {
       )}
 
       {/* Heart Rate Zones Legend */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="heart-rate-zones">
+        <h3 className="heart-rate-zones-title">
           Heart Rate Zones
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="heart-rate-zones-grid">
           {Object.entries(zones).map(([key, zone]) => (
-            <div key={key} className="text-center">
+            <div key={key} className="heart-rate-zone-item">
               <div 
-                className="w-full h-4 rounded mb-2"
+                className="heart-rate-zone-color"
                 style={{ backgroundColor: zone.color }}
               />
-              <div className="text-sm font-medium text-gray-900">
+              <div className="heart-rate-zone-name">
                 {zone.name}
               </div>
-              <div className="text-xs text-gray-500">
+              <div className="heart-rate-zone-range">
                 {zone.min}-{zone.max} BPM
               </div>
             </div>

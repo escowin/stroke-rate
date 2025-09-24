@@ -27,40 +27,40 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-6">
-            <div className="flex items-center space-x-3 mb-4">
-              <ExclamationTriangleIcon className="h-8 w-8 text-red-500" />
-              <h1 className="text-xl font-semibold text-gray-900">
+        <div className="error-boundary">
+          <div className="error-boundary-content">
+            <div className="error-boundary-header">
+              <ExclamationTriangleIcon className="error-boundary-icon" />
+              <h1 className="error-boundary-title">
                 Something went wrong
               </h1>
             </div>
             
-            <p className="text-gray-600 mb-4">
+            <p className="error-boundary-description">
               The app encountered an unexpected error. Please try refreshing the page.
             </p>
             
             {this.state.error && (
-              <details className="mb-4">
-                <summary className="text-sm font-medium text-gray-700 cursor-pointer">
+              <div className="error-boundary-details">
+                <summary className="error-boundary-details-summary">
                   Error Details
                 </summary>
-                <pre className="mt-2 text-xs text-gray-500 bg-gray-100 p-2 rounded overflow-auto">
+                <pre className="error-boundary-details-content">
                   {this.state.error.message}
                 </pre>
-              </details>
+              </div>
             )}
             
-            <div className="flex space-x-3">
+            <div className="error-boundary-actions">
               <button
                 onClick={() => window.location.reload()}
-                className="flex-1 bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="error-boundary-button"
               >
                 Refresh Page
               </button>
               <button
                 onClick={() => this.setState({ hasError: false, error: undefined })}
-                className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                className="error-boundary-button error-boundary-button--secondary"
               >
                 Try Again
               </button>

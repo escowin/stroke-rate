@@ -50,16 +50,28 @@ export const ConnectionStatus = () => {
   const StatusIcon = getStatusIcon();
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <StatusIcon className={`h-5 w-5 ${getStatusColor()}`} />
+    <div className="connection-status">
+      <div className="connection-status-content">
+        <div className="connection-status-info">
+          <StatusIcon className={`connection-status-icon ${
+            hasSpeedCoachConflicts ? 'connection-status-icon--conflict' :
+            unhealthyConnections.length > 0 ? 'connection-status-icon--unhealthy' :
+            connectedDevices.length > 0 ? 'connection-status-icon--connected' :
+            isScanning ? 'connection-status-icon--scanning' :
+            'connection-status-icon--disconnected'
+          }`} />
           <div>
-            <p className={`text-sm font-medium ${getStatusColor()}`}>
+            <p className={`connection-status-text ${
+              hasSpeedCoachConflicts ? 'connection-status-text--conflict' :
+              unhealthyConnections.length > 0 ? 'connection-status-text--unhealthy' :
+              connectedDevices.length > 0 ? 'connection-status-text--connected' :
+              isScanning ? 'connection-status-text--scanning' :
+              'connection-status-text--disconnected'
+            }`}>
               {getStatusText()}
             </p>
             {availableDevices.length > 0 && (
-              <p className="text-xs text-gray-500">
+              <p className="connection-status-subtitle">
                 {availableDevices.length} device(s) available
               </p>
             )}
@@ -68,20 +80,23 @@ export const ConnectionStatus = () => {
 
         {/* Device List */}
         {connectedDevices.length > 0 && (
-          <div className="flex space-x-2">
+          <div className="connection-device-list">
             {connectedDevices.map((device) => {
               const isHealthy = device.isHealthy !== false;
-              const healthColor = isHealthy ? 'bg-green-500' : 'bg-red-500';
-              const bgColor = isHealthy ? 'bg-green-100' : 'bg-red-100';
-              const textColor = isHealthy ? 'text-green-700' : 'text-red-700';
               
               return (
                 <div
                   key={device.id}
-                  className={`flex items-center space-x-1 px-2 py-1 ${bgColor} rounded-full`}
+                  className={`connection-device-item ${
+                    isHealthy ? 'connection-device-item--healthy' : 'connection-device-item--unhealthy'
+                  }`}
                 >
-                  <div className={`w-2 h-2 ${healthColor} rounded-full`} />
-                  <span className={`text-xs ${textColor} font-medium`}>
+                  <div className={`connection-device-indicator ${
+                    isHealthy ? 'connection-device-indicator--healthy' : 'connection-device-indicator--unhealthy'
+                  }`} />
+                  <span className={`connection-device-name ${
+                    isHealthy ? 'connection-device-name--healthy' : 'connection-device-name--unhealthy'
+                  }`}>
                     {device.name}
                   </span>
                 </div>
@@ -93,16 +108,16 @@ export const ConnectionStatus = () => {
 
       {/* Unhealthy Connections */}
       {unhealthyConnections.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-gray-200">
-          <div className="flex items-start space-x-2">
-            <ExclamationCircleIcon className="h-4 w-4 text-red-500 mt-0.5" />
-            <div className="text-sm">
-              <p className="text-red-800 font-medium">
+        <div className="connection-issues">
+          <div className="connection-issue">
+            <ExclamationCircleIcon className="connection-issue-icon connection-issue-icon--error" />
+            <div className="connection-issue-content">
+              <p className="connection-issue-title connection-issue-title--error">
                 Unhealthy connections detected:
               </p>
-              <ul className="mt-1 text-red-700">
+              <ul className="connection-issue-list">
                 {unhealthyConnections.map((health) => (
-                  <li key={health.deviceId} className="text-xs">
+                  <li key={health.deviceId} className="connection-issue-item connection-issue-item--error">
                     • Device {health.deviceId} - Last heartbeat: {Math.round(health.timeSinceLastHeartbeat / 1000)}s ago
                   </li>
                 ))}
@@ -114,16 +129,16 @@ export const ConnectionStatus = () => {
 
       {/* SpeedCoach Conflicts */}
       {hasSpeedCoachConflicts && conflicts.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-gray-200">
-          <div className="flex items-start space-x-2">
-            <ExclamationTriangleIcon className="h-4 w-4 text-yellow-500 mt-0.5" />
-            <div className="text-sm">
-              <p className="text-yellow-800 font-medium">
+        <div className="connection-issues">
+          <div className="connection-issue">
+            <ExclamationTriangleIcon className="connection-issue-icon connection-issue-icon--warning" />
+            <div className="connection-issue-content">
+              <p className="connection-issue-title connection-issue-title--warning">
                 Connection conflicts detected:
               </p>
-              <ul className="mt-1 text-yellow-700">
+              <ul className="connection-issue-list">
                 {conflicts.map((conflict) => (
-                  <li key={conflict.deviceId} className="text-xs">
+                  <li key={conflict.deviceId} className="connection-issue-item connection-issue-item--warning">
                     • {conflict.deviceName} is connected to SpeedCoach
                   </li>
                 ))}

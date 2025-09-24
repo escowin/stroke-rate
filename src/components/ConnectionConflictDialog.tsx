@@ -63,11 +63,11 @@ export const ConnectionConflictDialog = () => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25" />
+          <div className="dialog-overlay" />
         </Transition.Child>
 
-        <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+        <div className="dialog-container">
+          <div className="dialog-content">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -77,52 +77,52 @@ export const ConnectionConflictDialog = () => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
+              <Dialog.Panel className="dialog-panel">
+                <div className="dialog-header">
+                  <div className="dialog-title-container">
                     <div className="flex-shrink-0">
-                      <ExclamationTriangleIcon className="h-8 w-8 text-yellow-500" />
+                      <ExclamationTriangleIcon className="dialog-icon" />
                     </div>
                     <Dialog.Title
                       as="h3"
-                      className="text-lg font-medium leading-6 text-gray-900"
+                      className="dialog-title"
                     >
                       Connection Conflicts Detected
                     </Dialog.Title>
                   </div>
                   <button
                     onClick={handleClose}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="dialog-close-button"
                   >
-                    <XMarkIcon className="h-6 w-6" />
+                    <XMarkIcon className="dialog-close-icon" />
                   </button>
                 </div>
 
-                <div className="mb-6">
-                  <p className="text-sm text-gray-600 mb-4">
+                <div className="dialog-body">
+                  <p className="dialog-description">
                     The following heart rate monitors are currently connected to SpeedCoach devices:
                   </p>
                   
-                  <div className="space-y-3">
+                  <div className="dialog-conflict-list">
                     {conflicts.map((conflict) => (
                       <div
                         key={conflict.deviceId}
-                        className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200"
+                        className="dialog-conflict-item"
                       >
-                        <div className="flex items-center space-x-3">
-                          <WifiIcon className="h-5 w-5 text-yellow-600" />
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">
+                        <div className="dialog-conflict-info">
+                          <WifiIcon className="dialog-conflict-icon" />
+                          <div className="dialog-conflict-details">
+                            <p className="dialog-conflict-name">
                               {conflict.deviceName}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="dialog-conflict-status">
                               Connected to SpeedCoach
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <SignalSlashIcon className="h-4 w-4 text-yellow-600" />
-                          <span className="text-xs text-yellow-700">
+                        <div className="dialog-conflict-actions">
+                          <SignalSlashIcon className="dialog-conflict-warning-icon" />
+                          <span className="dialog-conflict-warning-text">
                             Will disconnect
                           </span>
                         </div>
@@ -130,24 +130,24 @@ export const ConnectionConflictDialog = () => {
                     ))}
                   </div>
 
-                  <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <p className="text-sm text-blue-800">
+                  <div className="dialog-note">
+                    <p className="dialog-note-text">
                       <strong>Note:</strong> To use this app, these devices will need to be disconnected from SpeedCoach and connected to this app instead.
                     </p>
                   </div>
                 </div>
 
-                <div className="flex space-x-3">
+                <div className="dialog-actions">
                   <button
                     onClick={handleCancel}
-                    className="flex-1 inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                    className="dialog-button dialog-button--secondary"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleContinue}
                     disabled={isProcessing}
-                    className="flex-1 inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="dialog-button dialog-button--primary"
                   >
                     {isProcessing ? 'Processing...' : 'Continue & Disconnect'}
                   </button>

@@ -30,38 +30,42 @@ export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
   const StatusIcon = connectionStatus.icon;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="heart-rate-card">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+      <div className="heart-rate-card-header">
+        <div className="heart-rate-card-info">
+          <h3 className="heart-rate-card-name">
             {rower.name}
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="heart-rate-card-seat">
             Seat {rower.seat}
           </p>
         </div>
-        <div className="flex items-center space-x-2">
-          <StatusIcon className={`h-5 w-5 ${connectionStatus.color}`} />
-          <Battery0Icon className="h-5 w-5 text-gray-400" />
+        <div className="heart-rate-card-status">
+          <StatusIcon className={`heart-rate-card-status-icon ${
+            connectionStatus.status === 'connected' ? 'heart-rate-card-status-icon--connected' :
+            connectionStatus.status === 'connecting' ? 'heart-rate-card-status-icon--connecting' :
+            'heart-rate-card-status-icon--disconnected'
+          }`} />
+          <Battery0Icon className="heart-rate-card-battery-icon" />
         </div>
       </div>
 
       {/* Heart Rate Display */}
-      <div className="text-center mb-4">
-        <div className="flex items-center justify-center mb-2">
-          <HeartIcon className="h-8 w-8 text-red-500 mr-2" />
+      <div className="heart-rate-display">
+        <div className="heart-rate-value-container">
+          <HeartIcon className="heart-rate-icon" />
           <div 
-            className="text-4xl font-bold"
+            className="heart-rate-value"
             style={{ color: zoneColor }}
           >
             {heartRate || '--'}
           </div>
-          <div className="text-sm text-gray-500 ml-2">BPM</div>
+          <div className="heart-rate-unit">BPM</div>
         </div>
         
         <div 
-          className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white"
+          className="heart-rate-zone-badge"
           style={{ backgroundColor: zoneColor }}
         >
           {zone}
@@ -70,14 +74,14 @@ export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
 
       {/* Zone Progress */}
       {heartRate && (
-        <div className="mb-4">
-          <div className="flex justify-between text-xs text-gray-500 mb-1">
+        <div className="heart-rate-zone-progress">
+          <div className="heart-rate-zone-labels">
             <span>Recovery</span>
             <span>Anaerobic</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="heart-rate-progress-bar">
             <div 
-              className="h-2 rounded-full transition-all duration-300"
+              className="heart-rate-progress-fill"
               style={{ 
                 backgroundColor: zoneColor,
                 width: `${Math.min(100, ((heartRate - 60) / (190 - 60)) * 100)}%`
@@ -88,7 +92,7 @@ export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
       )}
 
       {/* Last Update */}
-      <div className="text-xs text-gray-400 text-center">
+      <div className="heart-rate-last-update">
         {lastUpdate 
           ? `Updated ${lastUpdate.toLocaleTimeString()}`
           : 'No data received'
