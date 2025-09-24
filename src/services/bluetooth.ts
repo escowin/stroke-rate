@@ -17,6 +17,8 @@ export class BluetoothService {
   private healthMonitoringInterval: NodeJS.Timeout | null = null;
   private maxReconnectionAttempts = 3;
   private reconnectionDelay = 5000; // 5 seconds
+  private lastWarningTime: Map<string, number> = new Map();
+  private warningCooldown = 30000; // 30 seconds between warnings
 
   static getInstance(): BluetoothService {
     if (!BluetoothService.instance) {
@@ -374,6 +376,26 @@ export class BluetoothService {
     };
   }
 
+  // Get connection health summary
+  getConnectionHealthSummary(): { healthy: number; unhealthy: number; total: number } {
+    let healthy = 0;
+    let unhealthy = 0;
+    
+    for (const [deviceId] of this.connectionHealth) {
+      if (this.isConnectionHealthy(deviceId)) {
+        healthy++;
+      } else {
+        unhealthy++;
+      }
+    }
+    
+    return {
+      healthy,
+      unhealthy,
+      total: healthy + unhealthy
+    };
+  }
+
   // Connection health monitoring
   updateConnectionHealth(deviceId: string): void {
     this.connectionHealth.set(deviceId, {
@@ -410,17 +432,31 @@ export class BluetoothService {
     }
   }
 
+  // Rate-limited warning logging
+  private logWarningWithCooldown(deviceId: string, message: string): void {
+    const now = Date.now();
+    const lastWarning = this.lastWarningTime.get(deviceId) || 0;
+    
+    if (now - lastWarning > this.warningCooldown) {
+      console.warn(message);
+      this.lastWarningTime.set(deviceId, now);
+    }
+  }
+
   // Automatic reconnection logic
   async attemptReconnection(deviceId: string): Promise<boolean> {
     const attempts = this.connectionAttempts.get(deviceId) || 0;
     
     if (attempts >= this.maxReconnectionAttempts) {
-      console.warn(`Max reconnection attempts reached for device ${deviceId}`);
+      this.logWarningWithCooldown(deviceId, `Max reconnection attempts reached for device ${deviceId}. Connection marked as unhealthy.`);
       this.markConnectionUnhealthy(deviceId);
       return false;
     }
 
-    console.log(`Attempting reconnection for device ${deviceId} (attempt ${attempts + 1})`);
+    // Only log first attempt to reduce noise
+    if (attempts === 0) {
+      console.log(`Attempting reconnection for device ${deviceId}`);
+    }
     
     try {
       // Clear existing timer
@@ -441,6 +477,7 @@ export class BluetoothService {
       if (success) {
         this.connectionAttempts.delete(deviceId);
         this.reconnectionTimers.delete(deviceId);
+        this.lastWarningTime.delete(deviceId); // Clear warning cooldown on successful reconnect
         console.log(`Successfully reconnected to device ${deviceId}`);
         return true;
       } else {
@@ -449,7 +486,7 @@ export class BluetoothService {
         return this.attemptReconnection(deviceId);
       }
     } catch (error) {
-      console.error(`Reconnection failed for device ${deviceId}:`, error);
+      this.logWarningWithCooldown(deviceId, `Reconnection failed for device ${deviceId}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       this.connectionAttempts.set(deviceId, attempts + 1);
       return this.attemptReconnection(deviceId);
     }
@@ -465,7 +502,7 @@ export class BluetoothService {
     this.healthMonitoringInterval = setInterval(() => {
       for (const [deviceId] of this.connectionHealth) {
         if (!this.isConnectionHealthy(deviceId)) {
-          console.warn(`Connection unhealthy for device ${deviceId}`);
+          this.logWarningWithCooldown(deviceId, `Connection unhealthy for device ${deviceId}. Attempting reconnection...`);
           this.markConnectionUnhealthy(deviceId);
           
           // Attempt reconnection if device is still in connected devices
@@ -505,9 +542,10 @@ export class BluetoothService {
       this.reconnectionTimers.delete(deviceId);
     }
 
-    // Clear connection health
+    // Clear connection health and warning cooldowns
     this.connectionHealth.delete(deviceId);
     this.connectionAttempts.delete(deviceId);
+    this.lastWarningTime.delete(deviceId);
 
     // Disconnect device
     await this.disconnectFromDevice(deviceId);

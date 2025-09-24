@@ -354,8 +354,7 @@ body {
 }
 
 .rower-seat--empty {
-  background-color: var(--color-slate-light);
-  border-color: var(--color-slate-medium);
+  border-color: var(--color-slate-light);
 }
 
 .rower-seat-content {
@@ -963,6 +962,26 @@ body {
   width: 1rem;
   height: 1rem;
   color: var(--color-red-medium);
+}
+
+.connected-device-retry-button {
+  padding: 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease;
+  margin-right: 0.5rem;
+
+  &:hover {
+    background-color: var(--color-slate-medium);
+  }
+}
+
+.connected-device-retry-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-yellow-medium);
 }
 
 .connected-device-disconnect-button {
@@ -2147,7 +2166,6 @@ body {
 .error-boundary-details-content {
   font-size: var(--font-size-xs);
   color: var(--color-slate-light);
-  background-color: var(--color-slate-light);
   padding: 0.5rem;
   border-radius: 0.25rem;
   overflow: auto;
@@ -2184,11 +2202,10 @@ body {
 }
 
 .error-boundary-button--secondary {
-  background-color: var(--color-slate-light);
   color: var(--color-slate-light);
 
   &:hover {
-    background-color: var(--color-slate-light);
+    background-color: var(--color-blue-dark);
   }
 }
 

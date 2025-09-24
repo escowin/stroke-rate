@@ -24,9 +24,12 @@ export const useConnectionHealth = () => {
     for (const [deviceId, health] of allHealth) {
       const timeSinceLastHeartbeat = Date.now() - health.lastHeartbeat.getTime();
       
+      // Use the service's health calculation to ensure consistency
+      const isHealthy = bluetoothService.isConnectionHealthy(deviceId);
+      
       healthMap.set(deviceId, {
         deviceId,
-        isHealthy: health.isHealthy && timeSinceLastHeartbeat < 30000, // 30 seconds
+        isHealthy,
         lastHeartbeat: health.lastHeartbeat,
         timeSinceLastHeartbeat
       });
@@ -121,6 +124,9 @@ export const useConnectionHealth = () => {
     
     if (hasConnectedDevices) {
       bluetoothService.startConnectionHealthMonitoring();
+      
+      // Initial health data update
+      updateHealthData();
       
       // Update health data every 5 seconds
       const interval = setInterval(updateHealthData, 5000);

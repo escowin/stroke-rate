@@ -11,7 +11,8 @@ import {
   SignalIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
-  ExclamationCircleIcon
+  ExclamationCircleIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 
 export const DeviceSetup = () => {
@@ -30,7 +31,8 @@ export const DeviceSetup = () => {
     disconnectFromDevice, 
     isScanning,
     clearKnownDevices,
-    getKnownDevices
+    getKnownDevices,
+    attemptReconnection
   } = useBluetooth();
 
   const { getDeviceHealthStatus } = useConnectionHealth();
@@ -237,7 +239,16 @@ export const DeviceSetup = () => {
                   </div>
                   <div className="connected-device-actions">
                     {!isHealthy && (
-                      <ExclamationCircleIcon className="connected-device-warning-icon" />
+                      <>
+                        <ExclamationCircleIcon className="connected-device-warning-icon" />
+                        <button
+                          onClick={() => attemptReconnection(device.id)}
+                          className="connected-device-retry-button"
+                          title="Retry connection"
+                        >
+                          <ArrowPathIcon className="connected-device-retry-icon" />
+                        </button>
+                      </>
                     )}
                     <button
                       onClick={() => handleDisconnectDevice(device.id)}
