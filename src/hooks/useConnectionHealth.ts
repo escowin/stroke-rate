@@ -14,7 +14,7 @@ export const useConnectionHealth = () => {
   const [isMonitoring, setIsMonitoring] = useState(false);
   
   const bluetoothService = BluetoothService.getInstance();
-  const { connectionStatus, updateDeviceStatus } = useAppStore();
+  const { connectionStatus } = useAppStore();
 
   // Update connection health data
   const updateHealthData = useCallback(() => {
