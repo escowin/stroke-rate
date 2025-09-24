@@ -37,9 +37,15 @@ export const DeviceSetup = () => {
   
   const [newRowerName, setNewRowerName] = useState('');
   const [selectedSeat, setSelectedSeat] = useState(1);
+  const [hasScanned, setHasScanned] = useState(false);
 
   const availableSeats = [1, 2, 3, 4].filter(seat => 
     !rowers.some(rower => rower.seat === seat)
+  );
+
+  // Filter out connected devices from available devices
+  const unconnectedAvailableDevices = connectionStatus.availableDevices.filter(device => 
+    !connectionStatus.connectedDevices.some(connected => connected.id === device.id)
   );
 
   // Update selectedSeat when available seats change
@@ -50,6 +56,7 @@ export const DeviceSetup = () => {
   }, [availableSeats, selectedSeat]);
 
   const handleScanForDevices = async () => {
+    setHasScanned(true);
     await scanForDevices();
   };
 
@@ -95,11 +102,7 @@ export const DeviceSetup = () => {
 
 
   const handleConnectAllAvailable = async () => {
-    const unassignedDevices = connectionStatus.availableDevices.filter(device => 
-      !connectionStatus.connectedDevices.some(connected => connected.id === device.id)
-    );
-
-    for (const device of unassignedDevices) {
+    for (const device of unconnectedAvailableDevices) {
       await handleConnectDevice(device);
     }
   };
@@ -115,7 +118,7 @@ export const DeviceSetup = () => {
             Heart Rate Devices
           </h2>
           <div className="device-discovery-actions">
-            {connectionStatus.availableDevices.length > 0 && (
+            {unconnectedAvailableDevices.length > 0 && (
               <button
                 onClick={handleConnectAllAvailable}
                 className="btn btn-secondary"
@@ -136,10 +139,10 @@ export const DeviceSetup = () => {
         </div>
 
         {/* Available Devices */}
-        {connectionStatus.availableDevices.length > 0 && (
+        {unconnectedAvailableDevices.length > 0 && (
           <div className="device-list">
             <h3 className="device-list-title">Available Devices</h3>
-            {connectionStatus.availableDevices.map((device) => (
+            {unconnectedAvailableDevices.map((device) => (
               <div
                 key={device.id}
                 className="device-item"
@@ -167,7 +170,7 @@ export const DeviceSetup = () => {
         )}
 
         {/* No Heart Rate Devices Found */}
-        {connectionStatus.availableDevices.length === 0 && !isScanning && (
+        {hasScanned && unconnectedAvailableDevices.length === 0 && !isScanning && connectionStatus.connectedDevices.length === 0 && (
           <div className="no-devices-warning">
             <div className="no-devices-warning-content">
               <ExclamationTriangleIcon className="no-devices-warning-icon" />
