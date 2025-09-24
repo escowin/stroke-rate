@@ -101,22 +101,8 @@ export const useConnectionHealth = () => {
     return deviceHealthStatuses.get(deviceId) || { status: 'unknown', color: 'gray' };
   }, [deviceHealthStatuses]);
 
-  // Update device status in store based on health
-  useEffect(() => {
-    for (const [deviceId, health] of connectionHealth) {
-      const device = connectionStatus.connectedDevices.find(d => d.id === deviceId);
-      if (device) {
-        // Only update if the values have actually changed to prevent unnecessary updates
-        if (device.isHealthy !== health.isHealthy || 
-            device.lastSeen?.getTime() !== health.lastHeartbeat.getTime()) {
-          updateDeviceStatus(deviceId, {
-            isHealthy: health.isHealthy,
-            lastSeen: health.lastHeartbeat
-          });
-        }
-      }
-    }
-  }, [connectionHealth, connectionStatus.connectedDevices]);
+  // Note: Device status updates are now handled directly in the BluetoothService
+  // to avoid infinite loops between the hook and the store
 
   // Auto-start monitoring when devices are connected
   useEffect(() => {

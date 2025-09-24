@@ -19,12 +19,18 @@ export class BluetoothService {
   private reconnectionDelay = 5000; // 5 seconds
   private lastWarningTime: Map<string, number> = new Map();
   private warningCooldown = 30000; // 30 seconds between warnings
+  private storeUpdateCallback: ((deviceId: string, updates: Partial<BluetoothDevice>) => void) | null = null;
 
   static getInstance(): BluetoothService {
     if (!BluetoothService.instance) {
       BluetoothService.instance = new BluetoothService();
     }
     return BluetoothService.instance;
+  }
+
+  // Set store update callback
+  setStoreUpdateCallback(callback: (deviceId: string, updates: Partial<BluetoothDevice>) => void): void {
+    this.storeUpdateCallback = callback;
   }
 
   // Check if Bluetooth is available
@@ -501,13 +507,35 @@ export class BluetoothService {
     
     this.healthMonitoringInterval = setInterval(() => {
       for (const [deviceId] of this.connectionHealth) {
-        if (!this.isConnectionHealthy(deviceId)) {
-          this.logWarningWithCooldown(deviceId, `Connection unhealthy for device ${deviceId}. Attempting reconnection...`);
-          this.markConnectionUnhealthy(deviceId);
-          
-          // Attempt reconnection if device is still in connected devices
-          if (this.connectedDevices.has(deviceId)) {
-            this.attemptReconnection(deviceId);
+        const wasHealthy = this.connectionHealth.get(deviceId)?.isHealthy;
+        const isHealthy = this.isConnectionHealthy(deviceId);
+        
+        // Update health status if it changed
+        if (wasHealthy !== isHealthy) {
+          if (!isHealthy) {
+            this.logWarningWithCooldown(deviceId, `Connection unhealthy for device ${deviceId}. Attempting reconnection...`);
+            this.markConnectionUnhealthy(deviceId);
+            
+            // Update store
+            if (this.storeUpdateCallback) {
+              this.storeUpdateCallback(deviceId, { isHealthy: false });
+            }
+            
+            // Attempt reconnection if device is still in connected devices
+            if (this.connectedDevices.has(deviceId)) {
+              this.attemptReconnection(deviceId);
+            }
+          } else {
+            // Connection became healthy again
+            this.connectionHealth.set(deviceId, {
+              lastHeartbeat: new Date(),
+              isHealthy: true
+            });
+            
+            // Update store
+            if (this.storeUpdateCallback) {
+              this.storeUpdateCallback(deviceId, { isHealthy: true });
+            }
           }
         }
       }
