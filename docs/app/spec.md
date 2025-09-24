@@ -123,7 +123,7 @@ A Progressive Web Application (PWA) that enables coxswains to monitor real-time 
 #### Technical Tasks:
 - Implement connection pool management with Zustand state management
 - Create device assignment workflow with React forms
-- Design multi-rower dashboard layout with responsive Tailwind CSS
+- Design multi-rower dashboard layout with responsive vanilla CSS
 - Add connection health monitoring with custom React hooks
 - Implement automatic reconnection logic with Web Bluetooth API
 

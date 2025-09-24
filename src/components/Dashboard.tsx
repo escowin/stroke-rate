@@ -1,13 +1,17 @@
 import { useAppStore } from '../store';
 import { useHeartRateZones } from '../hooks/useHeartRateZones';
+import { useConnectionHealth } from '../hooks/useConnectionHealth';
 import { HeartRateCard } from './HeartRateCard';
 import { HeartRateChart } from './HeartRateChart';
 import { ConnectionStatus } from './ConnectionStatus';
+import { ReconnectionStatus } from './ReconnectionStatus';
 import { 
   PlayIcon, 
   StopIcon, 
   PlusIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon
 } from '@heroicons/react/24/outline';
 
 export const Dashboard = () => {
@@ -21,7 +25,10 @@ export const Dashboard = () => {
   } = useAppStore();
   
   const { zones } = useHeartRateZones();
+  const { getUnhealthyConnections } = useConnectionHealth();
   const isSessionActive = currentSession?.isActive;
+  
+  const unhealthyConnections = getUnhealthyConnections();
 
   const handleStartSession = () => {
     if (rowers.length === 0) {
@@ -61,6 +68,24 @@ export const Dashboard = () => {
                 : 'Ready to start monitoring'
               }
             </p>
+            {isSessionActive && (
+              <div className="flex items-center space-x-4 mt-2">
+                <div className="flex items-center space-x-1">
+                  <CheckCircleIcon className="h-4 w-4 text-green-500" />
+                  <span className="text-xs text-gray-600">
+                    {connectedRowers.length} rower(s) active
+                  </span>
+                </div>
+                {unhealthyConnections.length > 0 && (
+                  <div className="flex items-center space-x-1">
+                    <ExclamationTriangleIcon className="h-4 w-4 text-red-500" />
+                    <span className="text-xs text-red-600">
+                      {unhealthyConnections.length} connection(s) unhealthy
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           
           <div className="flex space-x-3">
@@ -97,18 +122,64 @@ export const Dashboard = () => {
       {/* Connection Status */}
       <ConnectionStatus />
 
+      {/* Reconnection Status */}
+      <ReconnectionStatus />
+
       {/* Heart Rate Monitoring */}
-      {connectedRowers.length > 0 ? (
+      {rowers.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {connectedRowers.map((rower) => (
-              <HeartRateCard
-                key={rower.id}
-                rower={rower}
-                zones={zones}
-              />
-            ))}
+          {/* Rower Status Overview */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Rower Status</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[1, 2, 3, 4].map(seat => {
+                const rower = rowers.find(r => r.seat === seat);
+                const isConnected = rower && rower.deviceId && rower.currentHeartRate;
+                const hasDevice = rower && rower.deviceId;
+                
+                return (
+                  <div
+                    key={seat}
+                    className={`p-3 rounded-lg border ${
+                      isConnected 
+                        ? 'bg-green-50 border-green-200' 
+                        : hasDevice 
+                        ? 'bg-yellow-50 border-yellow-200'
+                        : 'bg-gray-50 border-gray-200'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className={`w-3 h-3 rounded-full mx-auto mb-2 ${
+                        isConnected ? 'bg-green-500' : hasDevice ? 'bg-yellow-500' : 'bg-gray-400'
+                      }`} />
+                      <p className="text-sm font-medium text-gray-900">
+                        Seat {seat}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {rower ? rower.name : 'Empty'}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {isConnected ? 'Active' : hasDevice ? 'Connected' : 'No Device'}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
+
+          {/* Heart Rate Cards */}
+          {connectedRowers.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {connectedRowers.map((rower) => (
+                <HeartRateCard
+                  key={rower.id}
+                  rower={rower}
+                  zones={zones}
+                />
+              ))}
+            </div>
+          )}
           
           {/* Heart Rate Chart */}
           {currentSession && currentSession.heartRateData.length > 0 && (

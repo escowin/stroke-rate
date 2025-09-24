@@ -22,6 +22,8 @@ export interface BluetoothDevice {
   batteryLevel?: number;
   lastSeen: Date;
   isConnectedToSpeedCoach?: boolean;
+  isHealthy?: boolean;
+  connectionAttempts?: number;
 }
 
 export interface HeartRateData {

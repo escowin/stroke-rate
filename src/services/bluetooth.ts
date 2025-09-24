@@ -12,6 +12,11 @@ export class BluetoothService {
   private heartRateListeners: Map<string, (data: HeartRateData) => void> = new Map();
   private knownDevices: Map<string, BluetoothDevice> = new Map();
   private connectionAttempts: Map<string, number> = new Map();
+  private connectionHealth: Map<string, { lastHeartbeat: Date; isHealthy: boolean }> = new Map();
+  private reconnectionTimers: Map<string, NodeJS.Timeout> = new Map();
+  private healthMonitoringInterval: NodeJS.Timeout | null = null;
+  private maxReconnectionAttempts = 3;
+  private reconnectionDelay = 5000; // 5 seconds
 
   static getInstance(): BluetoothService {
     if (!BluetoothService.instance) {
@@ -176,6 +181,10 @@ export class BluetoothService {
             timestamp: new Date(),
             zone: this.calculateHeartRateZone(heartRate)
           };
+          
+          // Update connection health on each heartbeat
+          this.updateConnectionHealth(deviceId);
+          
           onHeartRateUpdate(heartRateData);
         }
       });
@@ -363,5 +372,144 @@ export class BluetoothService {
       connected: this.connectedDevices.size,
       total: this.connectedDevices.size
     };
+  }
+
+  // Connection health monitoring
+  updateConnectionHealth(deviceId: string): void {
+    this.connectionHealth.set(deviceId, {
+      lastHeartbeat: new Date(),
+      isHealthy: true
+    });
+  }
+
+  getConnectionHealth(deviceId: string): { lastHeartbeat: Date; isHealthy: boolean } | undefined {
+    return this.connectionHealth.get(deviceId);
+  }
+
+  getAllConnectionHealth(): Map<string, { lastHeartbeat: Date; isHealthy: boolean }> {
+    return new Map(this.connectionHealth);
+  }
+
+  // Check if connection is healthy (no heartbeat for 30 seconds)
+  isConnectionHealthy(deviceId: string): boolean {
+    const health = this.connectionHealth.get(deviceId);
+    if (!health) return false;
+    
+    const timeSinceLastHeartbeat = Date.now() - health.lastHeartbeat.getTime();
+    return timeSinceLastHeartbeat < 30000; // 30 seconds
+  }
+
+  // Mark connection as unhealthy
+  markConnectionUnhealthy(deviceId: string): void {
+    const health = this.connectionHealth.get(deviceId);
+    if (health) {
+      this.connectionHealth.set(deviceId, {
+        ...health,
+        isHealthy: false
+      });
+    }
+  }
+
+  // Automatic reconnection logic
+  async attemptReconnection(deviceId: string): Promise<boolean> {
+    const attempts = this.connectionAttempts.get(deviceId) || 0;
+    
+    if (attempts >= this.maxReconnectionAttempts) {
+      console.warn(`Max reconnection attempts reached for device ${deviceId}`);
+      this.markConnectionUnhealthy(deviceId);
+      return false;
+    }
+
+    console.log(`Attempting reconnection for device ${deviceId} (attempt ${attempts + 1})`);
+    
+    try {
+      // Clear existing timer
+      const existingTimer = this.reconnectionTimers.get(deviceId);
+      if (existingTimer) {
+        clearTimeout(existingTimer);
+      }
+
+      // Wait before attempting reconnection
+      await new Promise(resolve => {
+        const timer = setTimeout(resolve, this.reconnectionDelay);
+        this.reconnectionTimers.set(deviceId, timer);
+      });
+
+      // Attempt to reconnect
+      const success = await this.connectToDevice(deviceId);
+      
+      if (success) {
+        this.connectionAttempts.delete(deviceId);
+        this.reconnectionTimers.delete(deviceId);
+        console.log(`Successfully reconnected to device ${deviceId}`);
+        return true;
+      } else {
+        this.connectionAttempts.set(deviceId, attempts + 1);
+        // Schedule next attempt
+        return this.attemptReconnection(deviceId);
+      }
+    } catch (error) {
+      console.error(`Reconnection failed for device ${deviceId}:`, error);
+      this.connectionAttempts.set(deviceId, attempts + 1);
+      return this.attemptReconnection(deviceId);
+    }
+  }
+
+  // Start connection health monitoring
+  startConnectionHealthMonitoring(): void {
+    // Clear existing interval if any
+    if (this.healthMonitoringInterval) {
+      clearInterval(this.healthMonitoringInterval);
+    }
+    
+    this.healthMonitoringInterval = setInterval(() => {
+      for (const [deviceId] of this.connectionHealth) {
+        if (!this.isConnectionHealthy(deviceId)) {
+          console.warn(`Connection unhealthy for device ${deviceId}`);
+          this.markConnectionUnhealthy(deviceId);
+          
+          // Attempt reconnection if device is still in connected devices
+          if (this.connectedDevices.has(deviceId)) {
+            this.attemptReconnection(deviceId);
+          }
+        }
+      }
+    }, 10000); // Check every 10 seconds
+  }
+
+  // Stop connection health monitoring
+  stopConnectionHealthMonitoring(): void {
+    if (this.healthMonitoringInterval) {
+      clearInterval(this.healthMonitoringInterval);
+      this.healthMonitoringInterval = null;
+    }
+  }
+
+  // Enhanced connect to device with health monitoring
+  async connectToDeviceWithHealthMonitoring(deviceId: string): Promise<boolean> {
+    const success = await this.connectToDevice(deviceId);
+    
+    if (success) {
+      this.updateConnectionHealth(deviceId);
+    }
+    
+    return success;
+  }
+
+  // Enhanced disconnect with cleanup
+  async disconnectFromDeviceWithCleanup(deviceId: string): Promise<void> {
+    // Clear reconnection timer
+    const timer = this.reconnectionTimers.get(deviceId);
+    if (timer) {
+      clearTimeout(timer);
+      this.reconnectionTimers.delete(deviceId);
+    }
+
+    // Clear connection health
+    this.connectionHealth.delete(deviceId);
+    this.connectionAttempts.delete(deviceId);
+
+    // Disconnect device
+    await this.disconnectFromDevice(deviceId);
   }
 }

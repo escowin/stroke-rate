@@ -71,10 +71,10 @@ export const useBluetooth = () => {
     setStoreError(undefined);
 
     try {
-      const success = await bluetoothService.connectToDevice(device.id);
+      const success = await bluetoothService.connectToDeviceWithHealthMonitoring(device.id);
       
       if (success) {
-        const connectedDevice = { ...device, connected: true };
+        const connectedDevice = { ...device, connected: true, isHealthy: true };
         addConnectedDevice(connectedDevice);
         
         // Start heart rate monitoring
@@ -100,7 +100,7 @@ export const useBluetooth = () => {
   const disconnectFromDevice = useCallback(async (deviceId: string) => {
     try {
       await bluetoothService.stopHeartRateMonitoring(deviceId);
-      await bluetoothService.disconnectFromDevice(deviceId);
+      await bluetoothService.disconnectFromDeviceWithCleanup(deviceId);
       removeConnectedDevice(deviceId);
       return true;
     } catch (err) {
@@ -149,6 +149,23 @@ export const useBluetooth = () => {
     return bluetoothService.getKnownDevices();
   }, [bluetoothService]);
 
+  // Connection health methods
+  const getConnectionHealth = useCallback((deviceId: string) => {
+    return bluetoothService.getConnectionHealth(deviceId);
+  }, [bluetoothService]);
+
+  const getAllConnectionHealth = useCallback(() => {
+    return bluetoothService.getAllConnectionHealth();
+  }, [bluetoothService]);
+
+  const isConnectionHealthy = useCallback((deviceId: string) => {
+    return bluetoothService.isConnectionHealthy(deviceId);
+  }, [bluetoothService]);
+
+  const attemptReconnection = useCallback(async (deviceId: string) => {
+    return await bluetoothService.attemptReconnection(deviceId);
+  }, [bluetoothService]);
+
   return {
     isAvailable,
     isScanning,
@@ -160,6 +177,10 @@ export const useBluetooth = () => {
     handleSpeedCoachConflicts,
     clearError,
     clearKnownDevices,
-    getKnownDevices
+    getKnownDevices,
+    getConnectionHealth,
+    getAllConnectionHealth,
+    isConnectionHealthy,
+    attemptReconnection
   };
 };
