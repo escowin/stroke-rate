@@ -23,13 +23,6 @@ export const ConnectionStatus = () => {
   const healthSummary = getHealthSummary();
   const unhealthyConnections = getUnhealthyConnections();
 
-  const getStatusColor = () => {
-    if (hasSpeedCoachConflicts) return 'text-yellow-600';
-    if (unhealthyConnections.length > 0) return 'text-red-600';
-    if (connectedDevices.length > 0) return 'text-green-600';
-    if (isScanning) return 'text-blue-600';
-    return 'text-gray-600';
-  };
 
   const getStatusIcon = () => {
     if (hasSpeedCoachConflicts) return ExclamationTriangleIcon;

@@ -53,7 +53,7 @@ export const ConnectionConflictDialog = () => {
 
   return (
     <Transition appear show={showConflictDialog} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={handleClose}>
+      <Dialog as="div" className="dialog-overlay" onClose={handleClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -80,7 +80,7 @@ export const ConnectionConflictDialog = () => {
               <Dialog.Panel className="dialog-panel">
                 <div className="dialog-header">
                   <div className="dialog-title-container">
-                    <div className="flex-shrink-0">
+                    <div className="dialog-icon-container">
                       <ExclamationTriangleIcon className="dialog-icon" />
                     </div>
                     <Dialog.Title

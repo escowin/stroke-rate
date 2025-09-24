@@ -120,7 +120,7 @@ export const DeviceSetup = () => {
                 onClick={handleConnectAllAvailable}
                 className="btn btn-secondary"
               >
-                <CheckCircleIcon className="h-4 w-4 mr-2" />
+                <CheckCircleIcon className="btn-icon" />
                 Connect All
               </button>
             )}
@@ -129,7 +129,7 @@ export const DeviceSetup = () => {
               disabled={isScanning}
               className="btn btn-primary"
             >
-              <WifiIcon className="h-4 w-4 mr-2" />
+              <WifiIcon className="btn-icon" />
               {isScanning ? 'Scanning...' : 'Scan for Devices'}
             </button>
           </div>
@@ -283,7 +283,7 @@ export const DeviceSetup = () => {
               disabled={!newRowerName.trim() || availableSeats.length === 0}
               className="btn btn-primary"
             >
-              <PlusIcon className="h-4 w-4 mr-2" />
+              <PlusIcon className="btn-icon" />
               Add
             </button>
           </div>

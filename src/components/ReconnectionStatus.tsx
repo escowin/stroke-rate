@@ -72,7 +72,7 @@ export const ReconnectionStatus = () => {
               className="btn btn-secondary"
               style={{ color: 'var(--status-error)', borderColor: 'var(--status-error)' }}
             >
-              <ArrowPathIcon className="h-3 w-3 mr-1" />
+              <ArrowPathIcon className="reconnection-icon" />
               Reconnect All
             </button>
           </div>

@@ -95,7 +95,7 @@ export const Dashboard = () => {
                 disabled={connectionStatus.connectedDevices.length === 0}
                 className="btn btn-primary"
               >
-                <PlayIcon className="h-4 w-4 mr-2" />
+                <PlayIcon className="btn-icon" />
                 Start Session
               </button>
             ) : (
@@ -103,7 +103,7 @@ export const Dashboard = () => {
                 onClick={handleEndSession}
                 className="btn btn-danger"
               >
-                <StopIcon className="h-4 w-4 mr-2" />
+                <StopIcon className="btn-icon" />
                 End Session
               </button>
             )}
@@ -112,7 +112,7 @@ export const Dashboard = () => {
               onClick={() => setUIState({ currentView: 'setup' })}
               className="btn btn-secondary"
             >
-              <PlusIcon className="h-4 w-4 mr-2" />
+              <PlusIcon className="btn-icon" />
               Add Rower
             </button>
           </div>
@@ -202,7 +202,7 @@ export const Dashboard = () => {
               onClick={() => setUIState({ currentView: 'setup' })}
               className="btn btn-primary"
             >
-              <PlusIcon className="h-4 w-4 mr-2" />
+              <PlusIcon className="btn-icon" />
               Setup Devices
             </button>
           </div>

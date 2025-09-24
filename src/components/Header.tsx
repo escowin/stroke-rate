@@ -23,7 +23,6 @@ export const Header = () => {
 
   return (
     <header className="header">
-      <div className="header-container">
         <div className="header-content">
           {/* Logo and Title */}
           <div className="header-brand">
@@ -118,7 +117,6 @@ export const Header = () => {
             })}
           </div>
         </div>
-      </div>
     </header>
   );
 };
