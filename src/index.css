@@ -334,7 +334,7 @@ body {
   gap: 0.75rem;
 }
 
-@media (min-width: 768px) {
+@media (orientation: landscape) {
   .rower-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -408,17 +408,12 @@ body {
   gap: 1rem;
 }
 
-@media (min-width: 768px) {
+@media (orientation: landscape) {
   .heart-rate-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 1024px) {
-  .heart-rate-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
 
 .empty-state {
   padding: 3rem;
@@ -460,7 +455,7 @@ body {
   gap: 1rem;
 }
 
-@media (min-width: 768px) {
+@media (orientation: landscape) {
   .heart-rate-zones-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
