@@ -171,7 +171,8 @@ export const useAppStore = create<AppStore>()(
           currentSession: state.currentSession ? {
             ...state.currentSession,
             endTime: new Date(),
-            isActive: false
+            isActive: false,
+            finalHeartRateData: [...state.currentSession.heartRateData] // Capture static snapshot
           } : undefined
         })),
       

@@ -43,9 +43,9 @@ export const ConnectionStatus = () => {
   const StatusIcon = getStatusIcon();
 
   return (
-    <div className="card-base connection-status">
-      <div className="connection-status-content">
-        <div className="connection-status-info">
+    <>
+      <section className="connection-status-content">
+        <article className="connection-status-info">
           <StatusIcon className={`connection-status-icon ${
             hasSpeedCoachConflicts ? 'connection-status-icon--conflict' :
             unhealthyConnections.length > 0 ? 'connection-status-icon--unhealthy' :
@@ -69,16 +69,16 @@ export const ConnectionStatus = () => {
               </p>
             )}
           </div>
-        </div>
+        </article>
 
         {/* Device List */}
         {connectedDevices.length > 0 && (
-          <div className="connection-device-list">
+          <ul className="connection-device-list">
             {connectedDevices.map((device) => {
               const isHealthy = device.isHealthy !== false;
               
               return (
-                <div
+                <li
                   key={device.id}
                   className={`connection-device-item ${
                     isHealthy ? 'connection-device-item--healthy' : 'connection-device-item--unhealthy'
@@ -87,22 +87,22 @@ export const ConnectionStatus = () => {
                   <div className={`connection-device-indicator ${
                     isHealthy ? 'connection-device-indicator--healthy' : 'connection-device-indicator--unhealthy'
                   }`} />
-                  <span className={`connection-device-name ${
+                  <p className={`connection-device-name ${
                     isHealthy ? 'connection-device-name--healthy' : 'connection-device-name--unhealthy'
                   }`}>
                     {device.name}
-                  </span>
-                </div>
+                  </p>
+                </li>
               );
             })}
-          </div>
+          </ul>
         )}
-      </div>
+      </section>
 
       {/* Unhealthy Connections */}
       {unhealthyConnections.length > 0 && (
-        <div className="connection-issues">
-          <div className="connection-issue">
+        <section className="connection-issues">
+          <article className="connection-issue">
             <ExclamationCircleIcon className="connection-issue-icon connection-issue-icon--error" />
             <div className="connection-issue-content">
               <p className="connection-issue-title connection-issue-title--error">
@@ -116,14 +116,14 @@ export const ConnectionStatus = () => {
                 ))}
               </ul>
             </div>
-          </div>
-        </div>
+          </article>
+        </section>
       )}
 
       {/* SpeedCoach Conflicts */}
       {hasSpeedCoachConflicts && conflicts.length > 0 && (
-        <div className="connection-issues">
-          <div className="connection-issue">
+        <section className="connection-issues">
+          <article className="connection-issue">
             <ExclamationTriangleIcon className="connection-issue-icon connection-issue-icon--warning" />
             <div className="connection-issue-content">
               <p className="connection-issue-title connection-issue-title--warning">
@@ -137,9 +137,9 @@ export const ConnectionStatus = () => {
                 ))}
               </ul>
             </div>
-          </div>
-        </div>
+          </article>
+        </section>
       )}
-    </div>
+    </>
   );
 };

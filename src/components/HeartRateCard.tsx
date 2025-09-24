@@ -30,9 +30,9 @@ export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
   const StatusIcon = connectionStatus.icon;
 
   return (
-    <div className="heart-rate-card">
+    <article className="heart-rate-card">
       {/* Header */}
-      <div className="heart-rate-card-header">
+      <header className="heart-rate-card-header">
         <div className="heart-rate-card-info">
           <h3 className="heart-rate-card-name">
             {rower.name}
@@ -49,7 +49,7 @@ export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
           }`} />
           <Battery0Icon className="heart-rate-card-battery-icon" />
         </div>
-      </div>
+      </header>
 
       {/* Heart Rate Display */}
       <div className="heart-rate-display">
@@ -75,19 +75,20 @@ export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
       {/* Zone Progress */}
       {heartRate && (
         <div className="heart-rate-zone-progress">
-          <div className="heart-rate-zone-labels">
+          <label htmlFor={`progress-bar-${rower.id}`} className="heart-rate-zone-labels">
             <span>Recovery</span>
             <span>Anaerobic</span>
-          </div>
-          <div className="heart-rate-progress-bar">
-            <div 
-              className="heart-rate-progress-fill"
-              style={{ 
-                backgroundColor: zoneColor,
-                width: `${Math.min(100, ((heartRate - 60) / (190 - 60)) * 100)}%`
-              }}
-            />
-          </div>
+          </label>
+          <progress 
+            id={`progress-bar-${rower.id}`}
+            className="heart-rate-progress-bar"
+            max={190 - 60}
+            value={heartRate - 60}
+            style={{ '--zone-color': zoneColor } as React.CSSProperties}
+            aria-label={`Heart rate progress: ${heartRate} BPM`}
+          >
+            {heartRate} BPM
+          </progress>
         </div>
       )}
 
@@ -98,6 +99,6 @@ export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
           : 'No data received'
         }
       </div>
-    </div>
+    </article>
   );
 };

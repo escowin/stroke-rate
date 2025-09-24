@@ -3,9 +3,9 @@ import { useAppStore } from '../store';
 import { useBluetooth } from '../hooks/useBluetooth';
 import { useConnectionHealth } from '../hooks/useConnectionHealth';
 import type { BluetoothDevice, Rower } from '../types';
-import { 
-  WifiIcon, 
-  PlusIcon, 
+import {
+  WifiIcon,
+  PlusIcon,
   TrashIcon,
   UserIcon,
   SignalIcon,
@@ -16,19 +16,19 @@ import {
 } from '@heroicons/react/24/outline';
 
 export const DeviceSetup = () => {
-  const { 
-    connectionStatus, 
-    rowers, 
-    addRower, 
+  const {
+    connectionStatus,
+    rowers,
+    addRower,
     // updateRower, 
     removeRower,
-    assignDeviceToRower 
+    assignDeviceToRower
   } = useAppStore();
-  
-  const { 
-    scanForDevices, 
-    connectToDevice, 
-    disconnectFromDevice, 
+
+  const {
+    scanForDevices,
+    connectToDevice,
+    disconnectFromDevice,
     isScanning,
     clearKnownDevices,
     getKnownDevices,
@@ -36,17 +36,17 @@ export const DeviceSetup = () => {
   } = useBluetooth();
 
   const { getDeviceHealthStatus } = useConnectionHealth();
-  
+
   const [newRowerName, setNewRowerName] = useState('');
   const [selectedSeat, setSelectedSeat] = useState(1);
   const [hasScanned, setHasScanned] = useState(false);
 
-  const availableSeats = [1, 2, 3, 4].filter(seat => 
+  const availableSeats = [1, 2, 3, 4].filter(seat =>
     !rowers.some(rower => rower.seat === seat)
   );
 
   // Filter out connected devices from available devices
-  const unconnectedAvailableDevices = connectionStatus.availableDevices.filter(device => 
+  const unconnectedAvailableDevices = connectionStatus.availableDevices.filter(device =>
     !connectionStatus.connectedDevices.some(connected => connected.id === device.id)
   );
 
@@ -83,7 +83,7 @@ export const DeviceSetup = () => {
           anaerobic: { name: 'Anaerobic', min: 170, max: 190, color: '#ef4444', description: 'High intensity' }
         }
       };
-      
+
       addRower(rower);
       setNewRowerName('');
       setSelectedSeat(availableSeats[0] || 1);
@@ -112,37 +112,35 @@ export const DeviceSetup = () => {
   // Use the optimized getDeviceHealthStatus from the hook
 
   return (
-    <div className="device-setup-container">
+    <>
       {/* Device Discovery */}
-      <div className="device-discovery">
-        <div className="device-discovery-header">
+      <section className="device-discovery">
+        <article className="device-discovery-header">
           <h2 className="device-discovery-title">
             Heart Rate Devices
           </h2>
-          <div className="device-discovery-actions">
-            {unconnectedAvailableDevices.length > 0 && (
-              <button
-                onClick={handleConnectAllAvailable}
-                className="btn btn-secondary"
-              >
-                <CheckCircleIcon className="btn-icon" />
-                Connect All
-              </button>
-            )}
+          {unconnectedAvailableDevices.length > 0 && (
             <button
-              onClick={handleScanForDevices}
-              disabled={isScanning}
-              className="btn btn-primary"
+              onClick={handleConnectAllAvailable}
+              className="btn btn-secondary"
             >
-              <WifiIcon className="btn-icon" />
-              {isScanning ? 'Scanning...' : 'Scan for Devices'}
+              <CheckCircleIcon className="btn-icon" />
+              Connect All
             </button>
-          </div>
-        </div>
+          )}
+          <button
+            onClick={handleScanForDevices}
+            disabled={isScanning}
+            className="btn btn-primary"
+          >
+            <WifiIcon className="btn-icon" />
+            {isScanning ? 'Scanning...' : 'Scan for Devices'}
+          </button>
+        </article>
 
         {/* Available Devices */}
         {unconnectedAvailableDevices.length > 0 && (
-          <div className="device-list">
+          <article className="device-list">
             <h3 className="device-list-title">Available Devices</h3>
             {unconnectedAvailableDevices.map((device) => (
               <div
@@ -151,14 +149,14 @@ export const DeviceSetup = () => {
               >
                 <div className="device-item-info">
                   <SignalIcon className="device-item-icon" />
-                  <div className="device-item-details">
-                    <p className="device-item-name">
+                  <p className="device-item-details">
+                    <span className="device-item-name">
                       {device.name}
-                    </p>
-                    <p className="device-item-id">
+                    </span>
+                    <span className="device-item-id">
                       {device.id}
-                    </p>
-                  </div>
+                    </span>
+                  </p>
                 </div>
                 <button
                   onClick={() => handleConnectDevice(device)}
@@ -168,30 +166,30 @@ export const DeviceSetup = () => {
                 </button>
               </div>
             ))}
-          </div>
+          </article>
         )}
 
         {/* No Heart Rate Devices Found */}
         {hasScanned && unconnectedAvailableDevices.length === 0 && !isScanning && connectionStatus.connectedDevices.length === 0 && (
-          <div className="no-devices-warning">
-            <div className="no-devices-warning-content">
+          <article className="no-devices-warning">
+            {/* <div className="no-devices-warning-content"> */}
               <ExclamationTriangleIcon className="no-devices-warning-icon" />
               <div className="no-devices-warning-text">
                 <h3 className="no-devices-warning-title">
                   No heart rate devices found
                 </h3>
                 <p className="no-devices-warning-description">
-                  This may mean heart rate devices are connected to SpeedCoach. 
+                  This may mean heart rate devices are connected to SpeedCoach.
                   Ask rowers to disconnect their devices from SpeedCoach, then scan again.
                 </p>
               </div>
-            </div>
-          </div>
+            {/* </div> */}
+          </article>
         )}
 
         {/* Debug Information */}
         {process.env.NODE_ENV === 'development' && (
-          <div className="debug-info">
+          <article className="debug-info">
             <h4 className="debug-info-title">Debug Information</h4>
             <div className="debug-info-content">
               <p className="debug-info-item">Known Devices: {getKnownDevices().length}</p>
@@ -204,38 +202,35 @@ export const DeviceSetup = () => {
                 Clear Known Devices
               </button>
             </div>
-          </div>
+          </article>
         )}
 
         {/* Connected Devices */}
         {connectionStatus.connectedDevices.length > 0 && (
-          <div className="connected-devices">
+          <article className="connected-devices">
             <h3 className="connected-devices-title">Connected Devices</h3>
             {connectionStatus.connectedDevices.map((device) => {
               const healthStatus = getDeviceHealthStatus(device.id);
               const isHealthy = healthStatus.status === 'healthy';
-              
+
               return (
                 <div
                   key={device.id}
-                  className={`connected-device-item ${
-                    isHealthy ? 'connected-device-item--healthy' : 'connected-device-item--unhealthy'
-                  }`}
+                  className={`connected-device-item ${isHealthy ? 'connected-device-item--healthy' : 'connected-device-item--unhealthy'
+                    }`}
                 >
                   <div className="connected-device-info">
-                    <div className={`connected-device-status-indicator ${
-                      isHealthy ? 'connected-device-status-indicator--healthy' : 'connected-device-status-indicator--unhealthy'
-                    }`} />
-                    <div className="connected-device-details">
-                      <p className="connected-device-name">
+                    <span className={`connected-device-status-indicator ${isHealthy ? 'connected-device-status-indicator--healthy' : 'connected-device-status-indicator--unhealthy'
+                      }`} />
+                    <p className="connected-device-details">
+                      <span className="connected-device-name">
                         {device.name}
-                      </p>
-                      <p className={`connected-device-status ${
-                        isHealthy ? 'connected-device-status--healthy' : 'connected-device-status--unhealthy'
-                      }`}>
+                      </span>
+                      <span className={`connected-device-status ${isHealthy ? 'connected-device-status--healthy' : 'connected-device-status--unhealthy'
+                        }`}>
                         {isHealthy ? 'Connected & Healthy' : 'Connected (Unhealthy)'}
-                      </p>
-                    </div>
+                      </span>
+                    </p>
                   </div>
                   <div className="connected-device-actions">
                     {!isHealthy && (
@@ -260,18 +255,18 @@ export const DeviceSetup = () => {
                 </div>
               );
             })}
-          </div>
+          </article>
         )}
-      </div>
+      </section>
 
       {/* Rower Management */}
-      <div className="card-base rower-management">
+      <section className="card-base rower-management">
         <h2 className="rower-management-title">
           Rower Setup
         </h2>
 
         {/* Add New Rower */}
-        <div className="add-rower-section">
+        <article className="add-rower-section">
           <h3 className="add-rower-title">Add New Rower</h3>
           <div className="add-rower-form">
             <input
@@ -301,11 +296,11 @@ export const DeviceSetup = () => {
               Add
             </button>
           </div>
-        </div>
+        </article>
 
         {/* Rower List */}
         {rowers.length > 0 && (
-          <div className="rower-list">
+          <article className="rower-list">
             <h3 className="rower-list-title">Configured Rowers</h3>
             {rowers.map((rower) => (
               <div
@@ -323,7 +318,7 @@ export const DeviceSetup = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="rower-item-actions">
                   {/* Device Assignment */}
                   <div className="rower-device-assignment">
@@ -343,7 +338,7 @@ export const DeviceSetup = () => {
                         );
                       })}
                     </select>
-                    
+
                     {/* Device Health Indicator */}
                     {rower.deviceId && (
                       <div className="rower-device-health">
@@ -352,12 +347,10 @@ export const DeviceSetup = () => {
                           const isHealthy = healthStatus.status === 'healthy';
                           return (
                             <>
-                              <div className={`rower-device-health-indicator ${
-                                isHealthy ? 'rower-device-health-indicator--healthy' : 'rower-device-health-indicator--unhealthy'
-                              }`} />
-                              <span className={`rower-device-health-text ${
-                                isHealthy ? 'rower-device-health-text--healthy' : 'rower-device-health-text--unhealthy'
-                              }`}>
+                              <div className={`rower-device-health-indicator ${isHealthy ? 'rower-device-health-indicator--healthy' : 'rower-device-health-indicator--unhealthy'
+                                }`} />
+                              <span className={`rower-device-health-text ${isHealthy ? 'rower-device-health-text--healthy' : 'rower-device-health-text--unhealthy'
+                                }`}>
                                 {isHealthy ? 'Healthy' : 'Unhealthy'}
                               </span>
                             </>
@@ -366,7 +359,7 @@ export const DeviceSetup = () => {
                       </div>
                     )}
                   </div>
-                  
+
                   <button
                     onClick={() => handleRemoveRower(rower.id)}
                     className="rower-remove-button"
@@ -376,9 +369,9 @@ export const DeviceSetup = () => {
                 </div>
               </div>
             ))}
-          </div>
+          </article>
         )}
-      </div>
-    </div>
+      </section>
+    </>
   );
 };

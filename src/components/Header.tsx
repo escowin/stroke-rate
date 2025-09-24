@@ -23,10 +23,9 @@ export const Header = () => {
 
   return (
     <header className="header">
-        <div className="header-content">
+        <section className="header-content">
           {/* Logo and Title */}
-          <div className="header-brand">
-            <div className="header-logo">
+          <article className="header-brand">
               <HeartIcon className="header-logo-icon" />
               <div className="header-title">
                 <h1 className="header-app-name">
@@ -36,11 +35,10 @@ export const Header = () => {
                   Heart Rate Monitor
                 </p>
               </div>
-            </div>
-          </div>
+          </article>
 
           {/* Connection Status */}
-          <div className="header-status">
+          <article className="header-status">
             <div className="header-connection-status">
               {isConnected ? (
                 <>
@@ -66,12 +64,11 @@ export const Header = () => {
             >
               <Bars3Icon className="header-mobile-menu-icon" />
             </button>
-          </div>
-        </div>
+          </article>
+        </section>
 
         {/* Mobile Navigation Menu */}
-        <div className={`header-mobile-menu ${isMenuOpen ? 'header-mobile-menu--open' : ''}`}>
-          <div className="header-mobile-menu-content">
+        <nav className={`header-mobile-menu ${isMenuOpen ? 'header-mobile-menu--open' : ''}`}>
             {navigation.map((item) => {
               const isActive = uiState.currentView === item.view;
               return (
@@ -92,12 +89,10 @@ export const Header = () => {
                 </button>
               );
             })}
-          </div>
-        </div>
+        </nav>
 
         {/* Desktop Navigation */}
-        <div className="header-desktop-menu">
-          <div className="header-desktop-menu-content">
+        <nav className="header-desktop-menu">
             {navigation.map((item) => {
               const isActive = uiState.currentView === item.view;
               return (
@@ -115,8 +110,7 @@ export const Header = () => {
                 </button>
               );
             })}
-          </div>
-        </div>
+        </nav>
     </header>
   );
 };

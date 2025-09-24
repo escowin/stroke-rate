@@ -66,6 +66,7 @@ export interface TrainingSession {
   endTime?: Date;
   rowers: Rower[];
   heartRateData: HeartRateData[];
+  finalHeartRateData?: HeartRateData[]; // Static snapshot captured when session ends
   isActive: boolean;
 }
 

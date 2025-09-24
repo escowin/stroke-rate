@@ -1,7 +1,7 @@
 import { useAppStore } from '../store';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment, useState } from 'react';
-import { 
+import {
   ExclamationTriangleIcon,
   XMarkIcon,
   WifiIcon,
@@ -10,10 +10,10 @@ import {
 import { BluetoothService } from '../services/bluetooth';
 
 export const ConnectionConflictDialog = () => {
-  const { 
-    uiState, 
-    connectionStatus, 
-    setUIState 
+  const {
+    uiState,
+    connectionStatus,
+    setUIState
   } = useAppStore();
 
   const { showConflictDialog } = uiState;
@@ -31,7 +31,7 @@ export const ConnectionConflictDialog = () => {
     try {
       // Handle SpeedCoach disconnection
       const success = await bluetoothService.handleSpeedCoachDisconnection(conflicts);
-      
+
       if (success) {
         console.log('SpeedCoach disconnection handled successfully');
         // Optionally trigger a new scan to refresh available devices
@@ -78,7 +78,7 @@ export const ConnectionConflictDialog = () => {
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="dialog-panel">
-                <div className="dialog-header">
+                <header className="dialog-header">
                   <div className="dialog-title-container">
                     <div className="dialog-icon-container">
                       <ExclamationTriangleIcon className="dialog-icon" />
@@ -96,13 +96,13 @@ export const ConnectionConflictDialog = () => {
                   >
                     <XMarkIcon className="dialog-close-icon" />
                   </button>
-                </div>
+                </header>
 
                 <div className="dialog-body">
                   <p className="dialog-description">
                     The following heart rate monitors are currently connected to SpeedCoach devices:
                   </p>
-                  
+
                   <div className="dialog-conflict-list">
                     {conflicts.map((conflict) => (
                       <div

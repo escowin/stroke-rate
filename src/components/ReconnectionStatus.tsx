@@ -57,8 +57,8 @@ export const ReconnectionStatus = () => {
   }
 
   return (
-    <div className="card-base reconnection-status">
-      <div className="reconnection-status-header">
+    <section className="card-base reconnection-status">
+      <article className="reconnection-status-header">
         <div className="reconnection-status-title">
           <ExclamationTriangleIcon className="reconnection-status-icon" />
           <h3 className="reconnection-status-text">
@@ -77,16 +77,16 @@ export const ReconnectionStatus = () => {
             </button>
           </div>
         )}
-      </div>
+      </article>
 
-      <div className="reconnection-device-list">
+      <ul className="reconnection-device-list">
         {unhealthyConnections.map((health) => {
           const isAttempting = reconnectionAttempts.get(health.deviceId);
           const result = reconnectionResults.get(health.deviceId);
           const device = connectionStatus.connectedDevices.find(d => d.id === health.deviceId);
           
           return (
-            <div
+            <li
               key={health.deviceId}
               className="reconnection-device-item"
             >
@@ -135,10 +135,10 @@ export const ReconnectionStatus = () => {
                   )}
                 </button>
               </div>
-            </div>
+            </li>
           );
         })}
-      </div>
-    </div>
+      </ul>
+    </section>
   );
 };
