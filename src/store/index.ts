@@ -103,6 +103,9 @@ export const useAppStore = create<AppStore>()(
       // Heart Rate Data
       updateHeartRate: (data) =>
         set((state) => {
+          // console.log('Store - updateHeartRate called with:', data);
+          // console.log('Store - current session:', state.currentSession);
+          
           const updatedRowers = state.rowers.map(rower => {
             if (rower.deviceId === data.deviceId) {
               return { ...rower, currentHeartRate: data };
@@ -114,6 +117,8 @@ export const useAppStore = create<AppStore>()(
             ...state.currentSession,
             heartRateData: [...state.currentSession.heartRateData, data]
           } : undefined;
+          
+          // console.log('Store - updated session heartRateData length:', updatedSession?.heartRateData.length);
           
           return {
             rowers: updatedRowers,

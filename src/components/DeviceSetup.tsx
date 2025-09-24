@@ -33,7 +33,7 @@ export const DeviceSetup = () => {
     getKnownDevices
   } = useBluetooth();
 
-  const { getDeviceHealth, getDeviceHealthStatus } = useConnectionHealth();
+  const { getDeviceHealthStatus } = useConnectionHealth();
   
   const [newRowerName, setNewRowerName] = useState('');
   const [selectedSeat, setSelectedSeat] = useState(1);
