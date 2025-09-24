@@ -1,8 +1,9 @@
 import { useAppStore } from '../store';
 import { useHeartRateZones } from '../hooks/useHeartRateZones';
 import { useConnectionHealth } from '../hooks/useConnectionHealth';
+import { useSessionDuration } from '../hooks/useSessionDuration';
 import { HeartRateCard } from './HeartRateCard';
-import { HeartRateChart } from './HeartRateChart';
+// import { HeartRateChart } from './HeartRateChart';
 import { ConnectionStatus } from './ConnectionStatus';
 import { ReconnectionStatus } from './ReconnectionStatus';
 import { 
@@ -26,6 +27,7 @@ export const Dashboard = () => {
   
   const { zones } = useHeartRateZones();
   const { getUnhealthyConnections } = useConnectionHealth();
+  const sessionDuration = useSessionDuration(currentSession);
   const isSessionActive = currentSession?.isActive;
   
   const unhealthyConnections = getUnhealthyConnections();
@@ -65,6 +67,8 @@ export const Dashboard = () => {
             <p className="session-subtitle">
               {isSessionActive 
                 ? `Started ${currentSession?.startTime.toLocaleTimeString()}`
+                : currentSession && !isSessionActive
+                ? `Session ended - Duration: ${sessionDuration}`
                 : 'Ready to start monitoring'
               }
             </p>
@@ -74,6 +78,11 @@ export const Dashboard = () => {
                   <CheckCircleIcon className="status-icon" style={{ color: 'var(--status-success)' }} />
                   <span className="status-text status-text--success">
                     {connectedRowers.length} rower(s) active
+                  </span>
+                </div>
+                <div className="status-indicator">
+                  <span className="status-text status-text--info">
+                    Duration: {sessionDuration}
                   </span>
                 </div>
                 {unhealthyConnections.length > 0 && (
@@ -181,12 +190,12 @@ export const Dashboard = () => {
             </div>
           )}
           
-          {/* Heart Rate Chart */}
-          {currentSession && currentSession.heartRateData.length > 0 && (
+          {/* Heart Rate Chart - Temporarily disabled per TESTING_GUIDE.md */}
+          {/* {currentSession && currentSession.heartRateData.length > 0 && (
             <HeartRateChart
               data={currentSession.heartRateData}
             />
-          )}
+          )} */}
         </>
       ) : (
         <div className="card-base empty-state">

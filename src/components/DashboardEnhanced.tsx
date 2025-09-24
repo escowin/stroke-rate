@@ -1,6 +1,7 @@
 import { useAppStore } from '../store';
 import { useHeartRateZones } from '../hooks/useHeartRateZones';
 import { useConnectionHealth } from '../hooks/useConnectionHealth';
+import { useSessionDuration } from '../hooks/useSessionDuration';
 import { HeartRateCard } from './HeartRateCard';
 import { ConnectionStatus } from './ConnectionStatus';
 import { ReconnectionStatus } from './ReconnectionStatus';
@@ -26,6 +27,7 @@ export const DashboardEnhanced = () => {
   
   const { zones } = useHeartRateZones();
   const { getUnhealthyConnections } = useConnectionHealth();
+  const sessionDuration = useSessionDuration(currentSession);
   const isSessionActive = currentSession?.isActive;
   
   const unhealthyConnections = getUnhealthyConnections();
@@ -68,6 +70,8 @@ export const DashboardEnhanced = () => {
             <p className="session-subtitle">
               {isSessionActive 
                 ? `Started ${currentSession?.startTime.toLocaleTimeString()}`
+                : currentSession && !isSessionActive
+                ? `Session ended - Duration: ${sessionDuration}`
                 : 'Ready to start monitoring'
               }
             </p>
@@ -77,6 +81,11 @@ export const DashboardEnhanced = () => {
                   <CheckCircleIcon className="status-icon" style={{ color: 'var(--status-success)' }} />
                   <span className="status-text status-text--success">
                     {connectedRowers.length} rower(s) active
+                  </span>
+                </div>
+                <div className="status-indicator">
+                  <span className="status-text status-text--info">
+                    Duration: {sessionDuration}
                   </span>
                 </div>
                 {unhealthyConnections.length > 0 && (

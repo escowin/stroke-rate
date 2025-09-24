@@ -303,6 +303,10 @@ body {
   color: var(--color-red-medium);
 }
 
+.status-text--info {
+  color: var(--color-blue-medium);
+}
+
 .session-actions {
   display: flex;
   gap: 0.75rem;
