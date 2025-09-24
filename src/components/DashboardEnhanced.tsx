@@ -192,7 +192,7 @@ export const DashboardEnhanced = () => {
         )} */}
       </>
       ) : (
-        <div className="empty-state">
+        <div className="card-base empty-state">
           <ChartBarIcon className="empty-state-icon" />
           <h3 className="empty-state-title">
             No heart rate data
@@ -213,7 +213,7 @@ export const DashboardEnhanced = () => {
       )}
 
       {/* Heart Rate Zones Legend */}
-      <div className="heart-rate-zones">
+      <div className="card-base heart-rate-zones">
         <h3 className="heart-rate-zones-title">
           Heart Rate Zones
         </h3>

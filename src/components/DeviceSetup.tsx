@@ -251,7 +251,7 @@ export const DeviceSetup = () => {
       </div>
 
       {/* Rower Management */}
-      <div className="rower-management">
+      <div className="card-base rower-management">
         <h2 className="rower-management-title">
           Rower Setup
         </h2>

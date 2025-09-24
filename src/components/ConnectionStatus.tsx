@@ -43,7 +43,7 @@ export const ConnectionStatus = () => {
   const StatusIcon = getStatusIcon();
 
   return (
-    <div className="connection-status">
+    <div className="card-base connection-status">
       <div className="connection-status-content">
         <div className="connection-status-info">
           <StatusIcon className={`connection-status-icon ${

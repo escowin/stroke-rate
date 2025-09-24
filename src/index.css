@@ -156,15 +156,18 @@ body {
   cursor: not-allowed;
 }
 
-/* Card Styles */
-.card {
+/* Base Card Styles - Common styling for all card-like components */
+.card-base {
   background-color: var(--color-slate-medium);
   border-radius: 0.5rem;
   box-shadow: var(--shadow-primary);
   border: 1px solid var(--color-slate-medium);
   padding: 1.5rem;
   transition: background-color 0.2s ease, border-color 0.2s ease;
+  color: var(--color-slate-light); /* Inherit text color to children */
 }
+
+/* Card Styles - inherits from .card-base */
 
 /* Input Styles */
 .input {
@@ -404,32 +407,24 @@ body {
 }
 
 .empty-state {
-  background-color: var(--color-slate-medium);
-  border-radius: 0.5rem;
-  box-shadow: var(--shadow-primary);
-  border: 1px solid var(--color-slate-medium);
   padding: 3rem;
   text-align: center;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .empty-state-icon {
   width: 3rem;
   height: 3rem;
-  color: var(--color-slate-light);
   margin: 0 auto;
 }
 
 .empty-state-title {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-slate-light);
   margin: 0.5rem 0 0.25rem 0;
 }
 
 .empty-state-description {
   font-size: 0.875rem;
-  color: var(--color-slate-light);
   margin: 0 0 1.5rem 0;
 }
 
@@ -437,19 +432,11 @@ body {
   margin-top: 1.5rem;
 }
 
-.heart-rate-zones {
-  background-color: var(--color-slate-medium);
-  border-radius: 0.5rem;
-  box-shadow: var(--shadow-primary);
-  border: 1px solid var(--color-slate-medium);
-  padding: 1.5rem;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
+/* Heart rate zones inherits from .card-base */
 
 .heart-rate-zones-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--color-slate-light);
   margin: 0 0 1rem 0;
 }
 
@@ -643,11 +630,9 @@ body {
   padding: 0.25rem 0.25rem 1rem 0.25rem;
   font-size: 0.875rem;
   font-weight: 500;
+  border: none;
   border-bottom: 2px solid transparent;
   background: none;
-  border-top: none;
-  border-left: none;
-  border-right: none;
   cursor: pointer;
   transition: color 0.2s ease, border-color 0.2s ease;
 }
@@ -996,19 +981,11 @@ body {
 }
 
 /* Rower Management Semantic Classes */
-.rower-management {
-  background-color: var(--color-slate-medium);
-  border-radius: 0.5rem;
-  box-shadow: var(--shadow-primary);
-  border: 1px solid var(--color-slate-medium);
-  padding: 1.5rem;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
+/* Rower management inherits from .card-base */
 
 .rower-management-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--color-slate-light);
   margin: 0 0 1rem 0;
 }
 
@@ -1203,12 +1180,7 @@ body {
 
 /* Connection Status Semantic Classes */
 .connection-status {
-  background-color: var(--color-slate-medium);
-  border-radius: 0.5rem;
-  box-shadow: var(--shadow-primary);
-  border: 1px solid var(--color-slate-medium);
   padding: 1rem;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .connection-status-content {
@@ -1392,12 +1364,8 @@ body {
 
 /* Reconnection Status Semantic Classes */
 .reconnection-status {
-  background-color: var(--color-slate-medium);
-  border-radius: 0.5rem;
-  box-shadow: var(--shadow-primary);
   border: 1px solid var(--color-red-medium);
   padding: 1rem;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .reconnection-status-header {
@@ -2159,11 +2127,7 @@ body {
 .error-boundary-content {
   max-width: 28rem;
   width: 100%;
-  background-color: var(--color-slate-medium);
   box-shadow: var(--shadow-secondary);
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  transition: background-color 0.2s ease;
 }
 
 .error-boundary-header {

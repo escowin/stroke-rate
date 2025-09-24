@@ -57,7 +57,7 @@ export const ReconnectionStatus = () => {
   }
 
   return (
-    <div className="reconnection-status">
+    <div className="card-base reconnection-status">
       <div className="reconnection-status-header">
         <div className="reconnection-status-title">
           <ExclamationTriangleIcon className="reconnection-status-icon" />

@@ -28,7 +28,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className="error-boundary">
-          <div className="error-boundary-content">
+          <div className="card-base error-boundary-content">
             <div className="error-boundary-header">
               <ExclamationTriangleIcon className="error-boundary-icon" />
               <h1 className="error-boundary-title">
