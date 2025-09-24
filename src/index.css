@@ -1907,7 +1907,7 @@ body {
 .dialog-panel {
   width: 100%;
   max-width: 28rem;
-  transform: overflow-hidden;
+  overflow: hidden;
   border-radius: 1rem;
   background-color: var(--color-slate-medium);
   padding: 1.5rem;
@@ -2271,9 +2271,8 @@ body {
   display: inline-block;
   height: 1.25rem;
   width: 1.25rem;
-  transform: rounded-full;
+  border-radius: 50%;
   background-color: var(--color-slate-light);
-  box-shadow: 0 0 0 0;
   transition: var(--transition-all);
 }
 
