@@ -59,8 +59,6 @@ html {
   --transition-all: all 0.2s ease;
 
   /* Composed Values - Only when combining multiple values */
-  --shadow-primary: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --shadow-secondary: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
   --input-focus-shadow: 0 0 0 2px var(--color-blue-medium);
 }
 
@@ -176,7 +174,6 @@ body {
 .card-base {
   background-color: var(--color-slate-medium);
   border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-primary);
   border: 1px solid var(--color-slate-medium);
   padding: 1.5rem;
   transition: var(--transition-colors);
@@ -247,7 +244,6 @@ body {
 .session-controls {
   background-color: var(--color-slate-medium);
   border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-primary);
   border: 1px solid var(--color-slate-medium);
   padding: 1.5rem;
   transition: var(--transition-colors);
@@ -493,7 +489,6 @@ body {
 /* Header Semantic Classes */
 .header {
   background-color: var(--color-slate-medium);
-  box-shadow: var(--shadow-primary);
   border-bottom: 1px solid var(--color-slate-medium);
   max-width: 1200px;
   margin: 0 auto;
@@ -714,7 +709,6 @@ body {
 .device-discovery {
   background-color: var(--color-slate-medium);
   border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-primary);
   border: 1px solid var(--color-slate-medium);
   padding: 1.5rem;
   transition: var(--transition-colors);
@@ -1523,7 +1517,6 @@ body {
 .heart-rate-card {
   background-color: var(--color-slate-medium);
   border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-primary);
   border: 1px solid var(--color-slate-medium);
   padding: 1.5rem;
   transition: var(--transition-colors);
@@ -1657,7 +1650,6 @@ body {
 .heart-rate-chart {
   background-color: var(--color-slate-medium);
   border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-primary);
   border: 1px solid var(--color-slate-medium);
   padding: 1.5rem;
   transition: var(--transition-colors);
@@ -1704,7 +1696,6 @@ body {
   padding: 0.75rem;
   border: 1px solid var(--color-slate-medium);
   border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-secondary);
   transition: var(--transition-colors);
 }
 
@@ -1830,7 +1821,6 @@ body {
   border: 1px solid var(--color-slate-medium);
   border-radius: var(--border-radius-md);
   padding: 1rem;
-  box-shadow: var(--shadow-sm);
 }
 
 .error-svg-icon {
@@ -1863,7 +1853,6 @@ body {
   border: 1px solid var(--color-slate-medium);
   border-radius: var(--border-radius-md);
   padding: 1rem;
-  box-shadow: var(--shadow-sm);
 }
 
 .warning-svg-icon {
@@ -1924,7 +1913,6 @@ body {
   padding: 1.5rem;
   text-align: left;
   align-items: center;
-  box-shadow: var(--shadow-secondary);
   transition: all 0.2s ease, background-color 0.2s ease;
 }
 
@@ -2120,7 +2108,6 @@ body {
 .error-boundary-content {
   max-width: 28rem;
   width: 100%;
-  box-shadow: var(--shadow-secondary);
 }
 
 .error-boundary-header {
