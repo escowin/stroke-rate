@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import {
   ChartBarIcon,
-  TrendingUpIcon,
   CalendarIcon,
   FlagIcon,
   UserGroupIcon,
@@ -133,7 +132,7 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
       <section className="card-base progress-header">
         <div className="progress-header-content">
           <h2 className="progress-header-title">
-            <TrendingUpIcon className="progress-header-icon" />
+            <ArrowTrendingUpIcon className="progress-header-icon" />
             Progress Tracking
           </h2>
           <div className="progress-header-controls">
@@ -214,7 +213,7 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
       {/* Trend Charts */}
       <section className="card-base trend-charts">
         <h3 className="card-title">
-          <TrendingUpIcon className="card-title-icon" />
+          <ArrowTrendingUpIcon className="card-title-icon" />
           Performance Trends
         </h3>
         
