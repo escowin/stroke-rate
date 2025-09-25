@@ -10,11 +10,11 @@ import {
   ExclamationTriangleIcon,
   LightBulbIcon
 } from '@heroicons/react/24/outline';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useHistoricalData } from '../hooks/useHistoricalData';
 import { useDefaultHeartRateZones } from '../hooks/useHeartRateZones';
-import type { TrainingSession, HeartRateZones, ProgressReport, Goal, TrainingPhase } from '../types';
-import { generateProgressReport, createGoal, createTrainingPhase } from '../utils/progressTracking';
+import type { HeartRateZones, ProgressReport } from '../types';
+import { generateProgressReport } from '../utils/progressTracking';
 
 interface ProgressTrackingProps {
   className?: string;
@@ -48,19 +48,6 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
     return data;
   }, [crewProgress]);
 
-  const individualChartData = useMemo(() => {
-    if (!selectedRower) return [];
-    
-    const rowerProgress = individualProgress.find(ip => ip.rowerId === selectedRower);
-    if (!rowerProgress) return [];
-
-    return rowerProgress.trends.map(trend => ({
-      metric: trend.metric.replace('metrics.', ''),
-      direction: trend.direction,
-      changeRate: trend.changeRate,
-      confidence: trend.confidence
-    }));
-  }, [selectedRower, individualProgress]);
 
   const zoneDistributionData = useMemo(() => {
     const recentSessions = sessions
@@ -73,7 +60,6 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
     
     recentSessions.forEach(session => {
       const sessionData = session.finalHeartRateData!;
-      const totalPoints = sessionData.length;
       
       sessionData.forEach(data => {
         const zone = data.zone;
@@ -122,6 +108,21 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
     if (progress >= 80) return 'bg-green-100';
     if (progress >= 60) return 'bg-yellow-100';
     return 'bg-red-100';
+  };
+
+  const getMetricDisplayName = (metric: string): string => {
+    const metricMap: Record<string, string> = {
+      'metrics.avgHeartRate': 'Average Heart Rate',
+      'metrics.maxHeartRate': 'Max Heart Rate',
+      'metrics.trimp': 'TRIMP Score',
+      'metrics.consistencyScore': 'Consistency',
+      'metrics.effortScore': 'Effort Level',
+      'crewSynchronization': 'Crew Synchronization',
+      'crewCohesion': 'Crew Cohesion',
+      'performanceScore': 'Performance Score'
+    };
+    
+    return metricMap[metric] || metric.replace('metrics.', '').replace(/([A-Z])/g, ' $1').trim();
   };
 
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
@@ -268,7 +269,7 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
                     fill="#8884d8"
                     dataKey="count"
                   >
-                    {zoneDistributionData.map((entry, index) => (
+                    {zoneDistributionData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -326,7 +327,7 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
                     {rower.trends.slice(0, 3).map(trend => (
                       <div key={trend.metric} className="rower-trend-item">
                         <div className="rower-trend-header">
-                          <span className="rower-trend-metric">{trend.metric}</span>
+                          <span className="rower-trend-metric">{getMetricDisplayName(trend.metric)}</span>
                           {getTrendIcon(trend.direction)}
                         </div>
                         <div className="rower-trend-details">
