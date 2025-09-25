@@ -322,9 +322,8 @@ body {
   border: 1px solid var(--color-slate-medium);
   transition: var(--transition-colors);
   display: flex;
-  flex-direction: column;
-  gap: var(--size-xs);
-  align-items: center;
+  align-items: baseline;
+  justify-content: space-between;
 }
 
 .rower-seat--connected {
@@ -1603,6 +1602,11 @@ body {
 
 .heart-rate-chart-container {
   height: 16rem;
+
+  /* change height in mobile portrait mode */
+  @media (orientation: portrait) {
+    height: 20rem;
+  }
 }
 
 .heart-rate-chart-empty {
@@ -1659,7 +1663,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
 }
 
 .heart-rate-chart-subtitle {

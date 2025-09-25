@@ -14,6 +14,7 @@ export const useBluetooth = () => {
     addConnectedDevice,
     removeConnectedDevice,
     updateDeviceStatus,
+    updateDeviceHealth,
     updateHeartRate,
     setError: setStoreError
   } = useAppStore();
@@ -25,8 +26,16 @@ export const useBluetooth = () => {
 
   // Set up store update callback for health monitoring
   useEffect(() => {
-    bluetoothService.setStoreUpdateCallback(updateDeviceStatus);
-  }, [bluetoothService, updateDeviceStatus]);
+    const healthUpdateCallback = (deviceId: string, updates: Partial<BluetoothDevice>) => {
+      if ('isHealthy' in updates) {
+        updateDeviceHealth(deviceId, updates.isHealthy!);
+      } else {
+        updateDeviceStatus(deviceId, updates);
+      }
+    };
+    
+    bluetoothService.setStoreUpdateCallback(healthUpdateCallback);
+  }, [bluetoothService, updateDeviceStatus, updateDeviceHealth]);
 
   // Scan for devices
   const scanForDevices = useCallback(async () => {

@@ -1,6 +1,6 @@
 import { useAppStore } from '../store';
 import { useHeartRateZones } from '../hooks/useHeartRateZones';
-import { useConnectionHealth } from '../hooks/useConnectionHealth';
+// Removed useConnectionHealth import - now using global store for unhealthy devices
 import { useSessionDuration } from '../hooks/useSessionDuration';
 import { HeartRateCard } from './HeartRateCard';
 import { HeartRateChart } from './HeartRateChart';
@@ -24,15 +24,15 @@ export const Dashboard = () => {
     connectionStatus,
     startSession,
     endSession,
-    setUIState
+    setUIState,
+    getUnhealthyDevices
   } = useAppStore();
 
   const { zones } = useHeartRateZones();
-  const { getUnhealthyConnections } = useConnectionHealth();
   const sessionDuration = useSessionDuration(currentSession);
   const isSessionActive = currentSession?.isActive;
 
-  const unhealthyConnections = getUnhealthyConnections();
+  const unhealthyDevices = getUnhealthyDevices();
 
   const handleStartSession = () => {
     if (rowers.length === 0) {
@@ -90,11 +90,11 @@ export const Dashboard = () => {
                   Duration: {sessionDuration}
                 </span>
               </p>
-              {unhealthyConnections.length > 0 && (
+              {unhealthyDevices.length > 0 && (
                 <p className="status-indicator">
                   <ExclamationTriangleIcon className="status-icon" />
                   <span className="status-text status-text--error">
-                    {unhealthyConnections.length} connection(s) unhealthy
+                    {unhealthyDevices.length} connection(s) unhealthy
                   </span>
                 </p>
               )}

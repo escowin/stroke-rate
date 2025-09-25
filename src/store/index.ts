@@ -17,6 +17,8 @@ interface AppStore extends AppState {
   removeConnectedDevice: (deviceId: string) => void;
   removeAllConnectedDevices: () => void;
   updateDeviceStatus: (deviceId: string, updates: Partial<BluetoothDevice>) => void;
+  updateDeviceHealth: (deviceId: string, isHealthy: boolean) => void;
+  getUnhealthyDevices: () => BluetoothDevice[];
   
   // Heart Rate Data
   updateHeartRate: (data: HeartRateData) => void;
@@ -110,6 +112,21 @@ export const useAppStore = create<AppStore>()(
             )
           }
         })),
+      
+      updateDeviceHealth: (deviceId, isHealthy) =>
+        set((state) => ({
+          connectionStatus: {
+            ...state.connectionStatus,
+            connectedDevices: state.connectionStatus.connectedDevices.map(device =>
+              device.id === deviceId ? { ...device, isHealthy } : device
+            )
+          }
+        })),
+      
+      getUnhealthyDevices: () => {
+        const state = useAppStore.getState();
+        return state.connectionStatus.connectedDevices.filter(device => device.isHealthy === false);
+      },
       
       // Heart Rate Data
       updateHeartRate: (data) =>

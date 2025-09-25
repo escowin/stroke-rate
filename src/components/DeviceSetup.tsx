@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAppStore } from '../store';
 import { useBluetooth } from '../hooks/useBluetooth';
-import { useConnectionHealth } from '../hooks/useConnectionHealth';
+// Removed useConnectionHealth import - now using global store health status
 import type { BluetoothDevice, Rower } from '../types';
 import {
   WifiIcon,
@@ -35,7 +35,7 @@ export const DeviceSetup = () => {
     attemptReconnection
   } = useBluetooth();
 
-  const { getDeviceHealthStatus } = useConnectionHealth();
+  // Removed useConnectionHealth hook - now using global store health status
 
   const [newRowerName, setNewRowerName] = useState('');
   const [selectedSeat, setSelectedSeat] = useState(1);
@@ -210,8 +210,7 @@ export const DeviceSetup = () => {
           <article className="connected-devices">
             <h3 className="connected-devices-title">Connected Devices</h3>
             {connectionStatus.connectedDevices.map((device) => {
-              const healthStatus = getDeviceHealthStatus(device.id);
-              const isHealthy = healthStatus.status === 'healthy';
+              const isHealthy = device.isHealthy !== false;
 
               return (
                 <div
@@ -331,8 +330,7 @@ export const DeviceSetup = () => {
                     >
                       <option value="">No device</option>
                       {connectionStatus.connectedDevices.map((device) => {
-                        const healthStatus = getDeviceHealthStatus(device.id);
-                        const isHealthy = healthStatus.status === 'healthy';
+                        const isHealthy = device.isHealthy !== false;
                         return (
                           <option key={device.id} value={device.id}>
                             {device.name} {isHealthy ? '✓' : '⚠'}
@@ -345,8 +343,8 @@ export const DeviceSetup = () => {
                     {rower.deviceId && (
                       <div className="rower-device-health">
                         {(() => {
-                          const healthStatus = getDeviceHealthStatus(rower.deviceId);
-                          const isHealthy = healthStatus.status === 'healthy';
+                          const device = connectionStatus.connectedDevices.find(d => d.id === rower.deviceId);
+                          const isHealthy = device ? device.isHealthy !== false : false;
                           return (
                             <>
                               <div className={`rower-device-health-indicator ${isHealthy ? 'rower-device-health-indicator--healthy' : 'rower-device-health-indicator--unhealthy'
