@@ -62,52 +62,34 @@ export const HeartRateChart = memo(({ data, rowers, sessionStartTime, sessionEnd
     return chartData;
   }, [data, sessionStartTime?.getTime(), sessionEndTime?.getTime()]);
 
-  // Calculate dynamic ticks with even visual spacing
-  const xAxisTicks = useMemo(() => {
-    if (chartData.length === 0) return [];
+  // Calculate session duration and quarter ticks
+  const { sessionDuration, xAxisTicks } = useMemo(() => {
+    if (chartData.length === 0) return { sessionDuration: 0, xAxisTicks: [] };
 
-    const maxDuration = Math.max(...chartData.map(d => d.duration));
-
-    // Calculate appropriate tick interval based on session duration
-    let tickInterval: number;
-    if (maxDuration <= 60) {
-      tickInterval = 10; // 10-second intervals for sessions up to 1 minute
-    } else if (maxDuration <= 90) {
-      tickInterval = 15; // 15-second intervals for sessions up to 90 seconds
-    } else if (maxDuration <= 180) {
-      tickInterval = 30; // 30-second intervals for sessions up to 3 minutes
-    } else if (maxDuration <= 600) {
-      tickInterval = 60; // 1-minute intervals for sessions up to 10 minutes
+    // Use session end time if available, otherwise calculate from data
+    let actualDuration: number;
+    if (sessionEndTime && sessionStartTime) {
+      actualDuration = Math.round((sessionEndTime.getTime() - sessionStartTime.getTime()) / 1000);
     } else {
-      tickInterval = 120; // 2-minute intervals for longer sessions
+      // Fall back to data-based calculation, but add 1 to account for the last second
+      const maxDuration = Math.max(...chartData.map(d => d.duration));
+      actualDuration = maxDuration + 1; // Add 1 because if we have data at second 61, the session is 62 seconds
     }
+    
+    // Create 4 evenly spaced quarters: 0%, 25%, 50%, 75%, 100%
+    const quarterTicks = [
+      0,
+      Math.round(actualDuration * 0.25),
+      Math.round(actualDuration * 0.5),
+      Math.round(actualDuration * 0.75),
+      actualDuration
+    ];
 
-    // Generate ticks from 0 to maxDuration with consistent intervals
-    const ticks = [];
-    for (let i = 0; i <= maxDuration; i += tickInterval) {
-      ticks.push(i);
-    }
-
-    // Always include the final duration if it's not already included
-    if (ticks[ticks.length - 1] !== maxDuration) {
-      ticks.push(maxDuration);
-    }
-
-    // Ensure we have at least 5 ticks for good visibility
-    if (ticks.length < 5 && maxDuration > 0) {
-      const smallerInterval = Math.max(1, Math.floor(maxDuration / 6));
-      const newTicks = [];
-      for (let i = 0; i <= maxDuration; i += smallerInterval) {
-        newTicks.push(i);
-      }
-      if (newTicks[newTicks.length - 1] !== maxDuration) {
-        newTicks.push(maxDuration);
-      }
-      return newTicks;
-    }
-
-    return ticks;
-  }, [chartData]);
+    return { 
+      sessionDuration: actualDuration, 
+      xAxisTicks: quarterTicks 
+    };
+  }, [chartData, sessionStartTime, sessionEndTime]);
 
   // Get rowers with devices and current heart rate data, sorted by seat number
   const activeRowers = useMemo(() => {
@@ -184,7 +166,7 @@ export const HeartRateChart = memo(({ data, rowers, sessionStartTime, sessionEnd
     );
   };
 
-  // Custom x-axis label with spacing control
+  // Custom x-axis label with session duration
   const CustomXAxisLabel = ({ viewBox }: any) => {
     const { x, y, width, height } = viewBox;
     return (
@@ -195,7 +177,7 @@ export const HeartRateChart = memo(({ data, rowers, sessionStartTime, sessionEnd
         fontSize="12"
         fill="var(--color-blue-light)"
       >
-        Session Duration (seconds)
+        Session Duration: {sessionDuration}s
       </text>
     );
   };
