@@ -6,8 +6,8 @@ import { ConnectionConflictDialog } from './components/ConnectionConflictDialog'
 import { Header } from './components/Header';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
-// Lazy load the Enhanced Dashboard component (contains heavy recharts dependency)
-const DashboardEnhanced = lazy(() => import('./components/DashboardEnhanced').then(module => ({ default: module.DashboardEnhanced })));
+// Lazy load the Dashboard component (contains heavy recharts dependency)
+const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
 
 function AppEnhanced() {
   const { uiState, connectionStatus, error, setUIState, clearError } = useAppStore();
@@ -37,7 +37,7 @@ function AppEnhanced() {
               <div className="loading-spinner"></div>
             </div>
           }>
-            <DashboardEnhanced />
+            <Dashboard />
           </Suspense>
         );
       case 'settings':
@@ -49,7 +49,7 @@ function AppEnhanced() {
               <div className="loading-spinner"></div>
             </div>
           }>
-            <DashboardEnhanced />
+            <Dashboard />
           </Suspense>
         );
     }

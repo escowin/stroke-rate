@@ -61,7 +61,7 @@ const initialUIState: UIState = {
 
 export const useAppStore = create<AppStore>()(
   devtools(
-    (set) => ({
+    (set, get) => ({
       // Initial State
       connectionStatus: initialConnectionStatus,
       rowers: [],
@@ -124,12 +124,12 @@ export const useAppStore = create<AppStore>()(
         })),
       
       getUnhealthyDevices: () => {
-        const state = useAppStore.getState();
+        const state = get();
         return state.connectionStatus.connectedDevices.filter(device => device.isHealthy === false);
       },
       
       // Heart Rate Data
-      updateHeartRate: (data) =>
+      updateHeartRate: (data: HeartRateData) =>
         set((state) => {
           // console.log('Store - updateHeartRate called with:', data);
           // console.log('Store - current session:', state.currentSession);
@@ -164,19 +164,19 @@ export const useAppStore = create<AppStore>()(
         })),
       
       // Rower Management
-      addRower: (rower) =>
+      addRower: (rower: Rower) =>
         set((state) => ({
           rowers: [...state.rowers, rower]
         })),
       
-      updateRower: (rowerId, updates) =>
+      updateRower: (rowerId: string, updates: Partial<Rower>) =>
         set((state) => ({
           rowers: state.rowers.map(rower =>
             rower.id === rowerId ? { ...rower, ...updates } : rower
           )
         })),
       
-      removeRower: (rowerId) =>
+      removeRower: (rowerId: string) =>
         set((state) => ({
           rowers: state.rowers.filter(rower => rower.id !== rowerId)
         })),
@@ -186,7 +186,7 @@ export const useAppStore = create<AppStore>()(
           rowers: []
         })),
       
-      assignDeviceToRower: (rowerId, deviceId) =>
+      assignDeviceToRower: (rowerId: string, deviceId: string) =>
         set((state) => ({
           rowers: state.rowers.map(rower =>
             rower.id === rowerId ? { ...rower, deviceId } : rower
@@ -194,7 +194,7 @@ export const useAppStore = create<AppStore>()(
         })),
       
       // Session Management
-      startSession: (session) =>
+      startSession: (session: TrainingSession) =>
         set(() => ({
           currentSession: session
         })),
@@ -209,7 +209,7 @@ export const useAppStore = create<AppStore>()(
           } : undefined
         })),
       
-      updateSession: (updates) =>
+      updateSession: (updates: Partial<TrainingSession>) =>
         set((state) => ({
           currentSession: state.currentSession ? {
             ...state.currentSession,
@@ -218,14 +218,14 @@ export const useAppStore = create<AppStore>()(
         })),
       
       // Error Handling
-      setError: (error) =>
+      setError: (error: string | undefined) =>
         set(() => ({ error })),
       
       clearError: () =>
         set(() => ({ error: undefined })),
       
       // UI State
-      setUIState: (updates) =>
+      setUIState: (updates: Partial<UIState>) =>
         set((state) => ({
           uiState: { ...state.uiState, ...updates }
         }))
