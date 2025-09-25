@@ -13,7 +13,7 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useHistoricalData } from '../hooks/useHistoricalData';
 import { useDefaultHeartRateZones } from '../hooks/useHeartRateZones';
-import type { HeartRateZones, ProgressReport } from '../types';
+import type { ProgressReport } from '../types';
 import { generateProgressReport } from '../utils/progressTracking';
 
 interface ProgressTrackingProps {
@@ -32,7 +32,22 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
 
   // Generate progress report
   const progressReport = useMemo(() => {
-    return generateProgressReport(sessions, zones, [], [], selectedPeriod);
+    const report = generateProgressReport(sessions, zones, [], [], selectedPeriod);
+    
+    // Debug logging
+    console.log('Progress Report Debug:', {
+      totalSessions: sessions.length,
+      sessionsWithData: sessions.filter(s => s.finalHeartRateData && s.finalHeartRateData.length > 0).length,
+      individualProgress: report.individualProgress.length,
+      firstRowerTrends: report.individualProgress[0]?.trends?.map(t => ({
+        metric: t.metric,
+        changeRate: t.changeRate,
+        confidence: t.confidence,
+        direction: t.direction
+      }))
+    });
+    
+    return report;
   }, [sessions, zones, selectedPeriod]);
 
   const { crewProgress, individualProgress, insights } = progressReport;

@@ -1,4 +1,4 @@
-import type { TrainingSession, SessionMetrics, Rower, HeartRateZones } from '../types';
+import type { TrainingSession, SessionMetrics, HeartRateZones } from '../types';
 import { calculateSessionMetrics } from './sessionAnalytics';
 
 // Progress Tracking Types
@@ -163,7 +163,7 @@ export const calculateProgressTrend = (
   // Extract metric values
   const values = recentData.map(dp => {
     const pathParts = metricPath.split('.');
-    let value = dp.metrics;
+    let value: any = dp.metrics;
     for (const part of pathParts) {
       if (value && typeof value === 'object' && part in value) {
         value = value[part as keyof typeof value];
@@ -184,23 +184,38 @@ export const calculateProgressTrend = (
   const sumXY = x.reduce((sum, val, index) => sum + val * y[index], 0);
   const sumXX = x.reduce((sum, val) => sum + val * val, 0);
 
-  const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-  const intercept = (sumY - slope * sumX) / n;
+  const denominator = (n * sumXX - sumX * sumX);
+  const slope = denominator !== 0 ? (n * sumXY - sumX * sumY) / denominator : 0;
+  const intercept = n > 0 ? (sumY - slope * sumX) / n : 0;
+  
+  // Ensure slope and intercept are valid numbers
+  const validSlope = isNaN(slope) ? 0 : slope;
+  const validIntercept = isNaN(intercept) ? 0 : intercept;
 
   // Calculate R-squared for confidence
   const yMean = sumY / n;
   const ssRes = y.reduce((sum, val, index) => {
-    const predicted = slope * x[index] + intercept;
+    const predicted = validSlope * x[index] + validIntercept;
     return sum + Math.pow(val - predicted, 2);
   }, 0);
   const ssTot = y.reduce((sum, val) => sum + Math.pow(val - yMean, 2), 0);
-  const rSquared = ssTot > 0 ? 1 - (ssRes / ssTot) : 0;
+  const rSquared = ssTot > 0 ? Math.max(0, Math.min(1, 1 - (ssRes / ssTot))) : 0;
 
   // Calculate change rate (percentage per week)
   const firstValue = values[0];
   const lastValue = values[values.length - 1];
   const timeSpanWeeks = (recentData[recentData.length - 1].date.getTime() - recentData[0].date.getTime()) / (1000 * 60 * 60 * 24 * 7);
-  const changeRate = timeSpanWeeks > 0 ? ((lastValue - firstValue) / firstValue) * 100 / timeSpanWeeks : 0;
+  
+  let changeRate = 0;
+  if (timeSpanWeeks > 0 && firstValue > 0) {
+    changeRate = ((lastValue - firstValue) / firstValue) * 100 / timeSpanWeeks;
+  } else if (timeSpanWeeks > 0 && firstValue === 0 && lastValue > 0) {
+    // If starting from 0, calculate as absolute change per week
+    changeRate = (lastValue / timeSpanWeeks) * 100;
+  }
+  
+  // Ensure changeRate is a valid number
+  changeRate = isNaN(changeRate) ? 0 : changeRate;
 
   // Determine direction
   let direction: 'improving' | 'declining' | 'stable' = 'stable';
@@ -211,7 +226,7 @@ export const calculateProgressTrend = (
   // Create trend data for visualization
   const trendData = recentData.map((dp, index) => ({
     date: dp.date,
-    value: slope * index + intercept
+    value: validSlope * index + validIntercept
   }));
 
   return {
@@ -268,24 +283,6 @@ export const calculateRowerProgressTrend = (
   ];
 
   const trends = metrics.map(metric => {
-    const trendData = dataPoints
-      .map(dp => {
-        const rowerMetric = dp.rowerMetrics.find(rm => rm.rowerId === rowerId);
-        if (!rowerMetric) return null;
-        
-        const pathParts = metric.split('.');
-        let value = rowerMetric;
-        for (const part of pathParts) {
-          if (value && typeof value === 'object' && part in value) {
-            value = value[part as keyof typeof value];
-          } else {
-            return null;
-          }
-        }
-        return { date: dp.date, value: typeof value === 'number' ? value : 0 };
-      })
-      .filter(Boolean) as Array<{ date: Date; value: number }>;
-
     // Create a filtered data points array with only the current rower's data
     const filteredDataPoints = dataPoints
       .map(dp => {
