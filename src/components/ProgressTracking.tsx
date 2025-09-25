@@ -3,9 +3,7 @@ import {
   ChartBarIcon,
   TrendingUpIcon,
   CalendarIcon,
-  TrophyIcon,
-  TargetIcon,
-  ClockIcon,
+  FlagIcon,
   UserGroupIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
@@ -157,7 +155,7 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
                 className={`view-toggle ${showGoals ? 'active' : ''}`}
                 onClick={() => setShowGoals(!showGoals)}
               >
-                <TargetIcon className="view-toggle-icon" />
+                <FlagIcon className="view-toggle-icon" />
                 Goals
               </button>
               <button
@@ -436,7 +434,7 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
 
           <div className="insight-section">
             <h4 className="insight-section-title">
-              <TargetIcon className="insight-section-icon" />
+              <FlagIcon className="insight-section-icon" />
               Next Phase Focus
             </h4>
             <p className="insight-focus-text">{insights.nextPhaseFocus}</p>
