@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   ChartBarIcon,
-  CalendarIcon,
+  CalendarDaysIcon,
   FlagIcon,
   UserGroupIcon,
   ArrowTrendingUpIcon,
@@ -161,7 +161,7 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
                 className={`view-toggle ${showPhases ? 'active' : ''}`}
                 onClick={() => setShowPhases(!showPhases)}
               >
-                <CalendarIcon className="view-toggle-icon" />
+                <CalendarDaysIcon className="view-toggle-icon" />
                 Phases
               </button>
             </div>
