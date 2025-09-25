@@ -165,7 +165,11 @@ export const calculateProgressTrend = (
     const pathParts = metricPath.split('.');
     let value = dp.metrics;
     for (const part of pathParts) {
-      value = value[part as keyof typeof value];
+      if (value && typeof value === 'object' && part in value) {
+        value = value[part as keyof typeof value];
+      } else {
+        return 0;
+      }
     }
     return typeof value === 'number' ? value : 0;
   });
@@ -226,6 +230,18 @@ export const calculateRowerProgressTrend = (
   dataPoints: ProgressDataPoint[],
   rowerId: string
 ): RowerProgressTrend => {
+  if (!dataPoints || dataPoints.length === 0) {
+    return {
+      rowerId,
+      rowerName: '',
+      seat: 0,
+      trends: [],
+      overallProgress: 0,
+      strengths: [],
+      improvementAreas: []
+    };
+  }
+
   const rowerData = dataPoints
     .map(dp => dp.rowerMetrics.find(rm => rm.rowerId === rowerId))
     .filter(Boolean) as RowerProgressData[];
@@ -260,16 +276,30 @@ export const calculateRowerProgressTrend = (
         const pathParts = metric.split('.');
         let value = rowerMetric;
         for (const part of pathParts) {
-          value = value[part as keyof typeof value];
+          if (value && typeof value === 'object' && part in value) {
+            value = value[part as keyof typeof value];
+          } else {
+            return null;
+          }
         }
         return { date: dp.date, value: typeof value === 'number' ? value : 0 };
       })
       .filter(Boolean) as Array<{ date: Date; value: number }>;
 
-    return calculateProgressTrend(
-      dataPoints.map(dp => ({ ...dp, rowerMetrics: [rowerData[0]] })),
-      metric
-    );
+    // Create a filtered data points array with only the current rower's data
+    const filteredDataPoints = dataPoints
+      .map(dp => {
+        const rowerMetric = dp.rowerMetrics.find(rm => rm.rowerId === rowerId);
+        if (!rowerMetric) return null;
+        
+        return {
+          ...dp,
+          rowerMetrics: [rowerMetric]
+        };
+      })
+      .filter(Boolean) as ProgressDataPoint[];
+
+    return calculateProgressTrend(filteredDataPoints, metric);
   });
 
   // Calculate overall progress (weighted average of improvements)
@@ -307,7 +337,7 @@ export const calculateRowerProgressTrend = (
 export const calculateCrewProgressTrend = (
   dataPoints: ProgressDataPoint[]
 ): CrewProgressTrend => {
-  if (dataPoints.length < 2) {
+  if (!dataPoints || dataPoints.length < 2) {
     return {
       overallProgress: 0,
       synchronizationTrend: {
@@ -386,7 +416,13 @@ export const generateProgressDataPoints = (
   zones: HeartRateZones
 ): ProgressDataPoint[] => {
   return sessions
-    .filter(session => session.finalHeartRateData && session.finalHeartRateData.length > 0)
+    .filter(session => 
+      session && 
+      session.finalHeartRateData && 
+      session.finalHeartRateData.length > 0 &&
+      session.rowers &&
+      session.rowers.length > 0
+    )
     .map(session => {
       const metrics = calculateSessionMetrics(session, zones);
       
