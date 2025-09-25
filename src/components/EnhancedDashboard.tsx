@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useDefaultHeartRateZones } from '../hooks/useHeartRateZones';
+import { useHistoricalData } from '../hooks/useHistoricalData';
 import { HeartRateChart } from './HeartRateChart';
-import { SessionComparison } from './SessionComparison';
 import type { HeartRateData, Rower } from '../types';
 import {
   ChartBarIcon,
@@ -34,6 +34,8 @@ const ZONE_COLORS = {
 
 export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) => {
   const { zones } = useDefaultHeartRateZones();
+  const { sessions } = useHistoricalData();
+  const [selectedComparisonSession, setSelectedComparisonSession] = useState<string | null>(null);
 
 
 
@@ -135,6 +137,59 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
     };
   }, [currentSession, zones]);
 
+  // Calculate progress indicators if a comparison session is selected
+  const progressIndicators = useMemo(() => {
+    if (!selectedComparisonSession || !sessions || !performanceMetrics) return null;
+    
+    const comparisonSession = sessions.find(s => s.id === selectedComparisonSession);
+    if (!comparisonSession || !comparisonSession.finalHeartRateData) return null;
+
+    // Calculate comparison session metrics
+    const comparisonData = comparisonSession.finalHeartRateData;
+    const comparisonAvgHR = Math.round(comparisonData.reduce((sum, d) => sum + d.heartRate, 0) / comparisonData.length);
+    const comparisonMaxHR = Math.max(...comparisonData.map(d => d.heartRate));
+    const comparisonDuration = comparisonSession.endTime 
+      ? Math.floor((comparisonSession.endTime.getTime() - comparisonSession.startTime.getTime()) / 1000 / 60)
+      : 0;
+
+    // Calculate percentage changes
+    const avgHRChange = Math.round(((performanceMetrics.avgHeartRate - comparisonAvgHR) / comparisonAvgHR) * 100);
+    const maxHRChange = Math.round(((performanceMetrics.maxHeartRate - comparisonMaxHR) / comparisonMaxHR) * 100);
+    const durationChange = comparisonDuration > 0 ? Math.round(((performanceMetrics.sessionDuration - comparisonDuration) / comparisonDuration) * 100) : 0;
+
+    return {
+      avgHeartRate: avgHRChange,
+      maxHeartRate: maxHRChange,
+      duration: durationChange
+    };
+  }, [selectedComparisonSession, sessions, performanceMetrics]);
+
+  // Calculate individual rower progress indicators
+  const rowerProgressIndicators = useMemo(() => {
+    if (!selectedComparisonSession || !sessions || !performanceMetrics?.rowerMetrics) return null;
+    
+    const comparisonSession = sessions.find(s => s.id === selectedComparisonSession);
+    if (!comparisonSession || !comparisonSession.finalHeartRateData) return null;
+
+    return performanceMetrics.rowerMetrics.map(currentRowerMetric => {
+      if (!currentRowerMetric) return null;
+      
+      const rowerComparisonData = comparisonSession.finalHeartRateData!.filter(d => d.deviceId === currentRowerMetric.rower.deviceId);
+      if (rowerComparisonData.length === 0) return null;
+
+      const comparisonAvgHR = Math.round(rowerComparisonData.reduce((sum, d) => sum + d.heartRate, 0) / rowerComparisonData.length);
+      const comparisonMaxHR = Math.max(...rowerComparisonData.map(d => d.heartRate));
+      
+      const avgHRChange = Math.round(((currentRowerMetric.avgHeartRate - comparisonAvgHR) / comparisonAvgHR) * 100);
+      const maxHRChange = Math.round(((currentRowerMetric.maxHeartRate - comparisonMaxHR) / comparisonMaxHR) * 100);
+
+      return {
+        rowerId: currentRowerMetric.rower.id,
+        avgHeartRate: avgHRChange,
+        maxHeartRate: maxHRChange
+      };
+    }).filter(Boolean);
+  }, [selectedComparisonSession, sessions, performanceMetrics]);
 
   if (!currentSession) {
     return (
@@ -149,7 +204,7 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
   }
 
   return (
-    <div className="enhanced-dashboard">
+    <section className="enhanced-dashboard">
       {/* Performance Metrics */}
       {performanceMetrics && (
         <section className="card-base performance-metrics">
@@ -163,6 +218,20 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
               <div className="metric-content">
                 <p className="metric-value">{performanceMetrics.avgHeartRate}</p>
                 <p className="metric-label">Avg BPM</p>
+                {progressIndicators && (
+                  <div className={`progress-indicator ${
+                    progressIndicators.avgHeartRate === 0 ? 'neutral' : 
+                    progressIndicators.avgHeartRate < 0 ? 'improvement' : 'decline'
+                  }`}>
+                    <span className="progress-icon">
+                      {progressIndicators.avgHeartRate === 0 ? '—' : 
+                       progressIndicators.avgHeartRate < 0 ? '↗' : '↘'}
+                    </span>
+                    <span className="progress-text">
+                      {Math.abs(progressIndicators.avgHeartRate)}%
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
             <div className="metric-item">
@@ -170,6 +239,20 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
               <div className="metric-content">
                 <p className="metric-value">{performanceMetrics.maxHeartRate}</p>
                 <p className="metric-label">Max BPM</p>
+                {progressIndicators && (
+                  <div className={`progress-indicator ${
+                    progressIndicators.maxHeartRate === 0 ? 'neutral' : 
+                    progressIndicators.maxHeartRate < 0 ? 'improvement' : 'decline'
+                  }`}>
+                    <span className="progress-icon">
+                      {progressIndicators.maxHeartRate === 0 ? '—' : 
+                       progressIndicators.maxHeartRate < 0 ? '↗' : '↘'}
+                    </span>
+                    <span className="progress-text">
+                      {Math.abs(progressIndicators.maxHeartRate)}%
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
             <div className="metric-item">
@@ -177,6 +260,20 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
               <div className="metric-content">
                 <p className="metric-value">{performanceMetrics.sessionDuration}m</p>
                 <p className="metric-label">Duration</p>
+                {progressIndicators && (
+                  <div className={`progress-indicator ${
+                    progressIndicators.duration === 0 ? 'neutral' : 
+                    progressIndicators.duration > 0 ? 'improvement' : 'decline'
+                  }`}>
+                    <span className="progress-icon">
+                      {progressIndicators.duration === 0 ? '—' : 
+                       progressIndicators.duration > 0 ? '↗' : '↘'}
+                    </span>
+                    <span className="progress-text">
+                      {Math.abs(progressIndicators.duration)}%
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
             <div className="metric-item">
@@ -210,10 +307,44 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
                     <div className="rower-metric-stat">
                       <span className="rower-metric-stat-value">{rowerMetric.avgHeartRate}</span>
                       <span className="rower-metric-stat-label">Avg BPM</span>
+                      {rowerProgressIndicators && (() => {
+                        const rowerProgress = rowerProgressIndicators.find(p => p?.rowerId === rowerMetric.rower.id);
+                        return rowerProgress ? (
+                          <div className={`progress-indicator ${
+                            rowerProgress.avgHeartRate === 0 ? 'neutral' : 
+                            rowerProgress.avgHeartRate < 0 ? 'improvement' : 'decline'
+                          }`}>
+                            <span className="progress-icon">
+                              {rowerProgress.avgHeartRate === 0 ? '—' : 
+                               rowerProgress.avgHeartRate < 0 ? '↗' : '↘'}
+                            </span>
+                            <span className="progress-text">
+                              {Math.abs(rowerProgress.avgHeartRate)}%
+                            </span>
+                          </div>
+                        ) : null;
+                      })()}
                     </div>
                     <div className="rower-metric-stat">
                       <span className="rower-metric-stat-value">{rowerMetric.maxHeartRate}</span>
                       <span className="rower-metric-stat-label">Max BPM</span>
+                      {rowerProgressIndicators && (() => {
+                        const rowerProgress = rowerProgressIndicators.find(p => p?.rowerId === rowerMetric.rower.id);
+                        return rowerProgress ? (
+                          <div className={`progress-indicator ${
+                            rowerProgress.maxHeartRate === 0 ? 'neutral' : 
+                            rowerProgress.maxHeartRate < 0 ? 'improvement' : 'decline'
+                          }`}>
+                            <span className="progress-icon">
+                              {rowerProgress.maxHeartRate === 0 ? '—' : 
+                               rowerProgress.maxHeartRate < 0 ? '↗' : '↘'}
+                            </span>
+                            <span className="progress-text">
+                              {Math.abs(rowerProgress.maxHeartRate)}%
+                            </span>
+                          </div>
+                        ) : null;
+                      })()}
                     </div>
                     <div className="rower-metric-stat">
                       <span className="rower-metric-stat-value">{rowerMetric.dataPoints}</span>
@@ -262,8 +393,44 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
       )}
 
 
-      {/* Session Comparison */}
-      <SessionComparison currentSession={currentSession} />
-    </div>
+      {/* Session Selection for Comparison */}
+      {sessions && sessions.length > 0 && (
+        <section className="card-base session-selection">
+          <h3 className="card-title">
+            <ArrowTrendingUpIcon className="card-title-icon" />
+            Compare with Previous Session
+          </h3>
+          <div className="session-selection-grid">
+            {sessions
+              .filter(session => session.id !== currentSession.id) // Exclude current session
+              .map(session => (
+                <div
+                  key={session.id}
+                  className={`session-selection-card ${selectedComparisonSession === session.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedComparisonSession(selectedComparisonSession === session.id ? null : session.id)}
+                >
+                  <div className="session-selection-header">
+                    <input
+                      type="radio"
+                      name="session-comparison"
+                      checked={selectedComparisonSession === session.id}
+                      onChange={() => setSelectedComparisonSession(selectedComparisonSession === session.id ? null : session.id)}
+                      className="session-selection-radio"
+                    />
+                    <div className="session-selection-info">
+                      <span className="session-selection-date">
+                        {session.startTime.toLocaleDateString()} {session.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      <span className="session-selection-details">
+                        {session.rowers.length} rowers • {session.finalHeartRateData?.length || 0} data points
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </section>
+      )}
+    </section>
   );
 };

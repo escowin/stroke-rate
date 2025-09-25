@@ -224,6 +224,8 @@ body {
 /* Dashboard Semantic Classes */
 .session-controls {
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-md);
   align-items: center;
   justify-content: space-between;
   background-color: var(--color-slate-medium);
@@ -284,6 +286,7 @@ body {
 
 .session-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--size-md);
 }
 
@@ -962,6 +965,7 @@ body {
   font-size: var(--font-size-sm);
   background-color: var(--color-slate-medium);
   color: var(--color-slate-light);
+  width: 100%;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 
   &:focus {
@@ -1130,6 +1134,7 @@ body {
   border: 1px solid var(--color-slate-medium);
   padding: var(--size-lg);
   transition: var(--transition-colors);
+  gap: var(--size-md);
 }
 
 .connection-status-info {
@@ -1186,6 +1191,7 @@ body {
 
 .connection-device-list {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--size-sm);
 }
 
@@ -3570,6 +3576,11 @@ body {
 .progress-indicator.decline {
   background-color: rgba(239, 68, 68, 0.1);
   color: #ef4444;
+}
+
+.progress-indicator.neutral {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
 }
 
 .progress-icon {
