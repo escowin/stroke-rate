@@ -85,9 +85,12 @@ export const HeartRateChart = memo(({ data, rowers, sessionStartTime, sessionEnd
       actualDuration
     ];
 
+    // Ensure we have exactly 5 ticks and they're unique
+    const uniqueTicks = [...new Set(quarterTicks)].sort((a, b) => a - b);
+
     return { 
       sessionDuration: actualDuration, 
-      xAxisTicks: quarterTicks 
+      xAxisTicks: uniqueTicks 
     };
   }, [chartData, sessionStartTime, sessionEndTime]);
 
@@ -217,7 +220,8 @@ export const HeartRateChart = memo(({ data, rowers, sessionStartTime, sessionEnd
               tick={{ fontSize: 11, fill: 'var(--color-blue-light)' }}
               tickLine={{ stroke: 'var(--color-blue-light)' }}
               axisLine={{ stroke: 'var(--color-blue-light)' }}
-              domain={['dataMin', 'dataMax']}
+              domain={[0, sessionDuration]} // Explicit linear domain from 0 to session duration
+              scale="linear" // Force linear scaling for even visual distribution
               ticks={xAxisTicks} // Use custom calculated ticks
               label={<CustomXAxisLabel />}
             />

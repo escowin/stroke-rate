@@ -2119,11 +2119,13 @@ body {
 
 /* Dev Toggle Semantic Classes */
 .dev-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-md);
   background-color: var(--color-blue-dark);
   border: 1px solid var(--color-blue-light);
   border-radius: var(--size-sm);
   padding: var(--size);
-  margin-bottom: var(--size-lg);
   transition: var(--transition-colors);
 }
 
@@ -2131,7 +2133,6 @@ body {
   display: flex;
   align-items: center;
   gap: var(--size-sm);
-  margin-bottom: var(--size-md);
 }
 
 .dev-toggle-icon {
@@ -2155,7 +2156,7 @@ body {
 .dev-toggle-control {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--size-sm);
 }
 
 .dev-toggle-label {
@@ -2186,7 +2187,7 @@ body {
 }
 
 .dev-toggle-switch--inactive {
-  background-color: var(--color-slate-light);
+  background-color: var(--color-slate-dark);
 }
 
 .dev-toggle-switch-thumb {
@@ -2195,15 +2196,16 @@ body {
   height: 1.25rem;
   width: 1.25rem;
   border-radius: 50%;
-  background-color: var(--color-slate-light);
   transition: var(--transition-all);
 }
 
 .dev-toggle-switch-thumb--active {
+  background-color: var(--color-slate-light);
   transform: translateX(1.25rem);
 }
 
 .dev-toggle-switch-thumb--inactive {
+  background-color: var(--color-slate-medium);
   transform: translateX(0);
 }
 
