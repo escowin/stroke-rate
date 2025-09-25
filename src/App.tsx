@@ -12,14 +12,19 @@ import { notificationService } from './services/notifications';
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
 
 function App() {
-  const { uiState, connectionStatus, error, setUIState, clearError, loadRowersFromDatabase } = useAppStore();
+  const { uiState, connectionStatus, error, setUIState, clearError, loadRowersFromDatabase, loadCurrentSession } = useAppStore();
   const { isAvailable, error: bluetoothError, clearError: clearBluetoothError } = useBluetooth();
 
   // Clear errors and load data when component mounts
   useEffect(() => {
-    clearError();
-    clearBluetoothError();
-    loadRowersFromDatabase();
+    const initializeApp = async () => {
+      clearError();
+      clearBluetoothError();
+      await loadRowersFromDatabase();
+      await loadCurrentSession(); // Restore active session if exists
+    };
+    
+    initializeApp();
     
     // Check database usage periodically
     const checkDatabaseUsage = () => {
@@ -31,7 +36,7 @@ function App() {
     const interval = setInterval(checkDatabaseUsage, 5 * 60 * 1000);
     
     return () => clearInterval(interval);
-  }, [clearError, clearBluetoothError, loadRowersFromDatabase]);
+  }, [clearError, clearBluetoothError, loadRowersFromDatabase, loadCurrentSession]);
 
   // Show conflict dialog if conflicts are detected
   useEffect(() => {

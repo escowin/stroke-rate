@@ -235,6 +235,37 @@ body {
   transition: var(--transition-colors);
 }
 
+.session-restoration-notification {
+  display: flex;
+  align-items: center;
+  gap: var(--size-sm);
+  background-color: var(--color-green-dark);
+  color: var(--color-white);
+  padding: var(--size-sm) var(--size-md);
+  border-radius: var(--border-radius-sm);
+  margin-bottom: var(--size-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  animation: slideInFromTop 0.3s ease-out;
+}
+
+.restoration-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-white);
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .session-info {
   display: flex;
   flex-direction: column;

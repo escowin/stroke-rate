@@ -10,7 +10,7 @@ import type {
   UIState
 } from '../types';
 import { calculateRowerHeartRateZones } from '../utils/heartRateCalculations';
-import { storeHeartRateData, storeSession, storeRower, getAllRowers } from '../services/database';
+import { storeHeartRateData, storeSession, storeRower, getAllRowers, getCurrentActiveSession, getMostRecentSession } from '../services/database';
 import { notificationService } from '../services/notifications';
 
 interface AppStore extends AppState {
@@ -39,6 +39,8 @@ interface AppStore extends AppState {
   startSession: (session: TrainingSession) => void;
   endSession: () => void;
   updateSession: (updates: Partial<TrainingSession>) => void;
+  loadCurrentSession: () => Promise<void>;
+  sessionWasRestored: boolean;
   
   // Error Handling
   setError: (error: string | undefined) => void;
@@ -71,6 +73,8 @@ export const useAppStore = create<AppStore>()(
       rowers: [],
       isConnected: false,
       uiState: initialUIState,
+      currentSession: undefined,
+      sessionWasRestored: false,
       
       // Connection Management
       setConnectionStatus: (status) =>
@@ -264,7 +268,8 @@ export const useAppStore = create<AppStore>()(
           notificationService.checkDatabaseUsage();
           
           return {
-            currentSession: session
+            currentSession: session,
+            sessionWasRestored: false // Reset restoration flag for new session
           };
         }),
       
@@ -310,6 +315,55 @@ export const useAppStore = create<AppStore>()(
             currentSession: updatedSession
           };
         }),
+      
+      loadCurrentSession: async () => {
+        try {
+          // First, try to restore an active session
+          const activeSession = await getCurrentActiveSession();
+          if (activeSession) {
+            set({ 
+              currentSession: activeSession,
+              sessionWasRestored: true 
+            });
+            
+            // Restore connection status based on active rowers
+            const activeRowers = activeSession.rowers.filter(rower => rower.isActive);
+            if (activeRowers.length > 0) {
+              set((state) => ({
+                isConnected: true,
+                connectionStatus: {
+                  ...state.connectionStatus,
+                  connectedDevices: activeRowers
+                    .filter(rower => rower.deviceId)
+                    .map(rower => ({
+                      id: rower.deviceId!,
+                      name: rower.name,
+                      isConnected: true,
+                      isHealthy: true
+                    }))
+                }
+              }));
+            }
+          } else {
+            // No active session found, load the most recent session for display
+            const mostRecentSession = await getMostRecentSession();
+            if (mostRecentSession) {
+              set({ 
+                currentSession: mostRecentSession,
+                sessionWasRestored: false // Not restored, just loaded for display
+              });
+            } else {
+              set({ 
+                currentSession: undefined,
+                sessionWasRestored: false 
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Failed to load current session:', error);
+          set({ sessionWasRestored: false });
+        }
+      },
       
       // Error Handling
       setError: (error: string | undefined) =>

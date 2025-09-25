@@ -223,6 +223,61 @@ export const getRecentSessions = async (limit: number = 10): Promise<TrainingSes
 };
 
 /**
+ * Get the current active session (if any)
+ * Automatically ends stale sessions (older than 4 hours)
+ */
+export const getCurrentActiveSession = async (): Promise<TrainingSession | null> => {
+  const database = await getDatabase();
+  const sessions = await database.getAll('sessions');
+  
+  // Find the most recent active session
+  const activeSession = sessions
+    .filter(session => session.isActive)
+    .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())[0];
+  
+  if (!activeSession) {
+    return null;
+  }
+  
+  // Check if session is stale (older than 4 hours)
+  const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000);
+  if (activeSession.startTime < fourHoursAgo) {
+    // Auto-end the stale session
+    const endedSession = {
+      ...activeSession,
+      endTime: new Date(),
+      isActive: false,
+      finalHeartRateData: [...activeSession.heartRateData]
+    };
+    
+    // Update the session in the database
+    await database.put('sessions', endedSession);
+    
+    return null; // No active session to restore
+  }
+  
+  return activeSession;
+};
+
+/**
+ * Get the most recent session (active or ended) for display purposes
+ */
+export const getMostRecentSession = async (): Promise<TrainingSession | null> => {
+  const database = await getDatabase();
+  const sessions = await database.getAll('sessions');
+  
+  if (sessions.length === 0) {
+    return null;
+  }
+  
+  // Find the most recent session (active or ended)
+  const mostRecentSession = sessions
+    .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())[0];
+  
+  return mostRecentSession;
+};
+
+/**
  * Store rower profile
  */
 export const storeRower = async (rower: Rower): Promise<void> => {

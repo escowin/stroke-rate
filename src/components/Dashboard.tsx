@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '../store';
 import { useDefaultHeartRateZones } from '../hooks/useHeartRateZones';
 // Removed useConnectionHealth import - now using global store for unhealthy devices
@@ -29,21 +29,35 @@ export const Dashboard = () => {
     startSession,
     endSession,
     setUIState,
-    getUnhealthyDevices
+    getUnhealthyDevices,
+    sessionWasRestored
   } = useAppStore();
 
   const { zones } = useDefaultHeartRateZones();
   const sessionDuration = useSessionDuration(currentSession);
   const isSessionActive = currentSession?.isActive;
   const [showEnhancedView, setShowEnhancedView] = useState(false);
+  const [showRestorationNotification, setShowRestorationNotification] = useState(false);
 
   const unhealthyDevices = getUnhealthyDevices();
+
+  // Show restoration notification when session was actually restored
+  useEffect(() => {
+    if (sessionWasRestored && currentSession) {
+      setShowRestorationNotification(true);
+      // Auto-hide the notification after 5 seconds
+      setTimeout(() => setShowRestorationNotification(false), 5000);
+    }
+  }, [sessionWasRestored, currentSession]);
 
   const handleStartSession = () => {
     if (rowers.length === 0) {
       setUIState({ currentView: 'setup' });
       return;
     }
+
+    // Hide any restoration notification when starting new session
+    setShowRestorationNotification(false);
 
     const session = {
       id: `session-${Date.now()}`,
@@ -69,6 +83,14 @@ export const Dashboard = () => {
 
       {/* Session Controls */}
       <section className="session-controls">
+        {/* Session Restoration Notification */}
+        {showRestorationNotification && (
+          <div className="session-restoration-notification">
+            <CheckCircleIcon className="restoration-icon" />
+            <span>Session restored from previous session</span>
+          </div>
+        )}
+        
         <article className="session-info">
           <h2 className="session-title">
             Training Session
