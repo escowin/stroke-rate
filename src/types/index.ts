@@ -102,7 +102,7 @@ export interface HeartRateCalculation {
 
 // UI State Types
 export interface UIState {
-  currentView: 'dashboard' | 'setup' | 'session' | 'settings';
+  currentView: 'dashboard' | 'progress' | 'setup' | 'session' | 'settings';
   selectedRower?: string;
   showConflictDialog: boolean;
   isFullscreen: boolean;
@@ -208,5 +208,129 @@ export interface SessionReport {
     trainingEffectiveness: number;
     improvementAreas: string[];
     strengths: string[];
+  };
+}
+
+// Progress Tracking Types
+export interface ProgressDataPoint {
+  date: Date;
+  sessionId: string;
+  metrics: SessionMetrics;
+  rowerMetrics: RowerProgressData[];
+}
+
+export interface RowerProgressData {
+  rowerId: string;
+  rowerName: string;
+  seat: number;
+  metrics: {
+    avgHeartRate: number;
+    maxHeartRate: number;
+    trimp: number;
+    consistencyScore: number;
+    effortScore: number;
+    timeInZones: {
+      recovery: number;
+      aerobic: number;
+      threshold: number;
+      anaerobic: number;
+    };
+  };
+}
+
+export interface ProgressTrend {
+  metric: string;
+  direction: 'improving' | 'declining' | 'stable';
+  changeRate: number; // percentage change per week
+  confidence: number; // 0-100, based on data points and consistency
+  trendData: Array<{
+    date: Date;
+    value: number;
+  }>;
+}
+
+export interface RowerProgressTrend {
+  rowerId: string;
+  rowerName: string;
+  seat: number;
+  trends: ProgressTrend[];
+  overallProgress: number; // 0-100
+  strengths: string[];
+  improvementAreas: string[];
+}
+
+export interface CrewProgressTrend {
+  overallProgress: number; // 0-100
+  synchronizationTrend: ProgressTrend;
+  cohesionTrend: ProgressTrend;
+  performanceTrend: ProgressTrend;
+  individualTrends: RowerProgressTrend[];
+  crewStrengths: string[];
+  crewImprovementAreas: string[];
+}
+
+export interface Goal {
+  id: string;
+  name: string;
+  description: string;
+  type: 'performance' | 'consistency' | 'endurance' | 'synchronization' | 'custom';
+  targetValue: number;
+  currentValue: number;
+  unit: string;
+  startDate: Date;
+  targetDate: Date;
+  isAchieved: boolean;
+  progress: number; // 0-100
+  milestones: Milestone[];
+}
+
+export interface Milestone {
+  id: string;
+  name: string;
+  targetValue: number;
+  achievedValue?: number;
+  achievedDate?: Date;
+  isAchieved: boolean;
+  progress: number; // 0-100
+}
+
+export interface TrainingPhase {
+  id: string;
+  name: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  focus: 'base' | 'build' | 'peak' | 'recovery' | 'maintenance';
+  targetMetrics: {
+    primaryZone: string;
+    avgIntensity: number;
+    sessionDuration: number;
+    weeklyVolume: number;
+  };
+  actualMetrics?: {
+    avgIntensity: number;
+    avgDuration: number;
+    totalVolume: number;
+    primaryZoneTime: number;
+  };
+  progress: number; // 0-100
+}
+
+export interface ProgressReport {
+  period: {
+    startDate: Date;
+    endDate: Date;
+    duration: number; // days
+  };
+  totalSessions: number;
+  crewProgress: CrewProgressTrend;
+  individualProgress: RowerProgressTrend[];
+  goals: Goal[];
+  trainingPhases: TrainingPhase[];
+  insights: {
+    keyImprovements: string[];
+    areasOfConcern: string[];
+    recommendations: string[];
+    nextPhaseFocus: string;
   };
 }
