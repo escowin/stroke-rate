@@ -302,7 +302,9 @@ export const DeviceSetup = () => {
         {rowers.length > 0 && (
           <article className="rower-list">
             <h3 className="rower-list-title">Configured Rowers</h3>
-            {rowers.map((rower) => (
+            {rowers
+              .sort((a, b) => a.seat - b.seat)
+              .map((rower) => (
               <div
                 key={rower.id}
                 className="rower-item"
