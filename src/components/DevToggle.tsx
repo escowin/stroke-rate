@@ -7,6 +7,7 @@ import {
   toggleMockData,
   isDevelopmentMode 
 } from '../utils/mockData';
+import { storeHeartRateDataBatch, deleteDatabase } from '../services/database';
 import { 
   BeakerIcon,
   PlayIcon,
@@ -146,6 +147,18 @@ export const DevToggle = () => {
       // Generate initial batch of mock data
       const initialData = generateMockHeartRateData(session.rowers, 30, 'practice');
       // console.log('DevToggle - generated initial data:', initialData);
+      
+      // Store initial batch data to IndexedDB
+      const dataWithSessionId = initialData.map(data => ({
+        ...data,
+        sessionId: session.id
+      }));
+      
+      storeHeartRateDataBatch(dataWithSessionId).catch(error => {
+        console.error('Failed to store initial mock data batch:', error);
+      });
+      
+      // Also add to session for UI display
       initialData.forEach(data => {
         // console.log('DevToggle - adding heart rate data:', data);
         updateHeartRate(data);
@@ -208,6 +221,16 @@ export const DevToggle = () => {
       // console.log('DevToggle - adding scenario data:', data);
       updateHeartRate(data);
     });
+  };
+
+  const handleResetDatabase = async () => {
+    try {
+      await deleteDatabase();
+      // Reload the page to reinitialize the database
+      window.location.reload();
+    } catch (error) {
+      console.error('DevToggle - failed to reset database:', error);
+    }
   };
 
   // Cleanup interval on unmount
@@ -293,6 +316,18 @@ export const DevToggle = () => {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Database Reset */}
+        <div className="dev-toggle-actions">
+          <button
+            onClick={handleResetDatabase}
+            className="dev-toggle-button dev-toggle-button--danger"
+            title="Reset the entire IndexedDB database (useful when encountering storage errors)"
+          >
+            <ArrowPathIcon className="dev-toggle-button-icon" />
+            Reset Database
+          </button>
         </div>
 
         {isGeneratingData && (

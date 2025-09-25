@@ -1,4 +1,4 @@
-import { openDB } from 'idb';
+import { openDB, deleteDB } from 'idb';
 import type { DBSchema, IDBPDatabase } from 'idb';
 import type { HeartRateData, TrainingSession, Rower } from '../types';
 
@@ -30,7 +30,7 @@ interface StrokeRateDB extends DBSchema {
 
 // Database configuration
 const DB_NAME = 'StrokeRateDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 // Database instance
 let db: IDBPDatabase<StrokeRateDB> | null = null;
@@ -39,33 +39,44 @@ let db: IDBPDatabase<StrokeRateDB> | null = null;
  * Initialize the IndexedDB database
  */
 export const initDatabase = async (): Promise<IDBPDatabase<StrokeRateDB>> => {
-  if (db) return db;
+  if (db) {
+    return db;
+  }
 
   db = await openDB<StrokeRateDB>(DB_NAME, DB_VERSION, {
-    upgrade(db) {
-      // Heart rate data store
-      const heartRateStore = db.createObjectStore('heartRateData', {
-        keyPath: 'key',
-      });
-      
-      // Indexes for efficient querying
-      heartRateStore.createIndex('by-session', 'value.sessionId');
-      heartRateStore.createIndex('by-device', 'value.deviceId');
-      heartRateStore.createIndex('by-timestamp', 'value.timestamp', { unique: false });
-      heartRateStore.createIndex('by-session-device', ['value.sessionId', 'value.deviceId']);
+    upgrade(db, oldVersion) {
+      // Only create stores if they don't exist (oldVersion === 0 means new database)
+      if (oldVersion < 1) {
+        // Heart rate data store
+        const heartRateStore = db.createObjectStore('heartRateData', {
+          keyPath: 'key',
+        });
+        
+        // Indexes for efficient querying
+        heartRateStore.createIndex('by-session', 'sessionId');
+        heartRateStore.createIndex('by-device', 'deviceId');
+        heartRateStore.createIndex('by-timestamp', 'timestamp', { unique: false });
+        heartRateStore.createIndex('by-session-device', ['sessionId', 'deviceId']);
 
-      // Sessions store
-      const sessionsStore = db.createObjectStore('sessions', {
-        keyPath: 'id',
-      });
-      
-      sessionsStore.createIndex('by-startTime', 'startTime', { unique: false });
-      sessionsStore.createIndex('by-endTime', 'endTime', { unique: false });
+        // Sessions store
+        const sessionsStore = db.createObjectStore('sessions', {
+          keyPath: 'id',
+        });
+        
+        sessionsStore.createIndex('by-startTime', 'startTime', { unique: false });
+        sessionsStore.createIndex('by-endTime', 'endTime', { unique: false });
 
-      // Rowers store
-      db.createObjectStore('rowers', {
-        keyPath: 'id',
-      });
+        // Rowers store
+        db.createObjectStore('rowers', {
+          keyPath: 'id',
+        });
+      }
+      
+      // Handle version 2 upgrade (fix for keyPath issue)
+      if (oldVersion < 2) {
+        // The keyPath fix is handled by the new storage functions
+        // No schema changes needed, just data structure changes
+      }
     },
   });
 
@@ -89,13 +100,16 @@ export const storeHeartRateData = async (data: HeartRateData & { sessionId: stri
   const database = await getDatabase();
   const key = `${data.sessionId}-${data.deviceId}-${data.timestamp.getTime()}`;
   
-  await database.put('heartRateData', {
+  const dataToStore = {
+    key: key,
     deviceId: data.deviceId,
     heartRate: data.heartRate,
     timestamp: data.timestamp,
     zone: data.zone,
     sessionId: data.sessionId,
-  }, key);
+  };
+  
+  await database.put('heartRateData', dataToStore);
 };
 
 /**
@@ -107,13 +121,16 @@ export const storeHeartRateDataBatch = async (dataPoints: (HeartRateData & { ses
   
   for (const data of dataPoints) {
     const key = `${data.sessionId}-${data.deviceId}-${data.timestamp.getTime()}`;
-    await tx.store.put({
+    const dataToStore = {
+      key: key,
       deviceId: data.deviceId,
       heartRate: data.heartRate,
       timestamp: data.timestamp,
       zone: data.zone,
       sessionId: data.sessionId,
-    }, key);
+    };
+    
+    await tx.store.put(dataToStore);
   }
   
   await tx.done;
@@ -291,4 +308,16 @@ export const clearAllData = async (): Promise<void> => {
   ]);
   
   await tx.done;
+};
+
+/**
+ * Delete the entire database (useful for development/testing)
+ */
+export const deleteDatabase = async (): Promise<void> => {
+  if (db) {
+    db.close();
+    db = null;
+  }
+  
+  await deleteDB(DB_NAME);
 };
