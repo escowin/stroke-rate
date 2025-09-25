@@ -37,7 +37,8 @@ export const DevToggle = () => {
 
   const handleToggleMockData = () => {
     toggleMockData();
-    setUseMockData(!useMockData);
+    // Update local state to reflect the new value
+    setUseMockData(shouldUseMockData());
   };
 
   const handleLoadMockRowers = () => {
@@ -170,19 +171,20 @@ export const DevToggle = () => {
   }, [mockDataInterval]);
 
   return (
-    <div className="dev-toggle">
-      <div className="dev-toggle-header">
+    <section className="dev-toggle">
+      <header className="dev-toggle-header">
         <BeakerIcon className="dev-toggle-icon" />
         <h3 className="dev-toggle-title">
           Development Tools
         </h3>
-      </div>
+      </header>
       
-      <div className="dev-toggle-content">
+      <article className="dev-toggle-content">
         {/* Mock Data Toggle */}
         <div className="dev-toggle-control">
-          <span className="dev-toggle-label">Use Mock Data</span>
+          <label htmlFor="toggle-switch" className="dev-toggle-label">Use Mock Data</label>
           <button
+            id="toggle-switch"
             onClick={handleToggleMockData}
             className={`dev-toggle-switch ${
               useMockData ? 'dev-toggle-switch--active' : 'dev-toggle-switch--inactive'
@@ -247,7 +249,7 @@ export const DevToggle = () => {
             <span>Generating real-time mock data...</span>
           </div>
         )}
-      </div>
-    </div>
+      </article>
+    </section>
   );
 };

@@ -188,5 +188,5 @@ export const shouldUseMockData = (): boolean => {
 export const toggleMockData = (): void => {
   const current = shouldUseMockData();
   localStorage.setItem('useMockData', (!current).toString());
-  window.location.reload(); // Reload to apply changes
+  // No need to reload - the DevToggle component will reactively update
 };
