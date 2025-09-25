@@ -338,7 +338,8 @@ export const useAppStore = create<AppStore>()(
                     .map(rower => ({
                       id: rower.deviceId!,
                       name: rower.name,
-                      isConnected: true,
+                      connected: true,
+                      lastSeen: new Date(),
                       isHealthy: true
                     }))
                 }

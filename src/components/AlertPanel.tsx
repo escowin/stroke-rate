@@ -16,7 +16,6 @@ interface AlertPanelProps {
 
 export const AlertPanel: React.FC<AlertPanelProps> = ({ isOpen, onClose }) => {
   const {
-    alerts,
     config,
     activeAlertsCount,
     updateConfig,
@@ -45,16 +44,6 @@ export const AlertPanel: React.FC<AlertPanelProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const getSeverityColor = (severity: Alert['severity']) => {
-    switch (severity) {
-      case 'high':
-        return 'var(--color-red)';
-      case 'medium':
-        return 'var(--color-orange)';
-      case 'low':
-        return 'var(--color-blue-light)';
-    }
-  };
 
   const formatTimestamp = (timestamp: Date) => {
     return new Date(timestamp).toLocaleTimeString([], { 
@@ -112,14 +101,6 @@ export const AlertPanel: React.FC<AlertPanelProps> = ({ isOpen, onClose }) => {
                   onChange={(e) => updateConfig({ enableConnectionAlerts: e.target.checked })}
                 />
                 <span>Connection Alerts</span>
-              </label>
-              <label className="alert-setting-item">
-                <input
-                  type="checkbox"
-                  checked={config.enableSessionAlerts}
-                  onChange={(e) => updateConfig({ enableSessionAlerts: e.target.checked })}
-                />
-                <span>Session Alerts</span>
               </label>
             </div>
             <div className="alert-settings-sliders">

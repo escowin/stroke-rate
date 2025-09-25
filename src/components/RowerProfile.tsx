@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import type { Rower } from '../types';
 import { calculateMaxHeartRate, estimateRestingHeartRate } from '../utils/heartRateCalculations';
 import { 
@@ -66,9 +66,9 @@ export const RowerProfile = ({
   const handleSave = () => {
     const updates: Partial<Rower> = {
       name: formData.name,
-      age: formData.age ? parseInt(formData.age) : undefined,
-      restingHeartRate: formData.restingHeartRate ? parseInt(formData.restingHeartRate) : undefined,
-      maxHeartRate: formData.maxHeartRate ? parseInt(formData.maxHeartRate) : undefined
+      age: formData.age ? parseInt(String(formData.age)) : undefined,
+      restingHeartRate: formData.restingHeartRate ? parseInt(String(formData.restingHeartRate)) : undefined,
+      maxHeartRate: formData.maxHeartRate ? parseInt(String(formData.maxHeartRate)) : undefined
     };
     
     onUpdate(rower.id, updates);
@@ -88,7 +88,7 @@ export const RowerProfile = ({
   };
 
   // Calculate estimates based on current form data during editing, or rower data when not editing
-  const currentAge = isEditing ? (parseInt(formData.age) || 0) : (rower.age || 0);
+  const currentAge = isEditing ? (parseInt(String(formData.age)) || 0) : (rower.age || 0);
   const estimatedMaxHR = currentAge > 0 ? calculateMaxHeartRate(currentAge) : null;
   const estimatedRestingHR = currentAge > 0 ? estimateRestingHeartRate(currentAge) : null;
 

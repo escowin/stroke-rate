@@ -4,7 +4,6 @@ import { useDefaultHeartRateZones } from '../hooks/useHeartRateZones';
 import type { TrainingSession } from '../types';
 import {
   ChartBarIcon,
-  ArrowTrendingUpIcon,
   CalendarIcon,
   UserGroupIcon,
   HeartIcon,

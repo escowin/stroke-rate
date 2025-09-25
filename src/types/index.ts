@@ -31,6 +31,7 @@ export interface HeartRateData {
   heartRate: number;
   timestamp: Date;
   zone: keyof HeartRateZones;
+  batteryLevel?: number;
   sessionId?: string; // Optional for backward compatibility
 }
 
@@ -45,6 +46,7 @@ export interface Rower {
   maxHeartRate?: number;
   targetZones: HeartRateZones;
   currentHeartRate?: HeartRateData;
+  isActive?: boolean;
 }
 
 // Connection Status Types

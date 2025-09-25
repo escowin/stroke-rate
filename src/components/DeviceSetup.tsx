@@ -8,7 +8,6 @@ import {
   WifiIcon,
   PlusIcon,
   TrashIcon,
-  UserIcon,
   SignalIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,

@@ -6,8 +6,7 @@ import {
   CalendarIcon,
   ChartBarIcon,
   TrashIcon,
-  EyeIcon,
-  ArrowDownTrayIcon
+  EyeIcon
 } from '@heroicons/react/24/outline';
 
 interface HistoricalSessionsProps {

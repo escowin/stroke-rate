@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  Cog6ToothIcon, 
-  BellIcon, 
+import {
+  Cog6ToothIcon,
+  BellIcon,
   DevicePhoneMobileIcon,
   WifiIcon,
-  PlayIcon,
   XMarkIcon,
   CheckIcon
 } from '@heroicons/react/24/outline';
@@ -102,11 +101,6 @@ export const Settings: React.FC = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const estimateSessionsFromUsage = (usageBytes: number): number => {
-    // Each session is approximately 271 KB (270 KB heart rate data + 1 KB metadata)
-    const bytesPerSession = 271 * 1024;
-    return Math.round(usageBytes / bytesPerSession);
-  };
 
   return (
     <div className="settings-page">
