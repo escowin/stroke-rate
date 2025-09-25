@@ -11,6 +11,7 @@ import type {
 } from '../types';
 import { calculateRowerHeartRateZones } from '../utils/heartRateCalculations';
 import { storeHeartRateData, storeSession, storeRower, getAllRowers } from '../services/database';
+import { notificationService } from '../services/notifications';
 
 interface AppStore extends AppState {
   // Connection Management
@@ -161,6 +162,9 @@ export const useAppStore = create<AppStore>()(
               console.error('Failed to store heart rate data:', error);
             });
           }
+
+          // Note: Heart rate processing for alerts removed - zone violations and anomalies
+          // are now handled in person during practice
           
           // console.log('Store - updated session heartRateData length:', updatedSession?.heartRateData.length);
           
@@ -255,6 +259,9 @@ export const useAppStore = create<AppStore>()(
           storeSession(session).catch(error => {
             console.error('Failed to store session:', error);
           });
+
+          // Notify session started
+          notificationService.notifySessionStarted(session.id);
           
           return {
             currentSession: session
@@ -276,6 +283,10 @@ export const useAppStore = create<AppStore>()(
           storeSession(endedSession).catch(error => {
             console.error('Failed to store ended session:', error);
           });
+
+          // Calculate session duration and notify
+          const duration = Math.floor((endedSession.endTime!.getTime() - endedSession.startTime.getTime()) / 1000 / 60);
+          notificationService.notifySessionEnded(endedSession.id, `${duration}m`);
           
           return {
             currentSession: endedSession

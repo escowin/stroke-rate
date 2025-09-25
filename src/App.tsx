@@ -5,6 +5,7 @@ import { DeviceSetup } from './components/DeviceSetup';
 import { ConnectionConflictDialog } from './components/ConnectionConflictDialog';
 import { Header } from './components/Header';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { Settings } from './components/Settings';
 
 // Lazy load the Dashboard component (contains heavy recharts dependency)
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
@@ -42,7 +43,7 @@ function App() {
           </Suspense>
         );
       case 'settings':
-        return <section>Settings coming soon...</section>;
+        return <Settings />;
       default:
         return (
           <Suspense fallback={
