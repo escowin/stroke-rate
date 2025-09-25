@@ -10,14 +10,15 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
 
 function App() {
-  const { uiState, connectionStatus, error, setUIState, clearError } = useAppStore();
+  const { uiState, connectionStatus, error, setUIState, clearError, loadRowersFromDatabase } = useAppStore();
   const { isAvailable, error: bluetoothError, clearError: clearBluetoothError } = useBluetooth();
 
-  // Clear errors when component mounts
+  // Clear errors and load data when component mounts
   useEffect(() => {
     clearError();
     clearBluetoothError();
-  }, [clearError, clearBluetoothError]);
+    loadRowersFromDatabase();
+  }, [clearError, clearBluetoothError, loadRowersFromDatabase]);
 
   // Show conflict dialog if conflicts are detected
   useEffect(() => {

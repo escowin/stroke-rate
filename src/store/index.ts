@@ -10,7 +10,7 @@ import type {
   UIState
 } from '../types';
 import { calculateRowerHeartRateZones } from '../utils/heartRateCalculations';
-import { storeHeartRateData, storeSession } from '../services/database';
+import { storeHeartRateData, storeSession, storeRower, getAllRowers } from '../services/database';
 
 interface AppStore extends AppState {
   // Connection Management
@@ -32,6 +32,7 @@ interface AppStore extends AppState {
   removeRower: (rowerId: string) => void;
   removeAllRowers: () => void;
   assignDeviceToRower: (rowerId: string, deviceId: string) => void;
+  loadRowersFromDatabase: () => Promise<void>;
   
   // Session Management
   startSession: (session: TrainingSession) => void;
@@ -180,13 +181,20 @@ export const useAppStore = create<AppStore>()(
       
       // Rower Management
       addRower: (rower: Rower) =>
-        set((state) => ({
-          rowers: [...state.rowers, rower]
-        })),
+        set((state) => {
+          // Store rower to IndexedDB
+          storeRower(rower).catch(error => {
+            console.error('Failed to store rower:', error);
+          });
+          
+          return {
+            rowers: [...state.rowers, rower]
+          };
+        }),
       
       updateRower: (rowerId: string, updates: Partial<Rower>) =>
-        set((state) => ({
-          rowers: state.rowers.map(rower => {
+        set((state) => {
+          const updatedRowers = state.rowers.map(rower => {
             if (rower.id === rowerId) {
               const updatedRower = { ...rower, ...updates };
               
@@ -201,11 +209,18 @@ export const useAppStore = create<AppStore>()(
                 }
               }
               
+              // Store updated rower to IndexedDB
+              storeRower(updatedRower).catch(error => {
+                console.error('Failed to update rower in database:', error);
+              });
+              
               return updatedRower;
             }
             return rower;
-          })
-        })),
+          });
+          
+          return { rowers: updatedRowers };
+        }),
       
       removeRower: (rowerId: string) =>
         set((state) => ({
@@ -223,6 +238,15 @@ export const useAppStore = create<AppStore>()(
             rower.id === rowerId ? { ...rower, deviceId } : rower
           )
         })),
+      
+      loadRowersFromDatabase: async () => {
+        try {
+          const rowers = await getAllRowers();
+          set({ rowers });
+        } catch (error) {
+          console.error('Failed to load rowers from database:', error);
+        }
+      },
       
       // Session Management
       startSession: (session: TrainingSession) =>
