@@ -2,25 +2,19 @@ import { useMemo, useState } from 'react';
 import { useDefaultHeartRateZones } from '../hooks/useHeartRateZones';
 import { useHistoricalData } from '../hooks/useHistoricalData';
 import { HeartRateChart } from './HeartRateChart';
-import type { HeartRateData, Rower } from '../types';
+import { SessionAnalytics } from './SessionAnalytics';
+import type { TrainingSession } from '../types';
 import {
   ChartBarIcon,
   ClockIcon,
   HeartIcon,
   ArrowTrendingUpIcon,
-  FireIcon
+  FireIcon,
+  ChartPieIcon
 } from '@heroicons/react/24/outline';
 
 interface EnhancedDashboardProps {
-  currentSession?: {
-    id: string;
-    startTime: Date;
-    endTime?: Date;
-    isActive: boolean;
-    heartRateData: HeartRateData[];
-    finalHeartRateData?: HeartRateData[];
-    rowers: Rower[];
-  };
+  currentSession?: TrainingSession;
 }
 
 
@@ -36,6 +30,7 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
   const { zones } = useDefaultHeartRateZones();
   const { sessions } = useHistoricalData();
   const [selectedComparisonSession, setSelectedComparisonSession] = useState<string | null>(null);
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
 
 
@@ -392,7 +387,6 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
         />
       )}
 
-
       {/* Session Selection for Comparison */}
       {sessions && sessions.length > 0 && (
         <section className="card-base session-selection">
@@ -430,6 +424,32 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
               ))}
           </div>
         </section>
+      )}
+
+      {/* Analytics Toggle */}
+      {currentSession && !currentSession.isActive && currentSession.finalHeartRateData && currentSession.finalHeartRateData.length > 0 && (
+        <section className="card-base analytics-toggle">
+          <div className="analytics-toggle-content">
+            <h3 className="analytics-toggle-title">
+              <ChartPieIcon className="analytics-toggle-icon" />
+              Advanced Session Analytics
+            </h3>
+            <p className="analytics-toggle-description">
+              View detailed training analysis including TRIMP, TSS, recovery metrics, and crew synchronization
+            </p>
+            <button
+              className={`analytics-toggle-button ${showAnalytics ? 'active' : ''}`}
+              onClick={() => setShowAnalytics(!showAnalytics)}
+            >
+              {showAnalytics ? 'Hide Analytics' : 'Show Analytics'}
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* Session Analytics */}
+      {showAnalytics && currentSession && !currentSession.isActive && currentSession.finalHeartRateData && currentSession.finalHeartRateData.length > 0 && (
+        <SessionAnalytics session={currentSession} zones={zones} />
       )}
     </section>
   );
