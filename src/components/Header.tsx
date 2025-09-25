@@ -6,7 +6,8 @@ import {
   WifiIcon,
   SignalSlashIcon,
   HeartIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
 
 export const Header = () => {
@@ -19,6 +20,7 @@ export const Header = () => {
   const navigation = [
     { name: 'Dashboard', view: 'dashboard' as const, icon: HeartIcon },
     { name: 'Progress', view: 'progress' as const, icon: ChartBarIcon },
+    { name: 'Export', view: 'export' as const, icon: ArrowDownTrayIcon },
     { name: 'Setup', view: 'setup' as const, icon: WifiIcon },
     { name: 'Settings', view: 'settings' as const, icon: Cog6ToothIcon },
   ];

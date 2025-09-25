@@ -102,7 +102,7 @@ export interface HeartRateCalculation {
 
 // UI State Types
 export interface UIState {
-  currentView: 'dashboard' | 'progress' | 'setup' | 'session' | 'settings';
+  currentView: 'dashboard' | 'progress' | 'export' | 'setup' | 'session' | 'settings';
   selectedRower?: string;
   showConflictDialog: boolean;
   isFullscreen: boolean;

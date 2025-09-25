@@ -11,6 +11,7 @@ import { notificationService } from './services/notifications';
 // Lazy load the Dashboard component (contains heavy recharts dependency)
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
 const ProgressTracking = lazy(() => import('./components/ProgressTracking').then(module => ({ default: module.ProgressTracking })));
+const DataExport = lazy(() => import('./components/DataExport').then(module => ({ default: module.DataExport })));
 
 function App() {
   const { uiState, connectionStatus, error, setUIState, clearError, loadRowersFromDatabase, loadCurrentSession } = useAppStore();
@@ -58,6 +59,16 @@ function App() {
             </div>
           }>
             <ProgressTracking className="" />
+          </Suspense>
+        );
+      case 'export':
+        return (
+          <Suspense fallback={
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+            </div>
+          }>
+            <DataExport />
           </Suspense>
         );
       case 'session':
