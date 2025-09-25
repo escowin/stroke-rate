@@ -75,7 +75,7 @@ export const DeviceSetup = () => {
       const rower: Rower = {
         id: `rower-${Date.now()}`,
         name: newRowerName.trim(),
-        seat: availableSeats[0],
+        seat: selectedSeat,
         targetZones: {
           recovery: { name: 'Recovery', min: 60, max: 120, color: '#10b981', description: 'Active recovery' },
           aerobic: { name: 'Aerobic', min: 120, max: 150, color: '#3b82f6', description: 'Base aerobic' },
