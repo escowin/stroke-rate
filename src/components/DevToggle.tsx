@@ -22,8 +22,11 @@ export const DevToggle = () => {
     endSession, 
     updateHeartRate,
     addRower,
+    removeAllRowers,
     setConnectionStatus,
-    addConnectedDevice
+    addConnectedDevice,
+    removeAllConnectedDevices,
+    clearHeartRateData
   } = useAppStore();
 
   const [useMockData, setUseMockData] = useState(shouldUseMockData());
@@ -36,12 +39,46 @@ export const DevToggle = () => {
   }
 
   const handleToggleMockData = () => {
+    const newMockDataState = !shouldUseMockData();
     toggleMockData();
+    
+    // If turning off mock data, clean up all mock data
+    if (!newMockDataState) {
+      // Stop any running mock data generation
+      if (mockDataInterval) {
+        clearInterval(mockDataInterval);
+        setMockDataInterval(null);
+      }
+      setIsGeneratingData(false);
+      
+      // End any active mock session
+      if (currentSession?.isActive) {
+        endSession();
+      }
+      
+      // Clear all mock rowers and connected devices
+      removeAllRowers();
+      removeAllConnectedDevices();
+      clearHeartRateData();
+      
+      // Reset connection status
+      setConnectionStatus({
+        connectedDevices: [],
+        isScanning: false
+      });
+    }
+    
     // Update local state to reflect the new value
-    setUseMockData(shouldUseMockData());
+    setUseMockData(newMockDataState);
   };
 
   const handleLoadMockRowers = () => {
+    // Only allow if mock data is enabled
+    if (!useMockData) {
+      console.warn('Mock data is disabled. Enable mock data first.');
+      return;
+    }
+    
     const mockRowers = createMockRowers();
     
     // Add mock rowers to store
@@ -76,6 +113,12 @@ export const DevToggle = () => {
   };
 
   const handleStartMockSession = () => {
+    // Only allow if mock data is enabled
+    if (!useMockData) {
+      console.warn('Mock data is disabled. Enable mock data first.');
+      return;
+    }
+    
     if (rowers.length === 0) {
       handleLoadMockRowers();
       // Wait a bit for rowers to be added
@@ -138,6 +181,12 @@ export const DevToggle = () => {
   };
 
   const handleGenerateScenario = (scenario: 'practice' | 'race' | 'intervals' | 'warmup') => {
+    // Only allow if mock data is enabled
+    if (!useMockData) {
+      console.warn('Mock data is disabled. Enable mock data first.');
+      return;
+    }
+    
     if (rowers.length === 0) {
       handleLoadMockRowers();
       setTimeout(() => generateScenarioData(scenario), 100);
@@ -202,7 +251,8 @@ export const DevToggle = () => {
         <div className="dev-toggle-actions">
           <button
             onClick={handleLoadMockRowers}
-            className="dev-toggle-button"
+            disabled={!useMockData}
+            className={`dev-toggle-button ${!useMockData ? 'dev-toggle-button--disabled' : ''}`}
           >
             Load Mock Rowers
           </button>
@@ -210,7 +260,8 @@ export const DevToggle = () => {
           {!currentSession?.isActive ? (
             <button
               onClick={handleStartMockSession}
-              className="dev-toggle-button dev-toggle-button--primary"
+              disabled={!useMockData}
+              className={`dev-toggle-button dev-toggle-button--primary ${!useMockData ? 'dev-toggle-button--disabled' : ''}`}
             >
               <PlayIcon className="dev-toggle-button-icon" />
               Start Mock Session
@@ -234,7 +285,8 @@ export const DevToggle = () => {
               <button
                 key={scenario}
                 onClick={() => handleGenerateScenario(scenario as any)}
-                className="dev-toggle-scenario-button"
+                disabled={!useMockData}
+                className={`dev-toggle-scenario-button ${!useMockData ? 'dev-toggle-scenario-button--disabled' : ''}`}
               >
                 <ArrowPathIcon className="dev-toggle-scenario-icon" />
                 {scenario.charAt(0).toUpperCase() + scenario.slice(1)}

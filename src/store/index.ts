@@ -15,6 +15,7 @@ interface AppStore extends AppState {
   setConnectionStatus: (status: Partial<ConnectionStatus>) => void;
   addConnectedDevice: (device: BluetoothDevice) => void;
   removeConnectedDevice: (deviceId: string) => void;
+  removeAllConnectedDevices: () => void;
   updateDeviceStatus: (deviceId: string, updates: Partial<BluetoothDevice>) => void;
   
   // Heart Rate Data
@@ -25,6 +26,7 @@ interface AppStore extends AppState {
   addRower: (rower: Rower) => void;
   updateRower: (rowerId: string, updates: Partial<Rower>) => void;
   removeRower: (rowerId: string) => void;
+  removeAllRowers: () => void;
   assignDeviceToRower: (rowerId: string, deviceId: string) => void;
   
   // Session Management
@@ -90,6 +92,15 @@ export const useAppStore = create<AppStore>()(
           isConnected: state.connectionStatus.connectedDevices.length > 1
         })),
       
+      removeAllConnectedDevices: () =>
+        set((state) => ({
+          connectionStatus: {
+            ...state.connectionStatus,
+            connectedDevices: []
+          },
+          isConnected: false
+        })),
+      
       updateDeviceStatus: (deviceId, updates) =>
         set((state) => ({
           connectionStatus: {
@@ -151,6 +162,11 @@ export const useAppStore = create<AppStore>()(
       removeRower: (rowerId) =>
         set((state) => ({
           rowers: state.rowers.filter(rower => rower.id !== rowerId)
+        })),
+      
+      removeAllRowers: () =>
+        set(() => ({
+          rowers: []
         })),
       
       assignDeviceToRower: (rowerId, deviceId) =>
