@@ -1,16 +1,7 @@
 import { useMemo } from 'react';
-import {
-  BarChart,
-  Bar,
-  ResponsiveContainer,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip
-} from 'recharts';
 import { useDefaultHeartRateZones } from '../hooks/useHeartRateZones';
-import { useHistoricalData } from '../hooks/useHistoricalData';
 import { HeartRateChart } from './HeartRateChart';
+import { SessionComparison } from './SessionComparison';
 import type { HeartRateData, Rower } from '../types';
 import {
   ChartBarIcon,
@@ -43,7 +34,6 @@ const ZONE_COLORS = {
 
 export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) => {
   const { zones } = useDefaultHeartRateZones();
-  const { sessions } = useHistoricalData();
 
 
 
@@ -145,33 +135,6 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
     };
   }, [currentSession, zones]);
 
-  // Historical comparison data
-  const historicalComparison = useMemo(() => {
-    if (!sessions || sessions.length < 2) return null;
-
-    const recentSessions = sessions
-      .filter(s => !s.isActive)
-      .slice(0, 5)
-      .map(session => {
-        if (!session.heartRateData || session.heartRateData.length === 0) {
-          return null;
-        }
-
-        const heartRates = session.heartRateData.map(d => d.heartRate);
-        const avgHeartRate = Math.round(heartRates.reduce((sum, hr) => sum + hr, 0) / heartRates.length);
-        
-        return {
-          date: session.startTime.toLocaleDateString(),
-          avgHeartRate,
-          duration: session.endTime 
-            ? Math.floor((session.endTime.getTime() - session.startTime.getTime()) / 1000 / 60)
-            : 0
-        };
-      })
-      .filter(Boolean);
-
-    return recentSessions;
-  }, [sessions]);
 
   if (!currentSession) {
     return (
@@ -299,26 +262,8 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
       )}
 
 
-      {/* Historical Comparison */}
-      {historicalComparison && historicalComparison.length > 0 && (
-        <section className="card-base historical-comparison">
-          <h3 className="card-title">
-            <ArrowTrendingUpIcon className="card-title-icon" />
-            Recent Session Comparison
-          </h3>
-          <div className="chart-container">
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={historicalComparison}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis domain={[100, 200]} />
-                <Tooltip />
-                <Bar dataKey="avgHeartRate" fill="#3b82f6" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
-      )}
+      {/* Session Comparison */}
+      <SessionComparison currentSession={currentSession} />
     </div>
   );
 };
