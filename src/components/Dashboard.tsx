@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { useAppStore } from '../store';
 import { useDefaultHeartRateZones } from '../hooks/useHeartRateZones';
 // Removed useConnectionHealth import - now using global store for unhealthy devices
 import { useSessionDuration } from '../hooks/useSessionDuration';
 import { HeartRateCard } from './HeartRateCard';
 import { HeartRateChart } from './HeartRateChart';
+import { EnhancedDashboard } from './EnhancedDashboard';
 import { ConnectionStatus } from './ConnectionStatus';
 import { ReconnectionStatus } from './ReconnectionStatus';
 import { DevToggle } from './DevToggle';
@@ -13,7 +15,9 @@ import {
   PlusIcon,
   ChartBarIcon,
   ExclamationTriangleIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
+  ChartPieIcon,
+  EyeIcon
 } from '@heroicons/react/24/outline';
 
 
@@ -31,6 +35,7 @@ export const Dashboard = () => {
   const { zones } = useDefaultHeartRateZones();
   const sessionDuration = useSessionDuration(currentSession);
   const isSessionActive = currentSession?.isActive;
+  const [showEnhancedView, setShowEnhancedView] = useState(false);
 
   const unhealthyDevices = getUnhealthyDevices();
 
@@ -129,6 +134,25 @@ export const Dashboard = () => {
             <PlusIcon className="btn-icon" />
             Add Rower
           </button>
+
+          {currentSession && (
+            <button
+              onClick={() => setShowEnhancedView(!showEnhancedView)}
+              className={`btn ${showEnhancedView ? 'btn-primary' : 'btn-secondary'}`}
+            >
+              {showEnhancedView ? (
+                <>
+                  <EyeIcon className="btn-icon" />
+                  Basic View
+                </>
+              ) : (
+                <>
+                  <ChartPieIcon className="btn-icon" />
+                  Enhanced View
+                </>
+              )}
+            </button>
+          )}
         </article>
       </section>
 
@@ -141,63 +165,70 @@ export const Dashboard = () => {
       {/* Heart Rate Monitoring */}
       {rowers.length > 0 ? (
         <>
-          {/* Rower Status Overview */}
-          <section className="rower-overview">
-            <h3 className="rower-overview-title">Rower Status</h3>
-            <article className="rower-grid">
-              {[1, 2, 3, 4].map(seat => {
-                const rower = rowers.find(r => r.seat === seat);
-                const isConnected = rower && rower.deviceId && rower.currentHeartRate;
-                const hasDevice = rower && rower.deviceId;
+          {/* Enhanced Dashboard View */}
+          {showEnhancedView && currentSession ? (
+            <EnhancedDashboard currentSession={currentSession} />
+          ) : (
+            <>
+              {/* Rower Status Overview */}
+              <section className="rower-overview">
+                <h3 className="rower-overview-title">Rower Status</h3>
+                <article className="rower-grid">
+                  {[1, 2, 3, 4].map(seat => {
+                    const rower = rowers.find(r => r.seat === seat);
+                    const isConnected = rower && rower.deviceId && rower.currentHeartRate;
+                    const hasDevice = rower && rower.deviceId;
 
-                return (
-                  <div
-                    key={seat}
-                    className={`rower-seat ${isConnected
-                      ? 'rower-seat--connected'
-                      : hasDevice
-                        ? 'rower-seat--device-only'
-                        : 'rower-seat--empty'
-                      }`}
-                  >
-                      <span className={`rower-status-indicator ${isConnected ? 'rower-status-indicator--connected' : hasDevice ? 'rower-status-indicator--device-only' : 'rower-status-indicator--empty'
-                        }`} />
-                      <p className="rower-seat-number">
-                        Seat {seat}
-                      </p>
-                      <p className="rower-name">
-                        {rower ? rower.name : 'Empty'}
-                      </p>
-                      <p className="rower-status">
-                        {isConnected ? 'Active' : hasDevice ? 'Connected' : 'No Device'}
-                      </p>
-                  </div>
-                );
-              })}
-            </article>
-          </section>
+                    return (
+                      <div
+                        key={seat}
+                        className={`rower-seat ${isConnected
+                          ? 'rower-seat--connected'
+                          : hasDevice
+                            ? 'rower-seat--device-only'
+                            : 'rower-seat--empty'
+                          }`}
+                      >
+                          <span className={`rower-status-indicator ${isConnected ? 'rower-status-indicator--connected' : hasDevice ? 'rower-status-indicator--device-only' : 'rower-status-indicator--empty'
+                            }`} />
+                          <p className="rower-seat-number">
+                            Seat {seat}
+                          </p>
+                          <p className="rower-name">
+                            {rower ? rower.name : 'Empty'}
+                          </p>
+                          <p className="rower-status">
+                            {isConnected ? 'Active' : hasDevice ? 'Connected' : 'No Device'}
+                          </p>
+                      </div>
+                    );
+                  })}
+                </article>
+              </section>
 
-          {/* Heart Rate Cards */}
-          {connectedRowers.length > 0 && (
-            <section className="heart-rate-grid">
-              {connectedRowers.map((rower) => (
-                <HeartRateCard
-                  key={rower.id}
-                  rower={rower}
-                  zones={zones}
+              {/* Heart Rate Cards */}
+              {connectedRowers.length > 0 && (
+                <section className="heart-rate-grid">
+                  {connectedRowers.map((rower) => (
+                    <HeartRateCard
+                      key={rower.id}
+                      rower={rower}
+                      zones={zones}
+                    />
+                  ))}
+                </section>
+              )}
+
+              {/* Session Analysis Chart - Only show after session ends */}
+              {currentSession && !currentSession.isActive && currentSession.finalHeartRateData && currentSession.finalHeartRateData.length > 0 && (
+                <HeartRateChart
+                  data={currentSession.finalHeartRateData}
+                  rowers={currentSession.rowers}
+                  sessionStartTime={currentSession.startTime}
+                  sessionEndTime={currentSession.endTime}
                 />
-              ))}
-            </section>
-          )}
-
-          {/* Session Analysis Chart - Only show after session ends */}
-          {currentSession && !currentSession.isActive && currentSession.finalHeartRateData && currentSession.finalHeartRateData.length > 0 && (
-            <HeartRateChart
-              data={currentSession.finalHeartRateData}
-              rowers={currentSession.rowers}
-              sessionStartTime={currentSession.startTime}
-              sessionEndTime={currentSession.endTime}
-            />
+              )}
+            </>
           )}
         </>
       ) : (

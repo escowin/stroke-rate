@@ -26,6 +26,22 @@ export const useHistoricalData = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sessions, setSessions] = useState<TrainingSession[]>([]);
+
+  // Load sessions when database is initialized
+  const loadSessions = useCallback(async () => {
+    if (!isInitialized) return;
+    
+    try {
+      setIsLoading(true);
+      const allSessions = await getAllSessions();
+      setSessions(allSessions);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load sessions');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isInitialized]);
 
   // Initialize database
   useEffect(() => {
@@ -43,6 +59,11 @@ export const useHistoricalData = () => {
 
     initializeDB();
   }, []);
+
+  // Load sessions when database is initialized
+  useEffect(() => {
+    loadSessions();
+  }, [loadSessions]);
 
   // Store heart rate data point
   const storeHeartRate = useCallback(async (data: HeartRateData & { sessionId: string }) => {
@@ -227,6 +248,7 @@ export const useHistoricalData = () => {
     isInitialized,
     isLoading,
     error,
+    sessions,
     
     // Heart rate data methods
     storeHeartRate,

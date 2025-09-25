@@ -127,34 +127,34 @@ export const createMockRowers = (): Rower[] => {
   const mockRowers: Rower[] = [
     {
       id: 'rower-1',
-      name: 'Alex',
+      name: 'Edwin',
       seat: 1,
       deviceId: 'mock-device-1',
-      age: 17, // High School
+      age: 39, // Masters B
       targetZones: calculateRowerHeartRateZones(17)
     },
     {
       id: 'rower-2',
-      name: 'Jordan',
+      name: 'John',
       seat: 2,
       deviceId: 'mock-device-2',
-      age: 20, // Collegiate
+      age: 64, // Masters F
       targetZones: calculateRowerHeartRateZones(20)
     },
     {
       id: 'rower-3',
-      name: 'Morgan',
+      name: 'Craig',
       seat: 3,
       deviceId: 'mock-device-3',
-      age: 45, // Masters B
+      age: 47, // Masters C
       targetZones: calculateRowerHeartRateZones(45)
     },
     {
       id: 'rower-4',
-      name: 'Casey',
+      name: 'Robert',
       seat: 4,
       deviceId: 'mock-device-4',
-      age: 62, // Masters C
+      age: 44, // Masters C
       targetZones: calculateRowerHeartRateZones(62)
     }
   ];

@@ -27,31 +27,30 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="error-boundary">
-          <div className="card-base error-boundary-content">
-            <div className="error-boundary-header">
+        <main className="error-boundary">
+            <header className="error-boundary-header">
               <ExclamationTriangleIcon className="error-boundary-icon" />
               <h1 className="error-boundary-title">
                 Something went wrong
               </h1>
-            </div>
+            </header>
             
             <p className="error-boundary-description">
               The app encountered an unexpected error. Please try refreshing the page.
             </p>
             
             {this.state.error && (
-              <div className="error-boundary-details">
+              <section className="error-boundary-details">
                 <summary className="error-boundary-details-summary">
                   Error Details
                 </summary>
                 <pre className="error-boundary-details-content">
                   {this.state.error.message}
                 </pre>
-              </div>
+              </section>
             )}
             
-            <div className="error-boundary-actions">
+            <section className="error-boundary-actions">
               <button
                 onClick={() => window.location.reload()}
                 className="error-boundary-button"
@@ -64,9 +63,8 @@ export class ErrorBoundary extends Component<Props, State> {
               >
                 Try Again
               </button>
-            </div>
-          </div>
-        </div>
+            </section>
+        </main>
       );
     }
 
