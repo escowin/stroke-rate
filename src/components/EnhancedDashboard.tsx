@@ -2,9 +2,6 @@ import { useMemo } from 'react';
 import {
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
   ResponsiveContainer,
   CartesianGrid,
   XAxis,
@@ -50,38 +47,6 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
 
 
 
-  // Calculate zone distribution for current session
-  const zoneDistribution = useMemo(() => {
-    if (!currentSession?.finalHeartRateData || currentSession.finalHeartRateData.length === 0) {
-      return [];
-    }
-
-    const zoneCounts = {
-      recovery: 0,
-      aerobic: 0,
-      threshold: 0,
-      anaerobic: 0
-    };
-
-    currentSession.finalHeartRateData.forEach(data => {
-      const heartRate = data.heartRate;
-      if (heartRate >= zones.anaerobic.min) {
-        zoneCounts.anaerobic++;
-      } else if (heartRate >= zones.threshold.min) {
-        zoneCounts.threshold++;
-      } else if (heartRate >= zones.aerobic.min) {
-        zoneCounts.aerobic++;
-      } else {
-        zoneCounts.recovery++;
-      }
-    });
-
-    return Object.entries(zoneCounts).map(([zone, count]) => ({
-      name: zone.charAt(0).toUpperCase() + zone.slice(1),
-      value: count,
-      color: ZONE_COLORS[zone as keyof typeof ZONE_COLORS]
-    }));
-  }, [currentSession?.finalHeartRateData, zones]);
 
   // Calculate performance metrics
   const performanceMetrics = useMemo(() => {
@@ -106,12 +71,55 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
       const maxHR = Math.max(...rowerHeartRates);
       const minHR = Math.min(...rowerHeartRates);
       
+      // Calculate zone distribution for this rower
+      const zoneCounts = {
+        recovery: 0,
+        aerobic: 0,
+        threshold: 0,
+        anaerobic: 0
+      };
+      
+      rowerData.forEach(dataPoint => {
+        const heartRate = dataPoint.heartRate;
+        if (heartRate >= zones.anaerobic.min) {
+          zoneCounts.anaerobic++;
+        } else if (heartRate >= zones.threshold.min) {
+          zoneCounts.threshold++;
+        } else if (heartRate >= zones.aerobic.min) {
+          zoneCounts.aerobic++;
+        } else {
+          zoneCounts.recovery++;
+        }
+      });
+      
+      // Calculate percentages and time durations
+      const totalDataPoints = rowerData.length;
+      const sessionDurationSeconds = currentSession.endTime 
+        ? Math.floor((currentSession.endTime.getTime() - currentSession.startTime.getTime()) / 1000)
+        : 0;
+      
+      const zoneBreakdown = Object.entries(zoneCounts).map(([zone, count]) => {
+        const percentage = totalDataPoints > 0 ? Math.round((count / totalDataPoints) * 100) : 0;
+        const durationSeconds = totalDataPoints > 0 ? Math.round((count / totalDataPoints) * sessionDurationSeconds) : 0;
+        const minutes = Math.floor(durationSeconds / 60);
+        const seconds = durationSeconds % 60;
+        
+        return {
+          zone,
+          count,
+          percentage,
+          durationSeconds,
+          durationFormatted: minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`
+        };
+      });
+      
       return {
         rower,
         avgHeartRate: avgHR,
         maxHeartRate: maxHR,
         minHeartRate: minHR,
-        dataPoints: rowerData.length
+        dataPoints: rowerData.length,
+        zoneBreakdown
       };
     }).filter(Boolean);
     
@@ -249,6 +257,30 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
                       <span className="rower-metric-stat-label">Data Points</span>
                     </div>
                   </div>
+                  
+                  {/* Heart Rate Zone Breakdown */}
+                  <div className="rower-zone-breakdown">
+                    <h5 className="rower-zone-breakdown-title">Heart Rate Zones</h5>
+                    <div className="rower-zone-list">
+                      {rowerMetric.zoneBreakdown.map((zoneData) => (
+                        <div key={zoneData.zone} className="rower-zone-item">
+                          <div className="rower-zone-header">
+                            <span 
+                              className="rower-zone-color" 
+                              style={{ backgroundColor: ZONE_COLORS[zoneData.zone as keyof typeof ZONE_COLORS] }}
+                            />
+                            <span className="rower-zone-name">
+                              {zoneData.zone.charAt(0).toUpperCase() + zoneData.zone.slice(1)}
+                            </span>
+                          </div>
+                          <div className="rower-zone-details">
+                            <span className="rower-zone-percentage">{zoneData.percentage}%</span>
+                            <span className="rower-zone-duration">{zoneData.durationFormatted}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               );
             })}
@@ -266,34 +298,6 @@ export const EnhancedDashboard = ({ currentSession }: EnhancedDashboardProps) =>
         />
       )}
 
-      {/* Zone Distribution */}
-      {zoneDistribution.length > 0 && (
-        <section className="card-base zone-distribution">
-          <h3 className="card-title">
-            <ChartBarIcon className="card-title-icon" />
-            Heart Rate Zone Distribution
-          </h3>
-          <div className="zone-chart-container">
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={zoneDistribution}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  dataKey="value"
-                  label={({ name, percent }: any) => `${name} ${((percent as number) * 100).toFixed(0)}%`}
-                >
-                  {zoneDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
-      )}
 
       {/* Historical Comparison */}
       {historicalComparison && historicalComparison.length > 0 && (
