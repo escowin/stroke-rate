@@ -29,27 +29,30 @@ export const SessionComparison = ({ currentSession }: SessionComparisonProps) =>
   const { zones } = useDefaultHeartRateZones();
   const [selectedSessions, setSelectedSessions] = useState<string[]>([]);
 
-  // Get all available sessions (including current if it's ended)
+  // Get all available sessions (excluding current session since it's already shown)
   const availableSessions = useMemo(() => {
-    const allSessions = [...sessions];
-    if (currentSession && !currentSession.isActive && currentSession.finalHeartRateData) {
-      allSessions.unshift(currentSession);
-    }
-    return allSessions
-      .filter(session => session.finalHeartRateData && session.finalHeartRateData.length > 0)
+    return sessions
+      .filter(session => 
+        session.finalHeartRateData && 
+        session.finalHeartRateData.length > 0 &&
+        session.id !== currentSession?.id // Exclude current session to avoid duplicates
+      )
       .sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
   }, [sessions, currentSession]);
 
-  // Calculate comparison data for selected sessions
+  // Calculate comparison data for selected sessions (including current session)
   const comparisonData = useMemo(() => {
-    if (selectedSessions.length < 2) return null;
+    if (selectedSessions.length === 0 || !currentSession?.finalHeartRateData) return null;
 
     const selectedSessionData = selectedSessions
       .map(sessionId => availableSessions.find(s => s.id === sessionId))
       .filter(Boolean) as TrainingSession[];
+    
+    // Always include current session as the first session for comparison
+    const allSessions = [currentSession, ...selectedSessionData];
 
     // Calculate metrics for each session
-    const sessionMetrics = selectedSessionData.map(session => {
+    const sessionMetrics = allSessions.map(session => {
       const data = session.finalHeartRateData!;
       const heartRates = data.map(d => d.heartRate);
       
@@ -195,15 +198,8 @@ export const SessionComparison = ({ currentSession }: SessionComparisonProps) =>
     return Array.from(allRowers.values());
   }, [comparisonData]);
 
-  const handleSessionToggle = (sessionId: string) => {
-    setSelectedSessions(prev => {
-      if (prev.includes(sessionId)) {
-        return prev.filter(id => id !== sessionId);
-      } else if (prev.length < 3) { // Limit to 3 sessions for readability
-        return [...prev, sessionId];
-      }
-      return prev;
-    });
+  const handleSessionSelect = (sessionId: string) => {
+    setSelectedSessions([sessionId]); // Only allow one session selection
   };
 
   const formatSessionLabel = (session: TrainingSession) => {
@@ -241,20 +237,21 @@ export const SessionComparison = ({ currentSession }: SessionComparisonProps) =>
       
       {/* Session Selection */}
       <div className="session-selection">
-        <h4 className="session-selection-title">Select Sessions to Compare (2-3 max)</h4>
+        <h4 className="session-selection-title">Select Previous Session to Compare</h4>
         <div className="session-selection-grid">
           {availableSessions.map(session => (
             <div
               key={session.id}
               className={`session-selection-card ${selectedSessions.includes(session.id) ? 'selected' : ''}`}
-              onClick={() => handleSessionToggle(session.id)}
+              onClick={() => handleSessionSelect(session.id)}
             >
               <div className="session-selection-header">
                 <input
-                  type="checkbox"
+                  type="radio"
+                  name="session-comparison"
                   checked={selectedSessions.includes(session.id)}
-                  onChange={() => handleSessionToggle(session.id)}
-                  className="session-selection-checkbox"
+                  onChange={() => handleSessionSelect(session.id)}
+                  className="session-selection-radio"
                 />
                 <div className="session-selection-info">
                   <span className="session-selection-date">{formatSessionLabel(session)}</span>
@@ -268,70 +265,103 @@ export const SessionComparison = ({ currentSession }: SessionComparisonProps) =>
         </div>
       </div>
 
-      {/* Session Overview Comparison */}
-      {comparisonData && comparisonData.length >= 2 && (
+      {/* Previous Session Comparison */}
+      {comparisonData && comparisonData.length >= 2 && comparisonData[1] && (
         <div className="comparison-section">
-          <h4 className="comparison-section-title">Session Overview</h4>
+          <h4 className="comparison-section-title">Previous Session Comparison</h4>
           <div className="session-overview-grid">
-            {comparisonData.map((sessionData, index) => (
-              <div key={sessionData.session.id} className="session-overview-card">
-                <div className="session-overview-header">
-                  <h5 className="session-overview-title">Session {index + 1}</h5>
-                  <div className="session-overview-meta">
-                    <span className="session-overview-date">{sessionData.sessionDate}</span>
-                    <span className="session-overview-time">{sessionData.sessionTime}</span>
-                    <span className="session-overview-duration">{sessionData.duration}m</span>
+            {/* Previous Session with Progress Indicators */}
+            <div className="session-overview-card previous-session">
+              <div className="session-overview-header">
+                <h5 className="session-overview-title">Previous Session</h5>
+                <div className="session-overview-meta">
+                  <span className="session-overview-date">{comparisonData[1].sessionDate}</span>
+                  <span className="session-overview-time">{comparisonData[1].sessionTime}</span>
+                  <span className="session-overview-duration">{comparisonData[1].duration}m</span>
+                </div>
+              </div>
+              
+              <div className="session-overview-metrics">
+                <div className="session-overview-metric">
+                  <HeartIcon className="session-overview-metric-icon" />
+                  <div className="session-overview-metric-content">
+                    <span className="session-overview-metric-value">{comparisonData[1].avgHeartRate}</span>
+                    <span className="session-overview-metric-label">Avg BPM</span>
+                    <div className="session-overview-progress">
+                      {(() => {
+                        const current = comparisonData[0].avgHeartRate;
+                        const previous = comparisonData[1].avgHeartRate;
+                        const diff = current - previous;
+                        const percentChange = Math.round((diff / previous) * 100);
+                        const isImprovement = diff < 0; // Lower HR is better
+                        return (
+                          <div className={`progress-indicator ${isImprovement ? 'improvement' : 'decline'}`}>
+                            <span className="progress-icon">
+                              {isImprovement ? '↗' : '↘'}
+                            </span>
+                            <span className="progress-text">
+                              {Math.abs(percentChange)}% {isImprovement ? 'better' : 'higher'}
+                            </span>
+                          </div>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
-                
-                <div className="session-overview-metrics">
-                  <div className="session-overview-metric">
-                    <HeartIcon className="session-overview-metric-icon" />
-                    <div className="session-overview-metric-content">
-                      <span className="session-overview-metric-value">{sessionData.avgHeartRate}</span>
-                      <span className="session-overview-metric-label">Avg BPM</span>
-                    </div>
-                  </div>
-                  <div className="session-overview-metric">
-                    <FireIcon className="session-overview-metric-icon" />
-                    <div className="session-overview-metric-content">
-                      <span className="session-overview-metric-value">{sessionData.maxHeartRate}</span>
-                      <span className="session-overview-metric-label">Max BPM</span>
-                    </div>
-                  </div>
-                  <div className="session-overview-metric">
-                    <ClockIcon className="session-overview-metric-icon" />
-                    <div className="session-overview-metric-content">
-                      <span className="session-overview-metric-value">{sessionData.duration}</span>
-                      <span className="session-overview-metric-label">Duration (m)</span>
+                <div className="session-overview-metric">
+                  <FireIcon className="session-overview-metric-icon" />
+                  <div className="session-overview-metric-content">
+                    <span className="session-overview-metric-value">{comparisonData[1].maxHeartRate}</span>
+                    <span className="session-overview-metric-label">Max BPM</span>
+                    <div className="session-overview-progress">
+                      {(() => {
+                        const current = comparisonData[0].maxHeartRate;
+                        const previous = comparisonData[1].maxHeartRate;
+                        const diff = current - previous;
+                        const percentChange = Math.round((diff / previous) * 100);
+                        const isImprovement = diff < 0; // Lower HR is better
+                        return (
+                          <div className={`progress-indicator ${isImprovement ? 'improvement' : 'decline'}`}>
+                            <span className="progress-icon">
+                              {isImprovement ? '↗' : '↘'}
+                            </span>
+                            <span className="progress-text">
+                              {Math.abs(percentChange)}% {isImprovement ? 'better' : 'higher'}
+                            </span>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
-                
-                <div className="session-overview-zones">
-                  <h6 className="session-overview-zones-title">Zone Distribution</h6>
-                  <div className="session-overview-zones-list">
-                    {sessionData.zoneBreakdown.map((zoneData) => (
-                      <div key={zoneData.zone} className="session-overview-zone-item">
-                        <div className="session-overview-zone-header">
-                          <span 
-                            className="session-overview-zone-color" 
-                            style={{ backgroundColor: ZONE_COLORS[zoneData.zone as keyof typeof ZONE_COLORS] }}
-                          />
-                          <span className="session-overview-zone-name">
-                            {zoneData.zone.charAt(0).toUpperCase() + zoneData.zone.slice(1)}
-                          </span>
-                        </div>
-                        <div className="session-overview-zone-details">
-                          <span className="session-overview-zone-percentage">{zoneData.percentage}%</span>
-                          <span className="session-overview-zone-duration">{zoneData.durationFormatted}</span>
-                        </div>
-                      </div>
-                    ))}
+                <div className="session-overview-metric">
+                  <ClockIcon className="session-overview-metric-icon" />
+                  <div className="session-overview-metric-content">
+                    <span className="session-overview-metric-value">{comparisonData[1].duration}</span>
+                    <span className="session-overview-metric-label">Duration (m)</span>
+                    <div className="session-overview-progress">
+                      {(() => {
+                        const current = comparisonData[0].duration;
+                        const previous = comparisonData[1].duration;
+                        const diff = current - previous;
+                        const percentChange = Math.round((diff / previous) * 100);
+                        const isImprovement = diff > 0; // Longer duration is better
+                        return (
+                          <div className={`progress-indicator ${isImprovement ? 'improvement' : 'decline'}`}>
+                            <span className="progress-icon">
+                              {isImprovement ? '↗' : '↘'}
+                            </span>
+                            <span className="progress-text">
+                              {Math.abs(percentChange)}% {isImprovement ? 'longer' : 'shorter'}
+                            </span>
+                          </div>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       )}
@@ -352,38 +382,78 @@ export const SessionComparison = ({ currentSession }: SessionComparisonProps) =>
                 </div>
                 
                 <div className="rower-comparison-sessions">
-                  {rowerSessions.map((sessionData, index) => (
-                    <div key={index} className="rower-comparison-session">
-                      <div className="rower-comparison-session-header">
-                        <span className="rower-comparison-session-label">Session {index + 1}</span>
-                        <span className="rower-comparison-session-date">{sessionData.sessionDate}</span>
-                      </div>
-                      
-                      <div className="rower-comparison-session-metrics">
-                        <div className="rower-comparison-session-metric">
-                          <HeartIcon className="rower-comparison-session-metric-icon" />
-                          <div className="rower-comparison-session-metric-content">
-                            <span className="rower-comparison-session-metric-value">{sessionData.avgHeartRate}</span>
-                            <span className="rower-comparison-session-metric-label">Avg BPM</span>
+                  {/* Only show previous session (index 1) with progress indicators */}
+                  {rowerSessions.length > 1 && (() => {
+                    const previousSessionData = rowerSessions[1];
+                    const currentSessionData = rowerSessions[0];
+                    const previousSessionMetric = comparisonData?.find(s => s.session.id === previousSessionData.session.id);
+                    const currentSessionMetric = comparisonData?.find(s => s.session.id === currentSessionData.session.id);
+                    const previousRowerMetric = previousSessionMetric?.rowerMetrics.find((rm: any) => rm.rower.id === rower.id);
+                    const currentRowerMetric = currentSessionMetric?.rowerMetrics.find((rm: any) => rm.rower.id === rower.id);
+                    
+                    return (
+                      <div className="rower-comparison-session">
+                        <div className="rower-comparison-session-header">
+                          <span className="rower-comparison-session-label">Previous Session</span>
+                          <span className="rower-comparison-session-date">{previousSessionData.sessionDate}</span>
+                        </div>
+                        
+                        <div className="rower-comparison-session-metrics">
+                          <div className="rower-comparison-session-metric">
+                            <HeartIcon className="rower-comparison-session-metric-icon" />
+                            <div className="rower-comparison-session-metric-content">
+                              <span className="rower-comparison-session-metric-value">{previousSessionData.avgHeartRate}</span>
+                              <span className="rower-comparison-session-metric-label">Avg BPM</span>
+                              {currentRowerMetric && previousRowerMetric && (() => {
+                                const current = currentRowerMetric.avgHeartRate;
+                                const previous = previousRowerMetric.avgHeartRate;
+                                const diff = current - previous;
+                                const percentChange = Math.round((diff / previous) * 100);
+                                const isImprovement = diff < 0; // Lower HR is better
+                                return (
+                                  <div className={`progress-indicator ${isImprovement ? 'improvement' : 'decline'}`}>
+                                    <span className="progress-icon">
+                                      {isImprovement ? '↗' : '↘'}
+                                    </span>
+                                    <span className="progress-text">
+                                      {Math.abs(percentChange)}% {isImprovement ? 'better' : 'higher'}
+                                    </span>
+                                  </div>
+                                );
+                              })()}
+                            </div>
+                          </div>
+                          <div className="rower-comparison-session-metric">
+                            <FireIcon className="rower-comparison-session-metric-icon" />
+                            <div className="rower-comparison-session-metric-content">
+                              <span className="rower-comparison-session-metric-value">{previousSessionData.maxHeartRate}</span>
+                              <span className="rower-comparison-session-metric-label">Max BPM</span>
+                              {currentRowerMetric && previousRowerMetric && (() => {
+                                const current = currentRowerMetric.maxHeartRate;
+                                const previous = previousRowerMetric.maxHeartRate;
+                                const diff = current - previous;
+                                const percentChange = Math.round((diff / previous) * 100);
+                                const isImprovement = diff < 0; // Lower HR is better
+                                return (
+                                  <div className={`progress-indicator ${isImprovement ? 'improvement' : 'decline'}`}>
+                                    <span className="progress-icon">
+                                      {isImprovement ? '↗' : '↘'}
+                                    </span>
+                                    <span className="progress-text">
+                                      {Math.abs(percentChange)}% {isImprovement ? 'better' : 'higher'}
+                                    </span>
+                                  </div>
+                                );
+                              })()}
+                            </div>
                           </div>
                         </div>
-                        <div className="rower-comparison-session-metric">
-                          <FireIcon className="rower-comparison-session-metric-icon" />
-                          <div className="rower-comparison-session-metric-content">
-                            <span className="rower-comparison-session-metric-value">{sessionData.maxHeartRate}</span>
-                            <span className="rower-comparison-session-metric-label">Max BPM</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Find the corresponding session data for zone breakdown */}
-                      {(() => {
-                        const sessionMetric = comparisonData?.find(s => s.session.id === sessionData.session.id);
-                        const rowerMetric = sessionMetric?.rowerMetrics.find((rm: any) => rm.rower.id === rower.id);
-                        return rowerMetric?.zoneBreakdown ? (
+                        
+                        {/* Zone breakdown for previous session with progress indicators */}
+                        {previousRowerMetric?.zoneBreakdown && (
                           <div className="rower-comparison-session-zones">
                             <div className="rower-comparison-session-zones-list">
-                              {rowerMetric.zoneBreakdown.map((zoneData: any) => (
+                              {previousRowerMetric.zoneBreakdown.map((zoneData: any) => (
                                 <div key={zoneData.zone} className="rower-comparison-session-zone">
                                   <span 
                                     className="rower-comparison-session-zone-color" 
@@ -393,14 +463,32 @@ export const SessionComparison = ({ currentSession }: SessionComparisonProps) =>
                                     {zoneData.zone.charAt(0).toUpperCase() + zoneData.zone.slice(1)}
                                   </span>
                                   <span className="rower-comparison-session-zone-percentage">{zoneData.percentage}%</span>
+                                  {currentRowerMetric?.zoneBreakdown && (() => {
+                                    const currentZone = currentRowerMetric.zoneBreakdown.find((z: any) => z.zone === zoneData.zone);
+                                    if (!currentZone) return null;
+                                    const diff = currentZone.percentage - zoneData.percentage;
+                                    const isImprovement = zoneData.zone === 'aerobic' ? diff > 0 : 
+                                                         zoneData.zone === 'recovery' ? diff > 0 :
+                                                         zoneData.zone === 'threshold' ? diff < 0 : diff < 0;
+                                    return (
+                                      <div className={`progress-indicator ${isImprovement ? 'improvement' : 'decline'}`}>
+                                        <span className="progress-icon">
+                                          {isImprovement ? '↗' : '↘'}
+                                        </span>
+                                        <span className="progress-text">
+                                          {Math.abs(diff)}% {isImprovement ? 'more' : 'less'}
+                                        </span>
+                                      </div>
+                                    );
+                                  })()}
                                 </div>
                               ))}
                             </div>
                           </div>
-                        ) : null;
-                      })()}
-                    </div>
-                  ))}
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             ))}
