@@ -26,7 +26,16 @@ export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
     return { status: 'connecting', icon: SignalIcon, color: 'text-yellow-500' };
   };
 
+  const getBatteryStatus = () => {
+    const batteryLevel = rower.currentHeartRate?.batteryLevel;
+    if (batteryLevel === undefined) return { level: null, color: 'text-gray-400' };
+    if (batteryLevel <= 20) return { level: batteryLevel, color: 'text-red-500' };
+    if (batteryLevel <= 50) return { level: batteryLevel, color: 'text-yellow-500' };
+    return { level: batteryLevel, color: 'text-green-500' };
+  };
+
   const connectionStatus = getConnectionStatus();
+  const batteryStatus = getBatteryStatus();
   const StatusIcon = connectionStatus.icon;
 
   return (
@@ -47,7 +56,7 @@ export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
             connectionStatus.status === 'connecting' ? 'heart-rate-card-status-icon--connecting' :
             'heart-rate-card-status-icon--disconnected'
           }`} />
-          <Battery0Icon className="heart-rate-card-battery-icon" />
+          <Battery0Icon className={`heart-rate-card-battery-icon ${batteryStatus.color}`} />
         </div>
       </header>
 

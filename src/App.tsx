@@ -6,6 +6,7 @@ import { ConnectionConflictDialog } from './components/ConnectionConflictDialog'
 import { Header } from './components/Header';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Settings } from './components/Settings';
+import { notificationService } from './services/notifications';
 
 // Lazy load the Dashboard component (contains heavy recharts dependency)
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
@@ -19,6 +20,17 @@ function App() {
     clearError();
     clearBluetoothError();
     loadRowersFromDatabase();
+    
+    // Check database usage periodically
+    const checkDatabaseUsage = () => {
+      notificationService.checkDatabaseUsage();
+    };
+    
+    // Check immediately and then every 5 minutes
+    checkDatabaseUsage();
+    const interval = setInterval(checkDatabaseUsage, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
   }, [clearError, clearBluetoothError, loadRowersFromDatabase]);
 
   // Show conflict dialog if conflicts are detected

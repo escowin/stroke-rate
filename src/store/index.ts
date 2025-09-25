@@ -260,8 +260,8 @@ export const useAppStore = create<AppStore>()(
             console.error('Failed to store session:', error);
           });
 
-          // Notify session started
-          notificationService.notifySessionStarted(session.id);
+          // Check database usage after starting session
+          notificationService.checkDatabaseUsage();
           
           return {
             currentSession: session
@@ -284,9 +284,8 @@ export const useAppStore = create<AppStore>()(
             console.error('Failed to store ended session:', error);
           });
 
-          // Calculate session duration and notify
-          const duration = Math.floor((endedSession.endTime!.getTime() - endedSession.startTime.getTime()) / 1000 / 60);
-          notificationService.notifySessionEnded(endedSession.id, `${duration}m`);
+          // Check database usage after ending session
+          notificationService.checkDatabaseUsage();
           
           return {
             currentSession: endedSession

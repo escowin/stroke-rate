@@ -1,15 +1,16 @@
-import type { HeartRateData } from '../types';
+import { DATABASE_CAP_BYTES } from './database';
 
 export interface AlertConfig {
   enableLowBatteryAlerts: boolean;
   enableConnectionAlerts: boolean;
-  enableSessionAlerts: boolean;
+  enableDatabaseFullAlerts: boolean;
   batteryWarningThreshold: number; // percentage
+  databaseWarningThreshold: number; // percentage (80% = 0.8)
 }
 
 export interface Alert {
   id: string;
-  type: 'battery' | 'connection' | 'session';
+  type: 'battery' | 'connection' | 'database';
   severity: 'low' | 'medium' | 'high';
   title: string;
   message: string;
@@ -23,8 +24,9 @@ class NotificationService {
   private config: AlertConfig = {
     enableLowBatteryAlerts: true,
     enableConnectionAlerts: true,
-    enableSessionAlerts: true,
-    batteryWarningThreshold: 20 // 20% battery
+    enableDatabaseFullAlerts: true,
+    batteryWarningThreshold: 20, // 20% battery
+    databaseWarningThreshold: 0.8 // 80% of database quota
   };
 
   private alerts: Alert[] = [];
@@ -73,28 +75,30 @@ class NotificationService {
     this.alerts = [];
   }
 
-  // Session-related alerts
-  notifySessionStarted(sessionId: string): void {
-    if (this.config.enableSessionAlerts) {
-      this.createAlert({
-        type: 'session',
-        severity: 'low',
-        title: 'Session Started',
-        message: `Training session ${sessionId} has begun`,
-        timestamp: new Date()
-      });
-    }
-  }
+  // Database monitoring
+  async checkDatabaseUsage(): Promise<void> {
+    if (!this.config.enableDatabaseFullAlerts) return;
 
-  notifySessionEnded(sessionId: string, duration: string): void {
-    if (this.config.enableSessionAlerts) {
-      this.createAlert({
-        type: 'session',
-        severity: 'low',
-        title: 'Session Ended',
-        message: `Training session completed. Duration: ${duration}`,
-        timestamp: new Date()
-      });
+    try {
+      if ('storage' in navigator && 'estimate' in navigator.storage) {
+        const estimate = await navigator.storage.estimate();
+        if (estimate.usage !== undefined) {
+          // Use realistic 100MB cap instead of browser's massive quota
+          const usagePercentage = estimate.usage / DATABASE_CAP_BYTES;
+          
+          if (usagePercentage >= this.config.databaseWarningThreshold) {
+            this.createAlert({
+              type: 'database',
+              severity: 'high',
+              title: 'Database Storage Warning',
+              message: `Database is ${Math.round(usagePercentage * 100)}% full (${Math.round(estimate.usage / 1024 / 1024)}MB of 100MB). Consider clearing old data or exporting sessions.`,
+              timestamp: new Date()
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to check database usage:', error);
     }
   }
 

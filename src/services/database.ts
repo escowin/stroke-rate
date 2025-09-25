@@ -294,6 +294,49 @@ export const getDatabaseStats = async (): Promise<{
   };
 };
 
+// Realistic database cap for heart rate monitoring data
+// Based on: 90min practices, 5x/week, ~270KB per session
+// 100MB = ~4 months of data (370 sessions)
+export const DATABASE_CAP_BYTES = 100 * 1024 * 1024; // 100 MB
+
+/**
+ * Get actual database usage from browser storage API with realistic cap
+ */
+export const getDatabaseUsage = async (): Promise<{ usage: number; quota: number; percentage: number; cap: number } | null> => {
+  try {
+    if ('storage' in navigator && 'estimate' in navigator.storage) {
+      const estimate = await navigator.storage.estimate();
+      if (estimate.usage !== undefined) {
+        // Use our realistic cap instead of browser's massive quota
+        const usage = estimate.usage;
+        const quota = Math.min(estimate.quota || DATABASE_CAP_BYTES, DATABASE_CAP_BYTES);
+        const percentage = usage / quota;
+        
+        return {
+          usage,
+          quota,
+          percentage,
+          cap: DATABASE_CAP_BYTES
+        };
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('Failed to get database usage:', error);
+    return null;
+  }
+};
+
+/**
+ * Clear specific object store
+ */
+export const clearObjectStore = async (storeName: 'sessions' | 'heartRateData' | 'rowers'): Promise<void> => {
+  const database = await getDatabase();
+  const tx = database.transaction([storeName], 'readwrite');
+  await tx.objectStore(storeName).clear();
+  await tx.done;
+};
+
 /**
  * Clear all data (for development/testing)
  */

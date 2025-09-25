@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useAppStore } from '../store';
 import { useDefaultHeartRateZones } from '../hooks/useHeartRateZones';
-import { useNotifications } from '../hooks/useNotifications';
 // Removed useConnectionHealth import - now using global store for unhealthy devices
 import { useSessionDuration } from '../hooks/useSessionDuration';
 import { HeartRateCard } from './HeartRateCard';
@@ -10,7 +9,6 @@ import { EnhancedDashboard } from './EnhancedDashboard';
 import { ConnectionStatus } from './ConnectionStatus';
 import { ReconnectionStatus } from './ReconnectionStatus';
 import { DevToggle } from './DevToggle';
-import { AlertPanel } from './AlertPanel';
 import {
   PlayIcon,
   StopIcon,
@@ -20,7 +18,6 @@ import {
   CheckCircleIcon,
   ChartPieIcon,
   EyeIcon,
-  BellIcon
 } from '@heroicons/react/24/outline';
 
 
@@ -36,11 +33,9 @@ export const Dashboard = () => {
   } = useAppStore();
 
   const { zones } = useDefaultHeartRateZones();
-  const { activeAlertsCount } = useNotifications();
   const sessionDuration = useSessionDuration(currentSession);
   const isSessionActive = currentSession?.isActive;
   const [showEnhancedView, setShowEnhancedView] = useState(false);
-  const [showAlertPanel, setShowAlertPanel] = useState(false);
 
   const unhealthyDevices = getUnhealthyDevices();
 
@@ -158,18 +153,6 @@ export const Dashboard = () => {
               )}
             </button>
           )}
-
-          <button
-            onClick={() => setShowAlertPanel(true)}
-            className={`btn btn-secondary ${activeAlertsCount > 0 ? 'btn-alert' : ''}`}
-          >
-            <BellIcon className="btn-icon" />
-            Alerts
-            {activeAlertsCount > 0 && (
-              <span className="alert-badge">{activeAlertsCount}</span>
-            )}
-          </button>
-
         </article>
       </section>
 
@@ -284,12 +267,6 @@ export const Dashboard = () => {
           ))}
         </article>
       </section>
-
-      {/* Alert Panel */}
-      <AlertPanel 
-        isOpen={showAlertPanel} 
-        onClose={() => setShowAlertPanel(false)} 
-      />
 
     </>
   );
