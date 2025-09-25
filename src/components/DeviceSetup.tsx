@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAppStore } from '../store';
 import { useBluetooth } from '../hooks/useBluetooth';
+import { RowerProfile } from './RowerProfile';
 // Removed useConnectionHealth import - now using global store health status
 import type { BluetoothDevice, Rower } from '../types';
 import {
@@ -20,7 +21,7 @@ export const DeviceSetup = () => {
     connectionStatus,
     rowers,
     addRower,
-    // updateRower, 
+    updateRower, 
     removeRower,
     assignDeviceToRower
   } = useAppStore();
@@ -40,6 +41,7 @@ export const DeviceSetup = () => {
   const [newRowerName, setNewRowerName] = useState('');
   const [selectedSeat, setSelectedSeat] = useState(1);
   const [hasScanned, setHasScanned] = useState(false);
+  const [editingRowerId, setEditingRowerId] = useState<string | null>(null);
 
   const availableSeats = [1, 2, 3, 4].filter(seat =>
     !rowers.some(rower => rower.seat === seat)
@@ -100,6 +102,14 @@ export const DeviceSetup = () => {
       handleDisconnectDevice(rower.deviceId);
     }
     removeRower(rowerId);
+  };
+
+  const handleUpdateRower = (rowerId: string, updates: Partial<Rower>) => {
+    updateRower(rowerId, updates);
+  };
+
+  const handleEditToggle = (rowerId: string) => {
+    setEditingRowerId(editingRowerId === rowerId ? null : rowerId);
   };
 
 
@@ -297,78 +307,74 @@ export const DeviceSetup = () => {
           </div>
         </article>
 
-        {/* Rower List */}
+        {/* Rower Profiles */}
         {rowers.length > 0 && (
-          <article className="rower-list">
-            <h3 className="rower-list-title">Configured Rowers</h3>
-            {rowers
-              .sort((a, b) => a.seat - b.seat)
-              .map((rower) => (
-              <div
-                key={rower.id}
-                className="rower-item"
-              >
-                <div className="rower-item-info">
-                  <UserIcon className="rower-item-icon" />
-                  <div className="rower-item-details">
-                    <p className="rower-item-name">
-                      {rower.name}
-                    </p>
-                    <p className="rower-item-seat">
-                      Seat {rower.seat}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="rower-item-actions">
-                  {/* Device Assignment */}
-                  <div className="rower-device-assignment">
-                    <select
-                      value={rower.deviceId || ''}
-                      onChange={(e) => handleAssignDevice(rower.id, e.target.value)}
-                      className="rower-device-select"
-                    >
-                      <option value="">No device</option>
-                      {connectionStatus.connectedDevices.map((device) => {
-                        const isHealthy = device.isHealthy !== false;
-                        return (
-                          <option key={device.id} value={device.id}>
-                            {device.name} {isHealthy ? '✓' : '⚠'}
-                          </option>
-                        );
-                      })}
-                    </select>
-
-                    {/* Device Health Indicator */}
-                    {rower.deviceId && (
-                      <div className="rower-device-health">
-                        {(() => {
-                          const device = connectionStatus.connectedDevices.find(d => d.id === rower.deviceId);
-                          const isHealthy = device ? device.isHealthy !== false : false;
+          <article className="rower-profiles">
+            <h3 className="rower-profiles-title">Configured Rowers</h3>
+            <div className="rower-profiles-grid">
+              {rowers
+                .sort((a, b) => a.seat - b.seat)
+                .map((rower) => (
+                  <div key={rower.id} className="rower-profile-container">
+                    <RowerProfile
+                      rower={rower}
+                      onUpdate={handleUpdateRower}
+                      isEditing={editingRowerId === rower.id}
+                      onEditToggle={() => handleEditToggle(rower.id)}
+                    />
+                    
+                    {/* Device Assignment */}
+                    <div className="rower-device-assignment">
+                      <label className="rower-device-label">Heart Rate Device</label>
+                      <select
+                        value={rower.deviceId || ''}
+                        onChange={(e) => handleAssignDevice(rower.id, e.target.value)}
+                        className="rower-device-select"
+                      >
+                        <option value="">No device assigned</option>
+                        {connectionStatus.connectedDevices.map((device) => {
+                          const isHealthy = device.isHealthy !== false;
                           return (
-                            <>
-                              <div className={`rower-device-health-indicator ${isHealthy ? 'rower-device-health-indicator--healthy' : 'rower-device-health-indicator--unhealthy'
-                                }`} />
-                              <span className={`rower-device-health-text ${isHealthy ? 'rower-device-health-text--healthy' : 'rower-device-health-text--unhealthy'
-                                }`}>
-                                {isHealthy ? 'Healthy' : 'Unhealthy'}
-                              </span>
-                            </>
+                            <option key={device.id} value={device.id}>
+                              {device.name} {isHealthy ? '✓' : '⚠'}
+                            </option>
                           );
-                        })()}
-                      </div>
-                    )}
-                  </div>
+                        })}
+                      </select>
 
-                  <button
-                    onClick={() => handleRemoveRower(rower.id)}
-                    className="rower-remove-button"
-                  >
-                    <TrashIcon className="rower-remove-icon" />
-                  </button>
-                </div>
-              </div>
-            ))}
+                      {/* Device Health Indicator */}
+                      {rower.deviceId && (
+                        <div className="rower-device-health">
+                          {(() => {
+                            const device = connectionStatus.connectedDevices.find(d => d.id === rower.deviceId);
+                            const isHealthy = device ? device.isHealthy !== false : false;
+                            return (
+                              <>
+                                <div className={`rower-device-health-indicator ${isHealthy ? 'rower-device-health-indicator--healthy' : 'rower-device-health-indicator--unhealthy'
+                                  }`} />
+                                <span className={`rower-device-health-text ${isHealthy ? 'rower-device-health-text--healthy' : 'rower-device-health-text--unhealthy'
+                                  }`}>
+                                  {isHealthy ? 'Connected & Healthy' : 'Connected (Unhealthy)'}
+                                </span>
+                              </>
+                            );
+                          })()}
+                        </div>
+                      )}
+
+                      {/* Remove Rower Button */}
+                      <button
+                        onClick={() => handleRemoveRower(rower.id)}
+                        className="btn btn-sm btn-danger"
+                        title="Remove rower"
+                      >
+                        <TrashIcon className="btn-icon" />
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+            </div>
           </article>
         )}
       </section>

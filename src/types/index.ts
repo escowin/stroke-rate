@@ -39,6 +39,9 @@ export interface Rower {
   name: string;
   seat: number; // 1-4 for 4+ boat
   deviceId?: string;
+  age?: number;
+  restingHeartRate?: number;
+  maxHeartRate?: number;
   targetZones: HeartRateZones;
   currentHeartRate?: HeartRateData;
 }

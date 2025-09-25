@@ -1,4 +1,5 @@
 import type { HeartRateData, Rower, HeartRateZones } from '../types';
+import { calculateRowerHeartRateZones } from './heartRateCalculations';
 
 // Calculate heart rate zone based on BPM
 const calculateZone = (heartRate: number): keyof HeartRateZones => {
@@ -120,56 +121,41 @@ export const generateMockHeartRateReading = (
   };
 };
 
-// Mock rower data for testing
+// Mock rower data for testing with age-based heart rate zones
+// Represents High School, Collegiate, and Masters rowing categories
 export const createMockRowers = (): Rower[] => {
   const mockRowers: Rower[] = [
     {
       id: 'rower-1',
-      name: 'Edwin',
+      name: 'Alex',
       seat: 1,
       deviceId: 'mock-device-1',
-      targetZones: {
-        recovery: { name: 'Recovery', min: 60, max: 120, color: '#10b981', description: 'Active recovery' },
-        aerobic: { name: 'Aerobic', min: 120, max: 150, color: '#3b82f6', description: 'Base aerobic' },
-        threshold: { name: 'Threshold', min: 150, max: 170, color: '#f59e0b', description: 'Lactate threshold' },
-        anaerobic: { name: 'Anaerobic', min: 170, max: 190, color: '#ef4444', description: 'High intensity' }
-      }
+      age: 17, // High School
+      targetZones: calculateRowerHeartRateZones(17)
     },
     {
       id: 'rower-2',
-      name: 'John',
+      name: 'Jordan',
       seat: 2,
       deviceId: 'mock-device-2',
-      targetZones: {
-        recovery: { name: 'Recovery', min: 60, max: 120, color: '#10b981', description: 'Active recovery' },
-        aerobic: { name: 'Aerobic', min: 120, max: 150, color: '#3b82f6', description: 'Base aerobic' },
-        threshold: { name: 'Threshold', min: 150, max: 170, color: '#f59e0b', description: 'Lactate threshold' },
-        anaerobic: { name: 'Anaerobic', min: 170, max: 190, color: '#ef4444', description: 'High intensity' }
-      }
+      age: 20, // Collegiate
+      targetZones: calculateRowerHeartRateZones(20)
     },
     {
       id: 'rower-3',
-      name: 'Craig',
+      name: 'Morgan',
       seat: 3,
       deviceId: 'mock-device-3',
-      targetZones: {
-        recovery: { name: 'Recovery', min: 60, max: 120, color: '#10b981', description: 'Active recovery' },
-        aerobic: { name: 'Aerobic', min: 120, max: 150, color: '#3b82f6', description: 'Base aerobic' },
-        threshold: { name: 'Threshold', min: 150, max: 170, color: '#f59e0b', description: 'Lactate threshold' },
-        anaerobic: { name: 'Anaerobic', min: 170, max: 190, color: '#ef4444', description: 'High intensity' }
-      }
+      age: 45, // Masters B
+      targetZones: calculateRowerHeartRateZones(45)
     },
     {
       id: 'rower-4',
-      name: 'Rob',
+      name: 'Casey',
       seat: 4,
       deviceId: 'mock-device-4',
-      targetZones: {
-        recovery: { name: 'Recovery', min: 60, max: 120, color: '#10b981', description: 'Active recovery' },
-        aerobic: { name: 'Aerobic', min: 120, max: 150, color: '#3b82f6', description: 'Base aerobic' },
-        threshold: { name: 'Threshold', min: 150, max: 170, color: '#f59e0b', description: 'Lactate threshold' },
-        anaerobic: { name: 'Anaerobic', min: 170, max: 190, color: '#ef4444', description: 'High intensity' }
-      }
+      age: 62, // Masters C
+      targetZones: calculateRowerHeartRateZones(62)
     }
   ];
   

@@ -1,68 +1,79 @@
 import { useMemo } from 'react';
-import type { HeartRateZones, HeartRateZone } from '../types';
+import type { HeartRateZones, Rower } from '../types';
+import { 
+  calculateHeartRateZones, 
+  calculateRowerHeartRateZones,
+  getZoneForHeartRate,
+  getZoneColor,
+  getZoneName
+} from '../utils/heartRateCalculations';
 
-export const useHeartRateZones = (maxHR: number = 190, restingHR: number = 60) => {
+/**
+ * Hook for calculating heart rate zones for a specific rower
+ * @param rower - Rower object with age and optional custom HR values
+ * @returns Heart rate zones and utility functions
+ */
+export const useHeartRateZones = (rower?: Rower) => {
   const zones = useMemo((): HeartRateZones => {
-    // Calculate heart rate reserve (HRR)
-    const hrr = maxHR - restingHR;
+    if (!rower?.age) {
+      // Fallback to default values if no rower data
+      return calculateHeartRateZones(190, 60);
+    }
     
-    // Calculate zone boundaries using Karvonen method
-    const recovery: HeartRateZone = {
-      name: 'Recovery',
-      min: Math.round(restingHR + (hrr * 0.5)),
-      max: Math.round(restingHR + (hrr * 0.6)),
-      color: '#10b981',
-      description: 'Active recovery and warm-up'
-    };
-    
-    const aerobic: HeartRateZone = {
-      name: 'Aerobic',
-      min: Math.round(restingHR + (hrr * 0.6)),
-      max: Math.round(restingHR + (hrr * 0.7)),
-      color: '#3b82f6',
-      description: 'Base aerobic training'
-    };
-    
-    const threshold: HeartRateZone = {
-      name: 'Threshold',
-      min: Math.round(restingHR + (hrr * 0.7)),
-      max: Math.round(restingHR + (hrr * 0.8)),
-      color: '#f59e0b',
-      description: 'Lactate threshold training'
-    };
-    
-    const anaerobic: HeartRateZone = {
-      name: 'Anaerobic',
-      min: Math.round(restingHR + (hrr * 0.8)),
-      max: maxHR,
-      color: '#ef4444',
-      description: 'High-intensity intervals'
-    };
-    
-    return { recovery, aerobic, threshold, anaerobic };
-  }, [maxHR, restingHR]);
+    return calculateRowerHeartRateZones(
+      rower.age,
+      rower.restingHeartRate,
+      rower.maxHeartRate
+    );
+  }, [rower?.age, rower?.restingHeartRate, rower?.maxHeartRate]);
 
-  const getZoneForHeartRate = (heartRate: number): keyof HeartRateZones => {
-    if (heartRate <= zones.recovery.max) return 'recovery';
-    if (heartRate <= zones.aerobic.max) return 'aerobic';
-    if (heartRate <= zones.threshold.max) return 'threshold';
-    return 'anaerobic';
+  const getZoneForHeartRateValue = (heartRate: number): keyof HeartRateZones => {
+    return getZoneForHeartRate(heartRate, zones);
   };
 
-  const getZoneColor = (heartRate: number): string => {
-    const zone = getZoneForHeartRate(heartRate);
-    return zones[zone].color;
+  const getZoneColorValue = (heartRate: number): string => {
+    return getZoneColor(heartRate, zones);
   };
 
-  const getZoneName = (heartRate: number): string => {
-    const zone = getZoneForHeartRate(heartRate);
-    return zones[zone].name;
+  const getZoneNameValue = (heartRate: number): string => {
+    return getZoneName(heartRate, zones);
   };
 
   return {
     zones,
-    getZoneForHeartRate,
-    getZoneColor,
-    getZoneName
+    getZoneForHeartRate: getZoneForHeartRateValue,
+    getZoneColor: getZoneColorValue,
+    getZoneName: getZoneNameValue
+  };
+};
+
+/**
+ * Legacy hook for backward compatibility with default values
+ * @param maxHR - Maximum heart rate (default: 190)
+ * @param restingHR - Resting heart rate (default: 60)
+ * @returns Heart rate zones and utility functions
+ */
+export const useDefaultHeartRateZones = (maxHR: number = 190, restingHR: number = 60) => {
+  const zones = useMemo((): HeartRateZones => {
+    return calculateHeartRateZones(maxHR, restingHR);
+  }, [maxHR, restingHR]);
+
+  const getZoneForHeartRateValue = (heartRate: number): keyof HeartRateZones => {
+    return getZoneForHeartRate(heartRate, zones);
+  };
+
+  const getZoneColorValue = (heartRate: number): string => {
+    return getZoneColor(heartRate, zones);
+  };
+
+  const getZoneNameValue = (heartRate: number): string => {
+    return getZoneName(heartRate, zones);
+  };
+
+  return {
+    zones,
+    getZoneForHeartRate: getZoneForHeartRateValue,
+    getZoneColor: getZoneColorValue,
+    getZoneName: getZoneNameValue
   };
 };

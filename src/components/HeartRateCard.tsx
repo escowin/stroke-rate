@@ -13,7 +13,7 @@ interface HeartRateCardProps {
 }
 
 export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
-  const { getZoneColor, getZoneName } = useHeartRateZones();
+  const { getZoneColor, getZoneName, zones } = useHeartRateZones(rower);
   
   const heartRate = rower.currentHeartRate?.heartRate;
   const zone = heartRate ? getZoneName(heartRate) : 'No Data';
@@ -76,14 +76,14 @@ export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
       {heartRate && (
         <div className="heart-rate-zone-progress">
           <label htmlFor={`progress-bar-${rower.id}`} className="heart-rate-zone-labels">
-            <span>Recovery</span>
-            <span>Anaerobic</span>
+            <span>{zones.recovery.min}</span>
+            <span>{zones.anaerobic.max}</span>
           </label>
           <progress 
             id={`progress-bar-${rower.id}`}
             className="heart-rate-progress-bar"
-            max={190 - 60}
-            value={heartRate - 60}
+            max={zones.anaerobic.max - zones.recovery.min}
+            value={heartRate - zones.recovery.min}
             style={{ '--zone-color': zoneColor } as React.CSSProperties}
             aria-label={`Heart rate progress: ${heartRate} BPM`}
           >

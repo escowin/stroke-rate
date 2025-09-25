@@ -9,6 +9,7 @@ import type {
   ConnectionStatus,
   UIState
 } from '../types';
+import { calculateRowerHeartRateZones } from '../utils/heartRateCalculations';
 
 interface AppStore extends AppState {
   // Connection Management
@@ -171,9 +172,25 @@ export const useAppStore = create<AppStore>()(
       
       updateRower: (rowerId: string, updates: Partial<Rower>) =>
         set((state) => ({
-          rowers: state.rowers.map(rower =>
-            rower.id === rowerId ? { ...rower, ...updates } : rower
-          )
+          rowers: state.rowers.map(rower => {
+            if (rower.id === rowerId) {
+              const updatedRower = { ...rower, ...updates };
+              
+              // Recalculate heart rate zones if age or HR values changed
+              if (updates.age !== undefined || updates.restingHeartRate !== undefined || updates.maxHeartRate !== undefined) {
+                if (updatedRower.age) {
+                  updatedRower.targetZones = calculateRowerHeartRateZones(
+                    updatedRower.age,
+                    updatedRower.restingHeartRate,
+                    updatedRower.maxHeartRate
+                  );
+                }
+              }
+              
+              return updatedRower;
+            }
+            return rower;
+          })
         })),
       
       removeRower: (rowerId: string) =>

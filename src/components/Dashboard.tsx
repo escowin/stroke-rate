@@ -1,5 +1,5 @@
 import { useAppStore } from '../store';
-import { useHeartRateZones } from '../hooks/useHeartRateZones';
+import { useDefaultHeartRateZones } from '../hooks/useHeartRateZones';
 // Removed useConnectionHealth import - now using global store for unhealthy devices
 import { useSessionDuration } from '../hooks/useSessionDuration';
 import { HeartRateCard } from './HeartRateCard';
@@ -28,7 +28,7 @@ export const Dashboard = () => {
     getUnhealthyDevices
   } = useAppStore();
 
-  const { zones } = useHeartRateZones();
+  const { zones } = useDefaultHeartRateZones();
   const sessionDuration = useSessionDuration(currentSession);
   const isSessionActive = currentSession?.isActive;
 
