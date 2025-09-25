@@ -3825,7 +3825,7 @@ body {
 .alert-item {
   background-color: var(--color-slate-darker);
   border: 1px solid var(--color-slate-medium);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   padding: var(--size-md);
   transition: var(--transition-colors);
 }
@@ -4118,7 +4118,7 @@ body {
 .settings-item {
   background-color: var(--color-slate-darker);
   border: 1px solid var(--color-slate-medium);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   padding: var(--size-md);
   transition: var(--transition-colors);
 }
@@ -4514,7 +4514,7 @@ body {
   gap: var(--size-sm);
   padding: var(--size-md);
   background-color: var(--color-slate-light);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   border: 1px solid var(--color-slate-medium);
 }
 
@@ -4557,7 +4557,7 @@ body {
 
 .performance-score {
   padding: var(--size-md);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   border: 1px solid var(--color-slate-medium);
 }
 
@@ -4688,7 +4688,7 @@ body {
   align-items: center;
   padding: var(--size-md);
   background-color: var(--color-slate-light);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   border: 1px solid var(--color-slate-medium);
 }
 
@@ -4730,7 +4730,7 @@ body {
 .rower-performance-card {
   padding: var(--size-md);
   background-color: var(--color-slate-light);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   border: 1px solid var(--color-slate-medium);
 }
 
@@ -4810,7 +4810,7 @@ body {
   gap: var(--size-sm);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-slate-dark);
+  /* color: var(--color-slate-dark); */
   margin: 0;
 }
 
@@ -4826,7 +4826,7 @@ body {
   gap: var(--size-sm);
   padding: var(--size-md);
   background-color: var(--color-slate-light);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   border: 1px solid var(--color-slate-medium);
 }
 
@@ -4860,7 +4860,7 @@ body {
 
 .insight-item {
   padding: var(--size-sm) var(--size-md);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   font-size: var(--font-size-sm);
   line-height: 1.4;
 }
@@ -4900,7 +4900,7 @@ body {
   align-items: center;
   padding: var(--size-md);
   background-color: var(--color-slate-light);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   border: 1px solid var(--color-slate-medium);
 }
 
@@ -4958,7 +4958,7 @@ body {
   background-color: var(--color-blue-medium);
   color: var(--color-white);
   border: none;
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
@@ -5046,10 +5046,7 @@ body {
   display: flex;
   align-items: center;
   gap: var(--size-sm);
-  font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
-  color: var(--color-slate-dark);
-  margin: 0;
 }
 
 .progress-header-icon {
@@ -5079,7 +5076,7 @@ body {
 .period-selector-select {
   padding: var(--size-sm) var(--size-md);
   border: 1px solid var(--color-slate-medium);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   background-color: var(--color-white);
   font-size: var(--font-size-sm);
   color: var(--color-slate-dark);
@@ -5096,12 +5093,12 @@ body {
   align-items: center;
   gap: var(--size-xs);
   padding: var(--size-sm) var(--size-md);
-  background-color: var(--color-slate-light);
+  background-color: var(--color-slate-dark);
   border: 1px solid var(--color-slate-medium);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--color-slate-dark);
+  color: var(--color-slate-light);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -5148,25 +5145,89 @@ body {
 .progress-metric-label {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--color-slate-dark);
+  color: var(--color-blue-light);
 }
 
 .progress-metric-value {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
-  color: var(--color-slate-dark);
 }
 
-.progress-metric-bar {
+.progress-metric-progress {
+  width: 100%;
   height: 8px;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-slate-light);
+  overflow: hidden;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.progress-metric-progress::-webkit-progress-bar {
   background-color: var(--color-slate-light);
   border-radius: var(--border-radius-sm);
-  overflow: hidden;
 }
 
-.progress-metric-fill {
-  height: 100%;
-  transition: width 0.3s ease;
+.progress-metric-progress::-webkit-progress-value {
+  background: linear-gradient(90deg, var(--color-green-medium), var(--color-blue-medium));
+  border-radius: var(--border-radius-sm);
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.progress-metric-progress::-moz-progress-bar {
+  background: linear-gradient(90deg, var(--color-green-medium), var(--color-blue-medium));
+  border-radius: var(--border-radius-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Progress level variations */
+.progress-metric-progress[value="0"]::-webkit-progress-value {
+  background: var(--color-slate-medium);
+}
+
+.progress-metric-progress[value="0"]::-moz-progress-bar {
+  background: var(--color-slate-medium);
+}
+
+.progress-metric-progress[value^="1"]::-webkit-progress-value,
+.progress-metric-progress[value^="2"]::-webkit-progress-value,
+.progress-metric-progress[value^="3"]::-webkit-progress-value,
+.progress-metric-progress[value^="4"]::-webkit-progress-value {
+  background: var(--color-red-medium);
+}
+
+.progress-metric-progress[value^="1"]::-moz-progress-bar,
+.progress-metric-progress[value^="2"]::-moz-progress-bar,
+.progress-metric-progress[value^="3"]::-moz-progress-bar,
+.progress-metric-progress[value^="4"]::-moz-progress-bar {
+  background: var(--color-red-medium);
+}
+
+.progress-metric-progress[value^="5"]::-webkit-progress-value,
+.progress-metric-progress[value^="6"]::-webkit-progress-value,
+.progress-metric-progress[value^="7"]::-webkit-progress-value {
+  background: var(--color-yellow-medium);
+}
+
+.progress-metric-progress[value^="5"]::-moz-progress-bar,
+.progress-metric-progress[value^="6"]::-moz-progress-bar,
+.progress-metric-progress[value^="7"]::-moz-progress-bar {
+  background: var(--color-yellow-medium);
+}
+
+.progress-metric-progress[value^="8"]::-webkit-progress-value,
+.progress-metric-progress[value^="9"]::-webkit-progress-value,
+.progress-metric-progress[value="100"]::-webkit-progress-value {
+  background: var(--color-green-medium);
+}
+
+.progress-metric-progress[value^="8"]::-moz-progress-bar,
+.progress-metric-progress[value^="9"]::-moz-progress-bar,
+.progress-metric-progress[value="100"]::-moz-progress-bar {
+  background: var(--color-green-medium);
 }
 
 /* Trend Charts */
@@ -5187,10 +5248,8 @@ body {
 }
 
 .trend-chart-title {
-  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-slate-dark);
-  margin: 0;
+  color: var(--color-blue-light);
 }
 
 .trend-chart-container {
@@ -5218,30 +5277,30 @@ body {
 .rower-selector-label {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--color-slate-dark);
+  color: var(--color-blue-light);
 }
 
 .rower-selector-select {
   padding: var(--size-sm) var(--size-md);
   border: 1px solid var(--color-slate-medium);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   background-color: var(--color-white);
   font-size: var(--font-size-sm);
-  color: var(--color-slate-dark);
+  color: var(--color-blue-light);
   cursor: pointer;
   min-width: 200px;
 }
 
 .individual-progress-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--size-lg);
 }
 
 .rower-progress-card {
   padding: var(--size-lg);
-  background-color: var(--color-slate-light);
-  border-radius: var(--border-radius-md);
+  background-color: var(--color-slate-dark);
+  border-radius: var(--size-lg);
   border: 1px solid var(--color-slate-medium);
 }
 
@@ -5249,21 +5308,17 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--size-md);
 }
 
 .rower-progress-name {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-slate-dark);
-  margin: 0;
 }
 
 .rower-progress-seat {
   font-size: var(--font-size-sm);
-  color: var(--color-slate-medium);
   background-color: var(--color-slate-medium);
-  color: var(--color-white);
+  color: var(--color-slate-light);
   padding: var(--size-xs) var(--size-sm);
   border-radius: var(--border-radius-sm);
 }
@@ -5283,7 +5338,7 @@ body {
 .rower-progress-metric-label {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--color-slate-dark);
+  color: var(--color-blue-light);
 }
 
 .rower-progress-score {
@@ -5314,7 +5369,7 @@ body {
 .rower-trend-metric {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--color-slate-dark);
+  color: var(--color-blue-light);
 }
 
 .rower-trend-details {
@@ -5330,7 +5385,7 @@ body {
 
 .rower-trend-confidence {
   font-size: var(--font-size-xs);
-  color: var(--color-slate-medium);
+  color: var(--color-green-medium);
 }
 
 .rower-strengths,
@@ -5388,6 +5443,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--size-lg);
+  color: var(--color-blue-light);
 }
 
 .insight-section {
@@ -5402,8 +5458,6 @@ body {
   gap: var(--size-sm);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-slate-dark);
-  margin: 0;
 }
 
 .insight-section-icon {
@@ -5423,7 +5477,7 @@ body {
 
 .insight-item {
   padding: var(--size-sm) var(--size-md);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   font-size: var(--font-size-sm);
   line-height: 1.4;
 }
@@ -5437,24 +5491,22 @@ body {
 .insight-item.concern {
   background-color: rgba(245, 158, 11, 0.1);
   border-left: 4px solid var(--color-yellow-medium);
-  color: var(--color-yellow-dark);
+  color: var(--color-yellow-light);
 }
 
 .insight-item.recommendation {
   background-color: rgba(59, 130, 246, 0.1);
   border-left: 4px solid var(--color-blue-medium);
-  color: var(--color-blue-dark);
+  color: var(--color-blue-light);
 }
 
 .insight-focus-text {
   font-size: var(--font-size-sm);
-  color: var(--color-slate-dark);
-  line-height: 1.5;
-  margin: 0;
   padding: var(--size-md);
-  background-color: var(--color-slate-light);
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--color-slate-medium);
+  background-color:rgba(16, 185, 129, 0.1);
+  border-left: 4px solid var(--color-green-light);
+  border-radius: var(--size-md);
+  color: var(--color-green-light);
 }
 
 /* Responsive Design for Progress Tracking */
@@ -5560,7 +5612,7 @@ body {
   text-align: center;
   padding: var(--size-md);
   background-color: var(--color-slate-light);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   border: 1px solid var(--color-slate-medium);
 }
 
@@ -5614,7 +5666,7 @@ body {
   padding: var(--size-md);
   background-color: var(--color-slate-light);
   border: 2px solid var(--color-slate-medium);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -5678,7 +5730,7 @@ body {
   gap: var(--size-sm);
   padding: var(--size-md);
   background-color: var(--color-slate-light);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   border: 1px solid var(--color-slate-medium);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -5724,7 +5776,7 @@ body {
   padding: var(--size-sm) var(--size-md);
   background-color: var(--color-slate-light);
   border: 1px solid var(--color-slate-medium);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--color-slate-dark);
@@ -5743,7 +5795,7 @@ body {
   gap: var(--size-lg);
   padding: var(--size-lg);
   background-color: var(--color-slate-light);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   border: 1px solid var(--color-slate-medium);
 }
 
@@ -5790,7 +5842,7 @@ body {
 .export-date-field {
   padding: var(--size-sm) var(--size-md);
   border: 1px solid var(--color-slate-medium);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   background-color: var(--color-white);
   font-size: var(--font-size-sm);
   color: var(--color-slate-dark);
@@ -5805,7 +5857,7 @@ body {
   overflow-y: auto;
   padding: var(--size-sm);
   background-color: var(--color-white);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   border: 1px solid var(--color-slate-medium);
 }
 
@@ -5858,7 +5910,7 @@ body {
   background-color: var(--color-slate-medium);
   color: var(--color-white);
   border: none;
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
@@ -5911,7 +5963,7 @@ body {
   background-color: var(--color-blue-medium);
   color: var(--color-white);
   border: none;
-  border-radius: var(--border-radius-md);
+  border-radius: var(--size-md);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;

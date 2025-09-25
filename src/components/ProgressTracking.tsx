@@ -13,7 +13,6 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useHistoricalData } from '../hooks/useHistoricalData';
 import { useDefaultHeartRateZones } from '../hooks/useHeartRateZones';
-import type { ProgressReport } from '../types';
 import { generateProgressReport } from '../utils/progressTracking';
 
 interface ProgressTrackingProps {
@@ -119,11 +118,6 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
     return 'text-red-600';
   };
 
-  const getProgressBgColor = (progress: number) => {
-    if (progress >= 80) return 'bg-green-100';
-    if (progress >= 60) return 'bg-yellow-100';
-    return 'bg-red-100';
-  };
 
   const getMetricDisplayName = (metric: string): string => {
     const metricMap: Record<string, string> = {
@@ -200,12 +194,12 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
                 {crewProgress.overallProgress}%
               </span>
             </div>
-            <div className="progress-metric-bar">
-              <div 
-                className={`progress-metric-fill ${getProgressBgColor(crewProgress.overallProgress)}`}
-                style={{ width: `${crewProgress.overallProgress}%` }}
-              />
-            </div>
+            <progress 
+              className="progress-metric-progress"
+              value={crewProgress.overallProgress} 
+              max={100}
+              aria-label={`Crew progress: ${crewProgress.overallProgress}%`}
+            />
           </div>
 
           <div className="progress-metric">
