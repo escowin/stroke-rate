@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Rower } from '../types';
 import { calculateMaxHeartRate, estimateRestingHeartRate } from '../utils/heartRateCalculations';
 import { 
@@ -30,6 +30,9 @@ export const RowerProfile = ({
     hasCustomMaxHR: !!rower.maxHeartRate
   });
 
+  const [estimateUpdateKey, setEstimateUpdateKey] = useState(0);
+  const prevAgeRef = useRef(rower.age);
+
   const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({ 
       ...prev, 
@@ -42,6 +45,8 @@ export const RowerProfile = ({
 
   const handleAgeChange = (age: string) => {
     const ageNum = parseInt(age) || 0;
+    const prevAge = prevAgeRef.current;
+    
     setFormData(prev => ({
       ...prev,
       age: age,
@@ -49,6 +54,13 @@ export const RowerProfile = ({
       restingHeartRate: prev.hasCustomRestingHR ? prev.restingHeartRate : estimateRestingHeartRate(ageNum).toString(),
       maxHeartRate: prev.hasCustomMaxHR ? prev.maxHeartRate : calculateMaxHeartRate(ageNum).toString()
     }));
+
+    // Trigger animation when age changes and estimates would update
+    if (ageNum !== prevAge && (!formData.hasCustomRestingHR || !formData.hasCustomMaxHR)) {
+      setEstimateUpdateKey(prev => prev + 1);
+    }
+    
+    prevAgeRef.current = ageNum;
   };
 
   const handleSave = () => {
@@ -75,8 +87,10 @@ export const RowerProfile = ({
     onEditToggle?.();
   };
 
-  const estimatedMaxHR = rower.age ? calculateMaxHeartRate(rower.age) : null;
-  const estimatedRestingHR = rower.age ? estimateRestingHeartRate(rower.age) : null;
+  // Calculate estimates based on current form data during editing, or rower data when not editing
+  const currentAge = isEditing ? (parseInt(formData.age) || 0) : (rower.age || 0);
+  const estimatedMaxHR = currentAge > 0 ? calculateMaxHeartRate(currentAge) : null;
+  const estimatedRestingHR = currentAge > 0 ? estimateRestingHeartRate(currentAge) : null;
 
   return (
     <div className="rower-profile">
@@ -166,17 +180,19 @@ export const RowerProfile = ({
               />
               {estimatedRestingHR && (
                 <div className="rower-profile-estimate-group">
-                  <span className="rower-profile-estimate">
+                  <span 
+                    key={`resting-${estimateUpdateKey}`}
+                    className="rower-profile-estimate rower-profile-estimate--animated"
+                  >
                     Est: {estimatedRestingHR} BPM
                   </span>
                   {formData.hasCustomRestingHR && (
                     <button
                       type="button"
                       onClick={() => {
-                        const ageNum = parseInt(formData.age) || 0;
                         setFormData(prev => ({
                           ...prev,
-                          restingHeartRate: estimateRestingHeartRate(ageNum).toString(),
+                          restingHeartRate: estimatedRestingHR?.toString() || '',
                           hasCustomRestingHR: false
                         }));
                       }}
@@ -211,17 +227,19 @@ export const RowerProfile = ({
               />
               {estimatedMaxHR && (
                 <div className="rower-profile-estimate-group">
-                  <span className="rower-profile-estimate">
+                  <span 
+                    key={`max-${estimateUpdateKey}`}
+                    className="rower-profile-estimate rower-profile-estimate--animated"
+                  >
                     Est: {estimatedMaxHR} BPM
                   </span>
                   {formData.hasCustomMaxHR && (
                     <button
                       type="button"
                       onClick={() => {
-                        const ageNum = parseInt(formData.age) || 0;
                         setFormData(prev => ({
                           ...prev,
-                          maxHeartRate: calculateMaxHeartRate(ageNum).toString(),
+                          maxHeartRate: estimatedMaxHR?.toString() || '',
                           hasCustomMaxHR: false
                         }));
                       }}

@@ -10,6 +10,7 @@ import type {
   UIState
 } from '../types';
 import { calculateRowerHeartRateZones } from '../utils/heartRateCalculations';
+import { storeHeartRateData, storeSession } from '../services/database';
 
 interface AppStore extends AppState {
   // Connection Management
@@ -147,6 +148,19 @@ export const useAppStore = create<AppStore>()(
             heartRateData: [...state.currentSession.heartRateData, data]
           } : undefined;
           
+          // Store heart rate data in IndexedDB if we have an active session
+          if (state.currentSession && state.currentSession.isActive) {
+            const dataWithSessionId = {
+              ...data,
+              sessionId: state.currentSession.id
+            };
+            
+            // Store asynchronously without blocking the UI
+            storeHeartRateData(dataWithSessionId).catch(error => {
+              console.error('Failed to store heart rate data:', error);
+            });
+          }
+          
           // console.log('Store - updated session heartRateData length:', updatedSession?.heartRateData.length);
           
           return {
@@ -212,27 +226,56 @@ export const useAppStore = create<AppStore>()(
       
       // Session Management
       startSession: (session: TrainingSession) =>
-        set(() => ({
-          currentSession: session
-        })),
+        set(() => {
+          // Store session in IndexedDB
+          storeSession(session).catch(error => {
+            console.error('Failed to store session:', error);
+          });
+          
+          return {
+            currentSession: session
+          };
+        }),
       
       endSession: () =>
-        set((state) => ({
-          currentSession: state.currentSession ? {
+        set((state) => {
+          if (!state.currentSession) return state;
+          
+          const endedSession = {
             ...state.currentSession,
             endTime: new Date(),
             isActive: false,
             finalHeartRateData: [...state.currentSession.heartRateData] // Capture static snapshot
-          } : undefined
-        })),
+          };
+          
+          // Store updated session in IndexedDB
+          storeSession(endedSession).catch(error => {
+            console.error('Failed to store ended session:', error);
+          });
+          
+          return {
+            currentSession: endedSession
+          };
+        }),
       
       updateSession: (updates: Partial<TrainingSession>) =>
-        set((state) => ({
-          currentSession: state.currentSession ? {
+        set((state) => {
+          const updatedSession = state.currentSession ? {
             ...state.currentSession,
             ...updates
-          } : undefined
-        })),
+          } : undefined;
+          
+          // Store updated session in IndexedDB
+          if (updatedSession) {
+            storeSession(updatedSession).catch(error => {
+              console.error('Failed to store updated session:', error);
+            });
+          }
+          
+          return {
+            currentSession: updatedSession
+          };
+        }),
       
       // Error Handling
       setError: (error: string | undefined) =>

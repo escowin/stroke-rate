@@ -31,6 +31,7 @@ export interface HeartRateData {
   heartRate: number;
   timestamp: Date;
   zone: keyof HeartRateZones;
+  sessionId?: string; // Optional for backward compatibility
 }
 
 // Rower Types
