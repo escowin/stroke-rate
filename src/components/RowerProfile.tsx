@@ -259,15 +259,6 @@ export const RowerProfile = ({
           )}
         </div>
       </div>
-
-      {rower.age && (
-        <div className="rower-profile-note">
-          <p className="text-sm text-gray-600">
-            Heart rate zones calculated using athletic training formulas optimized for rowers.
-            Supports High School (14-18), Collegiate (18-22), and Masters (23-80+) rowing.
-          </p>
-        </div>
-      )}
     </div>
   );
 };

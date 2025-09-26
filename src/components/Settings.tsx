@@ -103,24 +103,15 @@ export const Settings: React.FC = () => {
 
 
   return (
-    <div className="settings-page">
-        <div className="settings-header">
-          <div className="settings-title">
+    <>
+        <header className="settings-header card-base">
             <Cog6ToothIcon className="settings-title-icon" />
             <h2>Settings</h2>
-          </div>
-          <button
-            className="settings-back-btn"
-            onClick={() => setUIState({ currentView: 'session' })}
-            title="Back to Dashboard"
-          >
-            <XMarkIcon className="settings-back-icon" />
-          </button>
-        </div>
+        </header>
 
-        <div className="settings-content">
+        <section className="settings-content card-base">
           {/* Tab Navigation */}
-          <div className="settings-tabs">
+          <article className="settings-tabs">
             <button
               className={`settings-tab ${activeTab === 'notifications' ? 'active' : ''}`}
               onClick={() => setActiveTab('notifications')}
@@ -135,11 +126,11 @@ export const Settings: React.FC = () => {
               <Cog6ToothIcon className="settings-tab-icon" />
               General
             </button>
-          </div>
+          </article>
 
           {/* Notifications Tab */}
           {activeTab === 'notifications' && (
-            <div className="settings-section">
+            <article className="settings-section">
               <h3 className="settings-section-title">Notification Preferences</h3>
               <p className="settings-section-description">
                 Choose which notifications you want to receive during training sessions.
@@ -266,12 +257,12 @@ export const Settings: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </article>
           )}
 
           {/* General Tab */}
           {activeTab === 'general' && (
-            <div className="settings-section">
+            <article className="settings-section">
               <h3 className="settings-section-title">General Settings</h3>
               <p className="settings-section-description">
                 Configure general application preferences.
@@ -430,18 +421,18 @@ export const Settings: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </article>
           )}
-        </div>
+        </section>
 
-        <div className="settings-footer">
+        <section className="settings-footer card-base">
           <button
             className="settings-reset-btn"
             onClick={handleReset}
           >
             Reset to Defaults
           </button>
-          <div className="settings-footer-actions">
+          <article className="settings-footer-actions">
             <button
               className="settings-cancel-btn"
               onClick={() => setUIState({ currentView: 'session' })}
@@ -455,8 +446,8 @@ export const Settings: React.FC = () => {
               <CheckIcon className="settings-save-icon" />
               Save
             </button>
-          </div>
-        </div>
-    </div>
+          </article>
+        </section>
+    </>
   );
 };
