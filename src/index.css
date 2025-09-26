@@ -1,3 +1,4 @@
+/* Optimized font loading - using font-display: swap for better performance */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* CSS Reset and Base Styles */
@@ -96,6 +97,32 @@ body {
   padding: var(--size);
   text-align: center;
   font-weight: var(--font-weight-semibold);
+}
+
+/* Chart Loading States */
+.chart-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  min-height: 200px;
+  color: var(--color-blue-light);
+}
+
+.chart-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-slate-medium);
+  border-top: 3px solid var(--color-blue-medium);
+  border-radius: 50%;
+  animation: chart-spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes chart-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .heart-rate-recovery {

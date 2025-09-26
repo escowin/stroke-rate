@@ -59,7 +59,7 @@ This repository contains the **completed Phase 1, Phase 2, Phase 3, and Phase 4*
 #### Prerequisites
 - Node.js 20.19+ or 22.12+
 - npm or yarn
-- Modern browser with Web Bluetooth API support (Chrome/Edge on Android, Safari on iOS)
+- Modern browser with Web Bluetooth API support (Chrome/Edge on Android)
 
 #### Installation
 
@@ -174,7 +174,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### 📞 Support
 
-For support, please open an issue in the GitHub repository or contact me [Edwin Escobar](https://github.com/escowin).
+For support, please open an issue in the GitHub repository or contact me, [Edwin Escobar](https://github.com/escowin).
 
 ---
 

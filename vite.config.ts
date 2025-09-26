@@ -64,15 +64,31 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       output: {
-        manualChunks: {
+        manualChunks: (id) => {
           // React and React DOM
-          'react-vendor': ['react', 'react-dom'],
+          if (id.includes('react') || id.includes('react-dom')) {
+            return 'react-vendor';
+          }
           // Chart library (recharts is quite large)
-          'charts': ['recharts'],
+          if (id.includes('recharts')) {
+            return 'charts';
+          }
           // UI libraries
-          'ui-vendor': ['@headlessui/react', '@heroicons/react'],
+          if (id.includes('@headlessui') || id.includes('@heroicons')) {
+            return 'ui-vendor';
+          }
           // State management and utilities
-          'utils': ['zustand', 'idb']
+          if (id.includes('zustand') || id.includes('idb')) {
+            return 'utils';
+          }
+          // D3 dependencies (used by recharts)
+          if (id.includes('d3-')) {
+            return 'd3-vendor';
+          }
+          // Node modules
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
         }
       }
     },
@@ -83,6 +99,8 @@ export default defineConfig({
     // Source maps for debugging (disable in production for smaller builds)
     sourcemap: false,
     // Target modern browsers for smaller bundles
-    target: 'esnext'
+    target: 'esnext',
+    // Enable CSS code splitting
+    cssCodeSplit: true
   }
 })
