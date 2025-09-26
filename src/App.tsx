@@ -12,6 +12,7 @@ import { notificationService } from './services/notifications';
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
 const ProgressTracking = lazy(() => import('./components/ProgressTracking').then(module => ({ default: module.ProgressTracking })));
 const DataExport = lazy(() => import('./components/DataExport').then(module => ({ default: module.DataExport })));
+const CompatibilityTestPage = lazy(() => import('./components/CompatibilityTestPage').then(module => ({ default: module.CompatibilityTestPage })));
 
 function App() {
   const { uiState, connectionStatus, error, setUIState, clearError, loadRowersFromDatabase, loadCurrentSession } = useAppStore();
@@ -83,6 +84,16 @@ function App() {
         );
       case 'settings':
         return <Settings />;
+      case 'compatibility':
+        return (
+          <Suspense fallback={
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+            </div>
+          }>
+            <CompatibilityTestPage />
+          </Suspense>
+        );
       default:
         return (
           <Suspense fallback={

@@ -7,7 +7,8 @@ import {
   SignalSlashIcon,
   HeartIcon,
   ChartBarIcon,
-  ArrowDownTrayIcon
+  ArrowDownTrayIcon,
+  CpuChipIcon
 } from '@heroicons/react/24/outline';
 
 export const Header = () => {
@@ -23,6 +24,8 @@ export const Header = () => {
     { name: 'Export', view: 'export' as const, icon: ArrowDownTrayIcon },
     { name: 'Setup', view: 'setup' as const, icon: WifiIcon },
     { name: 'Settings', view: 'settings' as const, icon: Cog6ToothIcon },
+    // Only show compatibility test in development
+    ...(import.meta.env.DEV ? [{ name: 'Compatibility', view: 'compatibility' as const, icon: CpuChipIcon }] : []),
   ];
 
   return (

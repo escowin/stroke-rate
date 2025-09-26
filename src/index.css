@@ -125,6 +125,551 @@ body {
   100% { transform: rotate(360deg); }
 }
 
+/* Compatibility Test Styles */
+.compatibility-test {
+  background: var(--color-slate-dark);
+  border: 1px solid var(--color-slate-medium);
+  border-radius: var(--border-radius-sm);
+  padding: 1.5rem;
+  margin: 1rem 0;
+}
+
+.compatibility-test-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.compatibility-test-title {
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-light);
+  margin: 0;
+}
+
+.compatibility-test-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.compatibility-test-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  color: var(--color-blue-light);
+}
+
+.compatibility-test-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-red-light);
+  padding: 1rem;
+}
+
+.compatibility-status {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 1.5rem;
+}
+
+.compatibility-status--supported {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid var(--color-green-medium);
+}
+
+.compatibility-status--partial {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid var(--color-yellow-medium);
+}
+
+.compatibility-status--unsupported {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--color-red-medium);
+}
+
+.compatibility-status-icon .status-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.compatibility-status-content {
+  flex: 1;
+}
+
+.compatibility-status-title {
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-semibold);
+  margin: 0 0 0.25rem 0;
+  color: var(--color-slate-light);
+}
+
+.compatibility-status-description {
+  margin: 0;
+  color: var(--color-slate-light);
+  opacity: 0.8;
+}
+
+.compatibility-features {
+  margin-bottom: 1.5rem;
+}
+
+.compatibility-features-title {
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-light);
+  margin: 0 0 1rem 0;
+}
+
+.compatibility-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.compatibility-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(51, 65, 85, 0.3);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-slate-medium);
+}
+
+.compatibility-feature-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.compatibility-feature-content {
+  flex: 1;
+}
+
+.compatibility-feature-name {
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-light);
+  margin: 0 0 0.25rem 0;
+}
+
+.compatibility-feature-description {
+  font-size: 0.75rem;
+  color: var(--color-slate-light);
+  opacity: 0.7;
+  margin: 0;
+}
+
+.compatibility-bluetooth-test {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(51, 65, 85, 0.2);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-slate-medium);
+}
+
+.compatibility-bluetooth-title {
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-light);
+  margin: 0 0 1rem 0;
+}
+
+.compatibility-bluetooth-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.compatibility-bluetooth-result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.compatibility-bluetooth-label {
+  color: var(--color-slate-light);
+  font-weight: var(--font-weight-medium);
+}
+
+.compatibility-bluetooth-value {
+  font-weight: var(--font-weight-semibold);
+}
+
+.compatibility-bluetooth-value.success {
+  color: var(--color-green-medium);
+}
+
+.compatibility-bluetooth-value.error {
+  color: var(--color-red-medium);
+}
+
+.compatibility-bluetooth-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-red-light);
+  font-size: 0.875rem;
+}
+
+.compatibility-bluetooth-capabilities h5 {
+  color: var(--color-slate-light);
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+}
+
+.compatibility-bluetooth-capabilities ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--color-slate-light);
+  font-size: 0.875rem;
+}
+
+.compatibility-detailed-report {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-slate-medium);
+}
+
+.compatibility-detailed-title {
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-light);
+  margin: 0 0 1rem 0;
+}
+
+.compatibility-warnings,
+.compatibility-recommendations {
+  margin-bottom: 1rem;
+}
+
+.compatibility-warnings-title,
+.compatibility-recommendations-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-light);
+  margin: 0 0 0.5rem 0;
+}
+
+.compatibility-warnings-list,
+.compatibility-recommendations-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--color-slate-light);
+  font-size: 0.875rem;
+}
+
+.compatibility-warning-item,
+.compatibility-recommendation-item {
+  margin-bottom: 0.25rem;
+}
+
+.compatibility-degradation {
+  margin-top: 1rem;
+}
+
+.compatibility-degradation-title {
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-light);
+  margin: 0 0 0.75rem 0;
+}
+
+.compatibility-degradation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.compatibility-degradation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: rgba(51, 65, 85, 0.2);
+  border-radius: var(--border-radius-sm);
+}
+
+.compatibility-degradation-label {
+  color: var(--color-slate-light);
+  font-size: 0.875rem;
+}
+
+.compatibility-degradation-value {
+  font-weight: var(--font-weight-semibold);
+  font-size: 0.875rem;
+}
+
+.compatibility-degradation-value.success {
+  color: var(--color-green-medium);
+}
+
+.compatibility-degradation-value.warning {
+  color: var(--color-yellow-medium);
+}
+
+.compatibility-degradation-value.error {
+  color: var(--color-red-medium);
+}
+
+/* Compatibility Test Page Styles */
+.compatibility-test-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.compatibility-test-page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.compatibility-test-page-title {
+  font-size: 2rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-light);
+  margin: 0 0 1rem 0;
+}
+
+.compatibility-test-page-description {
+  font-size: 1.125rem;
+  color: var(--color-slate-light);
+  opacity: 0.8;
+  margin: 0;
+}
+
+.compatibility-current-test {
+  margin-bottom: 2rem;
+}
+
+.compatibility-section-title {
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-light);
+  margin: 0 0 1rem 0;
+}
+
+.compatibility-summary {
+  margin-bottom: 2rem;
+}
+
+.compatibility-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.compatibility-summary-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(51, 65, 85, 0.3);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-slate-medium);
+}
+
+.compatibility-summary-icon .success-icon,
+.compatibility-summary-icon .warning-icon,
+.compatibility-summary-icon .error-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.compatibility-summary-icon .success-icon {
+  color: var(--color-green-medium);
+}
+
+.compatibility-summary-icon .warning-icon {
+  color: var(--color-yellow-medium);
+}
+
+.compatibility-summary-icon .error-icon {
+  color: var(--color-red-medium);
+}
+
+.compatibility-summary-content {
+  flex: 1;
+}
+
+.compatibility-summary-title {
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-light);
+  margin: 0 0 0.25rem 0;
+}
+
+.compatibility-summary-count {
+  font-size: 2rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-light);
+  margin: 0;
+}
+
+.compatibility-instructions {
+  margin-bottom: 2rem;
+}
+
+.compatibility-instructions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.compatibility-instruction {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(51, 65, 85, 0.2);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-slate-medium);
+}
+
+.compatibility-instruction-icon .instruction-icon {
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-blue-medium);
+}
+
+.compatibility-instruction-icon .instruction-icon.warning {
+  color: var(--color-yellow-medium);
+}
+
+.compatibility-instruction-content {
+  flex: 1;
+}
+
+.compatibility-instruction-title {
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-light);
+  margin: 0 0 0.5rem 0;
+}
+
+.compatibility-instruction-description {
+  color: var(--color-slate-light);
+  opacity: 0.8;
+  margin: 0 0 1rem 0;
+}
+
+.compatibility-instruction-steps {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--color-slate-light);
+  font-size: 0.875rem;
+}
+
+.compatibility-instruction-steps li {
+  margin-bottom: 0.25rem;
+}
+
+.compatibility-limitations {
+  margin-bottom: 2rem;
+}
+
+.compatibility-limitations-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.compatibility-limitation {
+  padding: 1.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-red-medium);
+}
+
+.compatibility-limitation-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-light);
+  margin: 0 0 0.75rem 0;
+}
+
+.compatibility-limitation-title .limitation-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-red-medium);
+}
+
+.compatibility-limitation-description {
+  color: var(--color-slate-light);
+  margin: 0 0 1rem 0;
+}
+
+.compatibility-limitation-workarounds h4 {
+  color: var(--color-slate-light);
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-semibold);
+}
+
+.compatibility-limitation-workarounds ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--color-slate-light);
+  font-size: 0.875rem;
+}
+
+.compatibility-limitation-workarounds li {
+  margin-bottom: 0.25rem;
+}
+
+.compatibility-future-plan {
+  margin-bottom: 2rem;
+}
+
+.compatibility-future-content {
+  padding: 1.5rem;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-blue-medium);
+}
+
+.compatibility-future-description {
+  color: var(--color-slate-light);
+  margin: 0 0 1.5rem 0;
+}
+
+.compatibility-future-features,
+.compatibility-future-ui {
+  margin-bottom: 1rem;
+}
+
+.compatibility-future-features h3,
+.compatibility-future-ui h3 {
+  color: var(--color-slate-light);
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+}
+
+.compatibility-future-features ul,
+.compatibility-future-ui ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--color-slate-light);
+  font-size: 0.875rem;
+}
+
+.compatibility-future-features li,
+.compatibility-future-ui li {
+  margin-bottom: 0.25rem;
+}
+
 .heart-rate-recovery {
   background-color: var(--color-green-light);
   color: var(--color-slate-light);
