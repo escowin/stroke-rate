@@ -255,7 +255,7 @@ export const calculateHeartRateVariability = (heartRateData: HeartRateData[]): n
  * @param tss - Training Stress Score
  * @returns Recovery time in hours
  */
-export const calculateRecoveryTime = (trimp: number, tss: number): number => {
+export const calculateRecoveryTime = (_trimp: number, tss: number): number => {
   // Recovery time based on training load
   // Higher TSS = longer recovery time
   const baseRecovery = 2; // Base 2 hours
@@ -275,14 +275,14 @@ export const calculateRecoveryTime = (trimp: number, tss: number): number => {
 export const calculateRecoveryScore = (
   heartRateVariability: number,
   recoveryTime: number,
-  maxHR: number,
+  _maxHR: number,
   restingHR: number
 ): number => {
   // Higher HRV = better recovery
   // Shorter recovery time = better recovery
   // Lower resting HR = better recovery
   
-  const hrr = maxHR - restingHR;
+  // const hrr = maxHR - restingHR; // Unused but kept for future reference
   const hrvScore = Math.min(heartRateVariability * 10, 50); // Max 50 points for HRV
   const recoveryTimeScore = Math.max(0, 30 - (recoveryTime - 2) * 2); // Max 30 points for recovery time
   const restingHRScore = Math.max(0, 20 - (restingHR - 40) * 0.5); // Max 20 points for resting HR

@@ -72,7 +72,7 @@ export class ExportService {
       session.isActive ? 'Yes' : 'No'
     ]);
 
-    return this.arrayToCSV([headers, ...rows]);
+    return this.arrayToCSV([headers, ...rows.map(row => row.map(cell => String(cell)))]);
   }
 
   /**
@@ -99,7 +99,7 @@ export class ExportService {
       data.sessionId || ''
     ]);
 
-    return this.arrayToCSV([headers, ...rows]);
+    return this.arrayToCSV([headers, ...rows.map(row => row.map(cell => String(cell)))]);
   }
 
   /**
@@ -163,7 +163,7 @@ export class ExportService {
         ];
       });
 
-    return this.arrayToCSV([headers, ...rows]);
+    return this.arrayToCSV([headers, ...rows.map(row => row.map(cell => String(cell)))]);
   }
 
   /**
@@ -212,7 +212,7 @@ export class ExportService {
       progressReport.insights.nextPhaseFocus
     ];
 
-    return this.arrayToCSV([headers, row]);
+    return this.arrayToCSV([headers, row.map(cell => String(cell))]);
   }
 
   /**
@@ -277,7 +277,7 @@ export class ExportService {
       ];
     });
 
-    return this.arrayToCSV([headers, ...rows]);
+    return this.arrayToCSV([headers, ...rows.map(row => row.map(cell => String(cell)))]);
   }
 
   /**

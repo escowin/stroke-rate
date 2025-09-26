@@ -4,7 +4,6 @@ import {
   BellIcon,
   DevicePhoneMobileIcon,
   WifiIcon,
-  XMarkIcon,
   CheckIcon
 } from '@heroicons/react/24/outline';
 import { useNotifications } from '../hooks/useNotifications';

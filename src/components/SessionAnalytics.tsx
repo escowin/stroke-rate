@@ -6,12 +6,11 @@ import {
   ClockIcon,
   UserGroupIcon,
   ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
   LightBulbIcon
 } from '@heroicons/react/24/outline';
-import type { TrainingSession, HeartRateZones, SessionReport } from '../types';
+import type { TrainingSession, HeartRateZones } from '../types';
 import { generateSessionReport } from '../utils/sessionAnalytics';
 
 interface SessionAnalyticsProps {

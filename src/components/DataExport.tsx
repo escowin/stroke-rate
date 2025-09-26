@@ -2,25 +2,23 @@ import React, { useState, useMemo } from 'react';
 import {
   ArrowDownTrayIcon,
   DocumentArrowDownIcon,
-  CalendarIcon,
+  CalendarDaysIcon,
   UserGroupIcon,
   ChartBarIcon,
   Cog6ToothIcon,
-  CheckIcon,
-  XMarkIcon,
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
 import { useHistoricalData } from '../hooks/useHistoricalData';
 import { useDefaultHeartRateZones } from '../hooks/useHeartRateZones';
 import { ExportService, type ExportOptions } from '../services/export';
-import type { TrainingSession, HeartRateData } from '../types';
+import type { HeartRateData } from '../types';
 
 interface DataExportProps {
   className?: string;
 }
 
 export const DataExport: React.FC<DataExportProps> = ({ className = '' }) => {
-  const { sessions, getAllHeartRateData } = useHistoricalData();
+  const { sessions, getSessionHeartRateData } = useHistoricalData();
   const { zones } = useDefaultHeartRateZones();
   
   const [isExporting, setIsExporting] = useState(false);
@@ -52,14 +50,19 @@ export const DataExport: React.FC<DataExportProps> = ({ className = '' }) => {
   React.useEffect(() => {
     const loadHeartRateData = async () => {
       try {
-        const data = await getAllHeartRateData();
-        setAllHeartRateData(data);
+        // Get heart rate data for all sessions
+        const allHeartRateData: HeartRateData[] = [];
+        for (const session of sessions) {
+          const sessionData = await getSessionHeartRateData(session.id);
+          allHeartRateData.push(...sessionData);
+        }
+        setAllHeartRateData(allHeartRateData);
       } catch (error) {
         console.error('Failed to load heart rate data:', error);
       }
     };
     loadHeartRateData();
-  }, [getAllHeartRateData]);
+  }, [sessions, getSessionHeartRateData]);
 
   // Calculate export statistics
   const exportStats = useMemo(() => {
@@ -285,7 +288,7 @@ export const DataExport: React.FC<DataExportProps> = ({ className = '' }) => {
                 {/* Date Range */}
                 <div className="export-filter-group">
                   <h5 className="export-filter-title">
-                    <CalendarIcon className="export-filter-icon" />
+                    <CalendarDaysIcon className="export-filter-icon" />
                     Date Range
                   </h5>
                   <div className="export-date-range">
