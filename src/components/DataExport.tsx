@@ -139,7 +139,9 @@ export const DataExport: React.FC<DataExportProps> = ({ className = '' }) => {
   };
 
   return (
-    <div className={`data-export ${className}`}>
+    <>
+      {/* Hidden title for accessibility */}
+      <h1 id="data-export-title" className="sr-only">Data Export</h1>
       {/* Header */}
       <section className="card-base export-header">
         <div className="export-header-content">
@@ -451,6 +453,6 @@ export const DataExport: React.FC<DataExportProps> = ({ className = '' }) => {
           </div>
         </div>
       </section>
-    </div>
+    </>
   );
 };

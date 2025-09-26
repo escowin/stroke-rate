@@ -243,7 +243,7 @@ export const DevToggle = () => {
   }, [mockDataInterval]);
 
   return (
-    <section className="dev-toggle">
+    <section className="card-base dev-toggle">
       <header className="dev-toggle-header">
         <BeakerIcon className="dev-toggle-icon" />
         <h3 className="dev-toggle-title">

@@ -187,7 +187,7 @@ export const HeartRateChart = memo(({ data, rowers, sessionStartTime, sessionEnd
 
   if (chartData.length === 0) {
     return (
-      <section className="heart-rate-chart">
+      <section className="card-base heart-rate-chart">
         <h3 className="heart-rate-chart-title">
           Heart Rate Trend
         </h3>
@@ -201,7 +201,7 @@ export const HeartRateChart = memo(({ data, rowers, sessionStartTime, sessionEnd
   }
 
   return (
-    <section className="heart-rate-chart">
+    <section className="card-base heart-rate-chart">
       <header className="heart-rate-chart-header">
         <h3 className="heart-rate-chart-title">
           Session Analysis

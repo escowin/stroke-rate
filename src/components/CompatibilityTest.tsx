@@ -89,8 +89,10 @@ export const CompatibilityTest = ({ onTestComplete, showDetailedReport = false }
   const status = getCompatibilityStatus();
 
   return (
-    <div className="compatibility-test">
-      <div className="compatibility-test-header">
+    <>
+      {/* Hidden title for accessibility */}
+      <h1 id="compatibility-test-title" className="sr-only">Browser Compatibility Test</h1>
+      <article className="compatibility-test-header">
         <h3 className="compatibility-test-title">
           Browser Compatibility Test
         </h3>
@@ -109,10 +111,10 @@ export const CompatibilityTest = ({ onTestComplete, showDetailedReport = false }
             Copy Report
           </button>
         </div>
-      </div>
+      </article>
 
       {/* Status Summary */}
-      <div className={`compatibility-status compatibility-status--${status.status}`}>
+      <article className={`compatibility-status compatibility-status--${status.status}`}>
         <div className="compatibility-status-icon">
           {status.status === 'supported' && <CheckCircleIcon className="status-icon" />}
           {status.status === 'partial' && <ExclamationTriangleIcon className="status-icon" />}
@@ -126,10 +128,10 @@ export const CompatibilityTest = ({ onTestComplete, showDetailedReport = false }
             {report.browser.name} {report.browser.version} on {report.browser.platform}
           </p>
         </div>
-      </div>
+      </article>
 
       {/* Feature Support Grid */}
-      <div className="compatibility-features">
+      <article className="compatibility-features">
         <h4 className="compatibility-features-title">Feature Support</h4>
         <div className="compatibility-features-grid">
           <div className="compatibility-feature">
@@ -180,11 +182,11 @@ export const CompatibilityTest = ({ onTestComplete, showDetailedReport = false }
             </div>
           </div>
         </div>
-      </div>
+      </article>
 
       {/* Web Bluetooth Test Results */}
       {bluetoothTest && (
-        <div className="compatibility-bluetooth-test">
+        <article className="compatibility-bluetooth-test">
           <h4 className="compatibility-bluetooth-title">Web Bluetooth API Test</h4>
           <div className="compatibility-bluetooth-results">
             <div className="compatibility-bluetooth-result">
@@ -208,12 +210,12 @@ export const CompatibilityTest = ({ onTestComplete, showDetailedReport = false }
               </ul>
             </div>
           </div>
-        </div>
+        </article>
       )}
 
       {/* Detailed Report */}
       {showFullReport && (
-        <div className="compatibility-detailed-report">
+        <article className="compatibility-detailed-report">
           <h4 className="compatibility-detailed-title">Detailed Report</h4>
           
           {/* Warnings */}
@@ -281,8 +283,8 @@ export const CompatibilityTest = ({ onTestComplete, showDetailedReport = false }
               </div>
             </div>
           </div>
-        </div>
+        </article>
       )}
-    </div>
+    </>
   );
 };

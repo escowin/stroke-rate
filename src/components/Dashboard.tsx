@@ -43,7 +43,6 @@ export const Dashboard = () => {
   const unhealthyDevices = getUnhealthyDevices();
   
   // Generate unique IDs for accessibility
-  const dashboardId = generateId('dashboard');
   const sessionControlsId = generateId('session-controls');
   const rowersSectionId = generateId('rowers-section');
   const announcer = AccessibilityAnnouncer.getInstance();
@@ -87,17 +86,16 @@ export const Dashboard = () => {
   const connectedRowers = rowers.filter(rower => rower.deviceId && rower.currentHeartRate);
 
   return (
-    <main 
-      id={dashboardId}
-      role="main"
-      aria-labelledby="dashboard-title"
-    >
+    <>
+      {/* Hidden title for accessibility */}
+      <h1 id="dashboard-title" className="sr-only">Training Session Dashboard</h1>
+      
       {/* Development Toggle */}
       <DevToggle />
 
       {/* Session Controls */}
       <section 
-        className="session-controls"
+        className="card-base session-controls"
         id={sessionControlsId}
         aria-labelledby="session-title"
         aria-describedby="session-status"
@@ -260,7 +258,7 @@ export const Dashboard = () => {
             <>
               {/* Rower Status Overview */}
               <section 
-                className="rower-overview"
+                className="card-base rower-overview"
                 id={rowersSectionId}
                 aria-labelledby="rower-overview-title"
               >
@@ -326,7 +324,7 @@ export const Dashboard = () => {
               {/* Heart Rate Cards */}
               {connectedRowers.length > 0 && (
                 <section 
-                  className="heart-rate-grid"
+                  className="card-base heart-rate-grid"
                   aria-labelledby="heart-rate-cards-title"
                 >
                   <h3 
@@ -424,7 +422,6 @@ export const Dashboard = () => {
           ))}
         </article>
       </section>
-
-    </main>
+    </>
   );
 };

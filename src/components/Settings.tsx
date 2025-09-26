@@ -103,6 +103,9 @@ export const Settings: React.FC = () => {
 
   return (
     <>
+      {/* Hidden title for accessibility */}
+      <h1 id="settings-title" className="sr-only">Settings</h1>
+      
         <header className="settings-header card-base">
             <Cog6ToothIcon className="settings-title-icon" />
             <h2>Settings</h2>

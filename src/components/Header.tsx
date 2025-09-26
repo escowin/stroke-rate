@@ -33,7 +33,7 @@ export const Header = () => {
 
   return (
     <header className="header">
-        <section className="header-content">
+        <header className="header-content">
           {/* Logo and Title */}
           <article className="header-brand">
               <HeartIcon className="header-logo-icon" />
@@ -84,7 +84,7 @@ export const Header = () => {
               <Bars3Icon className="header-mobile-menu-icon" />
             </button>
           </article>
-        </section>
+        </header>
 
         {/* Mobile Navigation Menu */}
         <nav className={`header-mobile-menu ${isMenuOpen ? 'header-mobile-menu--open' : ''}`}>

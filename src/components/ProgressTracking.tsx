@@ -137,7 +137,9 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
 
   return (
-    <div className={`progress-tracking ${className}`}>
+    <>
+      {/* Hidden title for accessibility */}
+      <h1 id="progress-tracking-title" className="sr-only">Progress Tracking</h1>
       {/* Header Controls */}
       <section className="card-base progress-header">
         <div className="progress-header-content">
@@ -450,6 +452,6 @@ export const ProgressTracking: React.FC<ProgressTrackingProps> = ({
           </div>
         </div>
       </section>
-    </div>
+    </>
   );
 };

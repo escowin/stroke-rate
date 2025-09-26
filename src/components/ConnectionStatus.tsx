@@ -44,7 +44,7 @@ export const ConnectionStatus = () => {
 
   return (
     <>
-      <section className="connection-status-content">
+      <section className="card-base connection-status-content">
         <article className="connection-status-info">
           <StatusIcon className={`connection-status-icon ${
             hasSpeedCoachConflicts ? 'connection-status-icon--conflict' :
@@ -101,7 +101,7 @@ export const ConnectionStatus = () => {
 
       {/* Unhealthy Connections */}
       {unhealthyConnections.length > 0 && (
-        <section className="connection-issues">
+        <section className="card-base connection-issues">
           <article className="connection-issue">
             <ExclamationCircleIcon className="connection-issue-icon connection-issue-icon--error" />
             <div className="connection-issue-content">
@@ -122,7 +122,7 @@ export const ConnectionStatus = () => {
 
       {/* SpeedCoach Conflicts */}
       {hasSpeedCoachConflicts && conflicts.length > 0 && (
-        <section className="connection-issues">
+        <section className="card-base connection-issues">
           <article className="connection-issue">
             <ExclamationTriangleIcon className="connection-issue-icon connection-issue-icon--warning" />
             <div className="connection-issue-content">

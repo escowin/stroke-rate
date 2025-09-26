@@ -122,8 +122,11 @@ export const DeviceSetup = () => {
 
   return (
     <>
+      {/* Hidden title for accessibility */}
+      <h1 id="device-setup-title" className="sr-only">Device Setup</h1>
+      
       {/* Device Discovery */}
-      <section className="device-discovery">
+      <section className="card-base device-discovery">
         <article className="device-discovery-header">
           <h2 className="device-discovery-title">
             Heart Rate Devices

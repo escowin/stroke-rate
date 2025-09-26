@@ -1,4 +1,4 @@
-import { useEffect, lazy, Suspense } from 'react';
+import { useEffect, lazy, Suspense, useMemo } from 'react';
 import { useAppStore } from './store';
 import { useBluetooth } from './hooks/useBluetooth';
 import { DeviceSetup } from './components/DeviceSetup';
@@ -7,6 +7,7 @@ import { Header } from './components/Header';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Settings } from './components/Settings';
 import { notificationService } from './services/notifications';
+import { generateId } from './utils/accessibility';
 
 // Lazy load the Dashboard component (contains heavy recharts dependency)
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
@@ -17,6 +18,56 @@ const CompatibilityTestPage = lazy(() => import('./components/CompatibilityTestP
 function App() {
   const { uiState, connectionStatus, error, setUIState, clearError, loadRowersFromDatabase, loadCurrentSession } = useAppStore();
   const { isAvailable, error: bluetoothError, clearError: clearBluetoothError } = useBluetooth();
+
+  // Dynamic aria management for main element based on current view
+  const mainElementProps = useMemo(() => {
+    const baseId = generateId('main');
+    
+    switch (uiState.currentView) {
+      case 'session':
+        return {
+          id: baseId,
+          role: 'main',
+          'aria-labelledby': 'dashboard-title'
+        };
+      case 'progress':
+        return {
+          id: baseId,
+          role: 'main',
+          'aria-labelledby': 'progress-tracking-title'
+        };
+      case 'export':
+        return {
+          id: baseId,
+          role: 'main',
+          'aria-labelledby': 'data-export-title'
+        };
+      case 'compatibility':
+        return {
+          id: baseId,
+          role: 'main',
+          'aria-labelledby': 'compatibility-test-title'
+        };
+      case 'setup':
+        return {
+          id: baseId,
+          role: 'main',
+          'aria-labelledby': 'device-setup-title'
+        };
+      case 'settings':
+        return {
+          id: baseId,
+          role: 'main',
+          'aria-labelledby': 'settings-title'
+        };
+      default:
+        return {
+          id: baseId,
+          role: 'main',
+          'aria-labelledby': 'dashboard-title'
+        };
+    }
+  }, [uiState.currentView]);
 
   // Clear errors and load data when component mounts
   useEffect(() => {
@@ -130,7 +181,10 @@ function App() {
       <>
         <Header />
 
-        <main className="main-container">
+        <main 
+          className="main-container"
+          {...mainElementProps}
+        >
           {error && (
             <section className="error-message">
               <svg className="error-svg-icon" viewBox="0 0 20 20" fill="currentColor">
