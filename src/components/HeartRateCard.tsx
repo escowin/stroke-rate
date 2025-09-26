@@ -6,6 +6,7 @@ import {
   SignalIcon,
   SignalSlashIcon
 } from '@heroicons/react/24/outline';
+import { HeartRateAccessibility, generateId } from '../utils/accessibility';
 
 interface HeartRateCardProps {
   rower: Rower;
@@ -19,6 +20,13 @@ export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
   const zone = heartRate ? getZoneName(heartRate) : 'No Data';
   const zoneColor = heartRate ? getZoneColor(heartRate) : '#6b7280';
   const lastUpdate = rower.currentHeartRate?.timestamp;
+
+  // Generate unique IDs for accessibility
+  const cardId = generateId(`heart-rate-card-${rower.id}`);
+  const heartRateId = generateId(`heart-rate-${rower.id}`);
+  const zoneId = generateId(`zone-${rower.id}`);
+  const connectionId = generateId(`connection-${rower.id}`);
+  const batteryId = generateId(`battery-${rower.id}`);
 
   const getConnectionStatus = () => {
     if (!rower.deviceId) return { status: 'disconnected', icon: SignalSlashIcon, color: 'text-gray-400' };
@@ -38,32 +46,75 @@ export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
   const batteryStatus = getBatteryStatus();
   const StatusIcon = connectionStatus.icon;
 
+  // Generate accessible descriptions
+  const heartRateDescription = heartRate 
+    ? HeartRateAccessibility.getHeartRateDescription(heartRate, zone, rower.name)
+    : `${rower.name} heart rate: No data available`;
+  
+  const zoneDescription = heartRate 
+    ? HeartRateAccessibility.getZoneDescription(zone, heartRate)
+    : `${rower.name} heart rate zone: No data available`;
+  
+  const connectionDescription = HeartRateAccessibility.getConnectionStatusDescription(
+    connectionStatus.status === 'connected',
+    rower.name
+  );
+
   return (
-    <article className="heart-rate-card">
+    <article 
+      className="heart-rate-card"
+      id={cardId}
+      role="region"
+      aria-labelledby={`${cardId}-name`}
+      aria-describedby={`${heartRateId} ${zoneId} ${connectionId} ${batteryId}`}
+    >
       {/* Header */}
       <header className="heart-rate-card-header">
         <div className="heart-rate-card-info">
-          <h3 className="heart-rate-card-name">
+          <h3 
+            className="heart-rate-card-name"
+            id={`${cardId}-name`}
+          >
             {rower.name}
           </h3>
           <p className="heart-rate-card-seat">
             Seat {rower.seat}
           </p>
         </div>
-        <div className="heart-rate-card-status">
-          <StatusIcon className={`heart-rate-card-status-icon ${
-            connectionStatus.status === 'connected' ? 'heart-rate-card-status-icon--connected' :
-            connectionStatus.status === 'connecting' ? 'heart-rate-card-status-icon--connecting' :
-            'heart-rate-card-status-icon--disconnected'
-          }`} />
-          <Battery0Icon className={`heart-rate-card-battery-icon ${batteryStatus.color}`} />
+        <div 
+          className="heart-rate-card-status"
+          id={connectionId}
+          role="status"
+          aria-label={connectionDescription}
+        >
+          <StatusIcon 
+            className={`heart-rate-card-status-icon ${
+              connectionStatus.status === 'connected' ? 'heart-rate-card-status-icon--connected' :
+              connectionStatus.status === 'connecting' ? 'heart-rate-card-status-icon--connecting' :
+              'heart-rate-card-status-icon--disconnected'
+            }`}
+            aria-hidden="true"
+          />
+          <Battery0Icon 
+            className={`heart-rate-card-battery-icon ${batteryStatus.color}`}
+            aria-hidden="true"
+          />
+          <span className="sr-only">{connectionDescription}</span>
         </div>
       </header>
 
       {/* Heart Rate Display */}
       <div className="heart-rate-display">
-        <div className="heart-rate-value-container">
-          <HeartIcon className="heart-rate-icon" />
+        <div 
+          className="heart-rate-value-container"
+          id={heartRateId}
+          role="status"
+          aria-label={heartRateDescription}
+        >
+          <HeartIcon 
+            className="heart-rate-icon"
+            aria-hidden="true"
+          />
           <div 
             className="heart-rate-value"
             style={{ color: zoneColor }}
@@ -71,13 +122,18 @@ export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
             {heartRate || '--'}
           </div>
           <div className="heart-rate-unit">BPM</div>
+          <span className="sr-only">{heartRateDescription}</span>
         </div>
         
         <div 
           className="heart-rate-zone-badge"
+          id={zoneId}
+          role="status"
+          aria-label={zoneDescription}
           style={{ backgroundColor: zoneColor }}
         >
           {zone}
+          <span className="sr-only">{zoneDescription}</span>
         </div>
       </div>
 
@@ -94,15 +150,46 @@ export const HeartRateCard = ({ rower }: HeartRateCardProps) => {
             max={zones.anaerobic.max - zones.recovery.min}
             value={heartRate - zones.recovery.min}
             style={{ '--zone-color': zoneColor } as React.CSSProperties}
-            aria-label={`Heart rate progress: ${heartRate} BPM`}
+            aria-label={`Heart rate progress: ${heartRate} BPM in ${zone} zone`}
           >
             {heartRate} BPM
           </progress>
         </div>
       )}
 
+      {/* Battery Status */}
+      <div 
+        className="heart-rate-battery-status"
+        id={batteryId}
+        role="status"
+        aria-label={batteryStatus.level !== null 
+          ? `${rower.name} heart rate monitor battery: ${batteryStatus.level}%`
+          : `${rower.name} heart rate monitor battery: Unknown`
+        }
+      >
+        <Battery0Icon 
+          className={`heart-rate-battery-icon ${batteryStatus.color}`}
+          aria-hidden="true"
+        />
+        <span className="heart-rate-battery-level">
+          {batteryStatus.level !== null ? `${batteryStatus.level}%` : '--'}
+        </span>
+        <span className="sr-only">
+          {batteryStatus.level !== null 
+            ? `Battery level: ${batteryStatus.level}%`
+            : 'Battery level: Unknown'
+          }
+        </span>
+      </div>
+
       {/* Last Update */}
-      <div className="heart-rate-last-update">
+      <div 
+        className="heart-rate-last-update"
+        aria-label={lastUpdate 
+          ? `Last heart rate update: ${lastUpdate.toLocaleTimeString()}`
+          : 'No heart rate data received'
+        }
+      >
         {lastUpdate 
           ? `Updated ${lastUpdate.toLocaleTimeString()}`
           : 'No data received'

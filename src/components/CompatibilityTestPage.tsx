@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { CompatibilityTest } from './CompatibilityTest';
+import { AccessibilityTest } from './AccessibilityTest';
 import { getCompatibilityStatus, type CompatibilityReport } from '../utils/browserCompatibility';
 import { 
   DevicePhoneMobileIcon, 
@@ -76,6 +77,12 @@ export const CompatibilityTestPage = () => {
           onTestComplete={handleTestComplete}
           showDetailedReport={true}
         />
+      </section>
+
+      {/* Accessibility Test */}
+      <section className="compatibility-accessibility-test">
+        <h2 className="compatibility-section-title">Accessibility Test</h2>
+        <AccessibilityTest />
       </section>
 
       {/* Test Results Summary */}

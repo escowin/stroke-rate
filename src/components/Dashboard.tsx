@@ -19,6 +19,7 @@ import {
   ChartPieIcon,
   EyeIcon,
 } from '@heroicons/react/24/outline';
+import { SessionAccessibility, AccessibilityAnnouncer, generateId } from '../utils/accessibility';
 
 
 export const Dashboard = () => {
@@ -40,6 +41,12 @@ export const Dashboard = () => {
   const [showRestorationNotification, setShowRestorationNotification] = useState(false);
 
   const unhealthyDevices = getUnhealthyDevices();
+  
+  // Generate unique IDs for accessibility
+  const dashboardId = generateId('dashboard');
+  const sessionControlsId = generateId('session-controls');
+  const rowersSectionId = generateId('rowers-section');
+  const announcer = AccessibilityAnnouncer.getInstance();
 
   // Show restoration notification when session was actually restored
   useEffect(() => {
@@ -53,6 +60,7 @@ export const Dashboard = () => {
   const handleStartSession = () => {
     if (rowers.length === 0) {
       setUIState({ currentView: 'setup' });
+      announcer.announce('No rowers configured. Please add rowers in setup.');
       return;
     }
 
@@ -68,34 +76,59 @@ export const Dashboard = () => {
     };
 
     startSession(session);
+    announcer.announceSessionStatus(true);
   };
 
   const handleEndSession = () => {
     endSession();
+    announcer.announceSessionStatus(false);
   };
 
   const connectedRowers = rowers.filter(rower => rower.deviceId && rower.currentHeartRate);
 
   return (
-    <>
+    <main 
+      id={dashboardId}
+      role="main"
+      aria-labelledby="dashboard-title"
+    >
       {/* Development Toggle */}
       <DevToggle />
 
       {/* Session Controls */}
-      <section className="session-controls">
+      <section 
+        className="session-controls"
+        id={sessionControlsId}
+        aria-labelledby="session-title"
+        aria-describedby="session-status"
+      >
         {/* Session Restoration Notification */}
         {showRestorationNotification && (
-          <div className="session-restoration-notification">
-            <CheckCircleIcon className="restoration-icon" />
+          <div 
+            className="session-restoration-notification"
+            role="status"
+            aria-live="polite"
+          >
+            <CheckCircleIcon 
+              className="restoration-icon"
+              aria-hidden="true"
+            />
             <span>Session restored from previous session</span>
           </div>
         )}
         
         <article className="session-info">
-          <h2 className="session-title">
+          <h2 
+            className="session-title"
+            id="session-title"
+          >
             Training Session
           </h2>
-          <p className="session-subtitle">
+          <p 
+            className="session-subtitle"
+            id="session-status"
+            aria-live="polite"
+          >
             {isSessionActive
               ? `Started ${currentSession?.startTime.toLocaleTimeString()}`
               : currentSession && !isSessionActive
@@ -105,9 +138,17 @@ export const Dashboard = () => {
           </p>
 
           {isSessionActive && (
-            <div className="session-status">
+            <div 
+              className="session-status"
+              role="status"
+              aria-live="polite"
+              aria-label={SessionAccessibility.getRowerCountDescription(rowers.length, connectedRowers.length)}
+            >
               <p className="status-indicator">
-                <CheckCircleIcon className="status-icon" />
+                <CheckCircleIcon 
+                  className="status-icon"
+                  aria-hidden="true"
+                />
                 <span className="status-text status-text--success">
                   {connectedRowers.length} rower(s) active
                 </span>
@@ -119,7 +160,10 @@ export const Dashboard = () => {
               </p>
               {unhealthyDevices.length > 0 && (
                 <p className="status-indicator">
-                  <ExclamationTriangleIcon className="status-icon" />
+                  <ExclamationTriangleIcon 
+                    className="status-icon"
+                    aria-hidden="true"
+                  />
                   <span className="status-text status-text--error">
                     {unhealthyDevices.length} connection(s) unhealthy
                   </span>
@@ -135,16 +179,24 @@ export const Dashboard = () => {
               onClick={handleStartSession}
               disabled={connectionStatus.connectedDevices.length === 0}
               className="btn btn-primary"
+              aria-describedby={connectionStatus.connectedDevices.length === 0 ? "no-devices-warning" : undefined}
             >
-              <PlayIcon className="btn-icon" />
+              <PlayIcon 
+                className="btn-icon"
+                aria-hidden="true"
+              />
               Start Session
             </button>
           ) : (
             <button
               onClick={handleEndSession}
               className="btn btn-danger"
+              aria-label="End current training session"
             >
-              <StopIcon className="btn-icon" />
+              <StopIcon 
+                className="btn-icon"
+                aria-hidden="true"
+              />
               End Session
             </button>
           )}
@@ -152,10 +204,24 @@ export const Dashboard = () => {
           <button
             onClick={() => setUIState({ currentView: 'setup' })}
             className="btn btn-secondary"
+            aria-label="Add new rower to session"
           >
-            <PlusIcon className="btn-icon" />
+            <PlusIcon 
+              className="btn-icon"
+              aria-hidden="true"
+            />
             Add Rower
           </button>
+
+          {connectionStatus.connectedDevices.length === 0 && (
+            <p 
+              id="no-devices-warning"
+              className="session-warning"
+              role="alert"
+            >
+              No heart rate devices connected. Please connect devices before starting a session.
+            </p>
+          )}
 
           {currentSession && (
             <button
@@ -193,33 +259,62 @@ export const Dashboard = () => {
           ) : (
             <>
               {/* Rower Status Overview */}
-              <section className="rower-overview">
-                <h3 className="rower-overview-title">Rower Status</h3>
-                <article className="rower-grid">
+              <section 
+                className="rower-overview"
+                id={rowersSectionId}
+                aria-labelledby="rower-overview-title"
+              >
+                <h3 
+                  className="rower-overview-title"
+                  id="rower-overview-title"
+                >
+                  Rower Status
+                </h3>
+                <article 
+                  className="rower-grid"
+                  role="grid"
+                  aria-label="Rower status grid showing all 4 seats"
+                >
                   {[1, 2, 3, 4].map(seat => {
                     const rower = rowers.find(r => r.seat === seat);
                     const isConnected = rower && rower.deviceId && rower.currentHeartRate;
                     const hasDevice = rower && rower.deviceId;
+                    const seatId = generateId(`rower-seat-${seat}`);
 
                     return (
                       <div
                         key={seat}
+                        id={seatId}
                         className={`rower-seat ${isConnected
                           ? 'rower-seat--connected'
                           : hasDevice
                             ? 'rower-seat--device-only'
                             : 'rower-seat--empty'
                           }`}
+                        role="gridcell"
+                        aria-labelledby={`${seatId}-name ${seatId}-status`}
                       >
-                          <span className={`rower-status-indicator ${isConnected ? 'rower-status-indicator--connected' : hasDevice ? 'rower-status-indicator--device-only' : 'rower-status-indicator--empty'
-                            }`} />
-                          <p className="rower-seat-number">
+                          <span 
+                            className={`rower-status-indicator ${isConnected ? 'rower-status-indicator--connected' : hasDevice ? 'rower-status-indicator--device-only' : 'rower-status-indicator--empty'
+                              }`}
+                            aria-hidden="true"
+                          />
+                          <p 
+                            className="rower-seat-number"
+                            id={`${seatId}-number`}
+                          >
                             Seat {seat}
                           </p>
-                          <p className="rower-name">
+                          <p 
+                            className="rower-name"
+                            id={`${seatId}-name`}
+                          >
                             {rower ? rower.name : 'Empty'}
                           </p>
-                          <p className="rower-status">
+                          <p 
+                            className="rower-status"
+                            id={`${seatId}-status`}
+                          >
                             {isConnected ? 'Active' : hasDevice ? 'Connected' : 'No Device'}
                           </p>
                       </div>
@@ -230,7 +325,16 @@ export const Dashboard = () => {
 
               {/* Heart Rate Cards */}
               {connectedRowers.length > 0 && (
-                <section className="heart-rate-grid">
+                <section 
+                  className="heart-rate-grid"
+                  aria-labelledby="heart-rate-cards-title"
+                >
+                  <h3 
+                    id="heart-rate-cards-title"
+                    className="sr-only"
+                  >
+                    Active Heart Rate Monitors
+                  </h3>
                   {connectedRowers.map((rower) => (
                     <HeartRateCard
                       key={rower.id}
@@ -254,9 +358,19 @@ export const Dashboard = () => {
           )}
         </>
       ) : (
-        <section className="card-base empty-state">
-          <ChartBarIcon className="empty-state-icon" />
-          <h3 className="empty-state-title">
+        <section 
+          className="card-base empty-state"
+          role="status"
+          aria-labelledby="empty-state-title"
+        >
+          <ChartBarIcon 
+            className="empty-state-icon"
+            aria-hidden="true"
+          />
+          <h3 
+            className="empty-state-title"
+            id="empty-state-title"
+          >
             No heart rate data
           </h3>
           <p className="empty-state-description">
@@ -266,8 +380,12 @@ export const Dashboard = () => {
             <button
               onClick={() => setUIState({ currentView: 'setup' })}
               className="btn btn-primary"
+              aria-label="Go to device setup to connect heart rate monitors"
             >
-              <PlusIcon className="btn-icon" />
+              <PlusIcon 
+                className="btn-icon"
+                aria-hidden="true"
+              />
               Setup Devices
             </button>
           </div>
@@ -275,14 +393,31 @@ export const Dashboard = () => {
       )}
 
       {/* Heart Rate Zones Legend */}
-      <section className="card-base heart-rate-zones">
-        <h3 className="heart-rate-zones-title">
+      <section 
+        className="card-base heart-rate-zones"
+        aria-labelledby="heart-rate-zones-title"
+      >
+        <h3 
+          className="heart-rate-zones-title"
+          id="heart-rate-zones-title"
+        >
           Heart Rate Zones
         </h3>
-        <article className="heart-rate-zones-grid">
+        <article 
+          className="heart-rate-zones-grid"
+          role="list"
+          aria-label="Heart rate zone definitions"
+        >
           {Object.entries(zones).map(([key, zone]) => (
-            <div key={key} className="heart-rate-zone-item">
-              <span className={`heart-rate-zone-color ${zone.name.toLowerCase()}`}/>
+            <div 
+              key={key} 
+              className="heart-rate-zone-item"
+              role="listitem"
+            >
+              <span 
+                className={`heart-rate-zone-color ${zone.name.toLowerCase()}`}
+                aria-hidden="true"
+              />
               <p className="heart-rate-zone-name">{zone.name}</p>
               <p className="heart-rate-zone-range">{zone.min}-{zone.max} BPM</p>
             </div>
@@ -290,6 +425,6 @@ export const Dashboard = () => {
         </article>
       </section>
 
-    </>
+    </main>
   );
 };
