@@ -8,12 +8,15 @@ import {
   HeartIcon,
   ChartBarIcon,
   ArrowDownTrayIcon,
-  CpuChipIcon
+  CpuChipIcon,
+  QuestionMarkCircleIcon
 } from '@heroicons/react/24/outline';
+import { HelpSystem } from './HelpSystem';
 
 export const Header = () => {
   const { uiState, connectionStatus, setUIState } = useAppStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const connectedDevices = connectionStatus.connectedDevices.length;
   const isConnected = connectedDevices > 0;
@@ -63,6 +66,15 @@ export const Header = () => {
                 </>
               )}
             </div>
+
+            {/* Help Button */}
+            <button
+              onClick={() => setIsHelpOpen(true)}
+              className="header-help-button"
+              aria-label="Open help system"
+            >
+              <QuestionMarkCircleIcon className="header-help-icon" />
+            </button>
 
             {/* Mobile Menu Button */}
             <button
@@ -118,6 +130,12 @@ export const Header = () => {
               );
             })}
         </nav>
+
+        {/* Help System */}
+        <HelpSystem 
+          isOpen={isHelpOpen} 
+          onClose={() => setIsHelpOpen(false)} 
+        />
     </header>
   );
 };
